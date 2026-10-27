@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <!-- © Mamat Aan S · SMAN 1 Majalengka — Simulasi Vektor. Dilarang menyebarluaskan tanpa izin. -->
+    <meta name="author" content="Mamat Aan S - SMAN 1 Majalengka">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lab Maya Vektor</title>
@@ -139,6 +141,42 @@
         .qz-score { font-size:12px; font-weight:700; opacity:.8; text-align:center; margin-bottom:8px; }
         #qzNext.pulse { animation: qzpulse 1.2s infinite; }
         @keyframes qzpulse { 0%,100% { box-shadow:0 0 0 0 rgba(102,126,234,.6); } 50% { box-shadow:0 0 0 8px rgba(102,126,234,0); } }
+
+        .jm-switch { display:flex; gap:8px; margin-bottom:12px; }
+        .jm-pill { flex:1; background:#fff; color:#555; border:2px solid #ddd; border-radius:10px; padding:10px 8px; font-size:13px; font-weight:700; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.06); }
+        .jm-pill.active { background:linear-gradient(135deg,#667eea,#764ba2); border-color:#667eea; color:#fff; }
+        body.dark-mode .jm-pill:not(.active) { background:#2d2d2d; border-color:#444; color:#ccc; }
+        .vf-inputs { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; padding:10px; background:#fff8f0; border:2px solid #ffd700; border-radius:8px; }
+        body.dark-mode .vf-inputs { background:#232323; border-color:#d4af37; }
+        .vf-field { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:700; color:#e65100; }
+        body.dark-mode .vf-field { color:#ffa500; }
+        .vf-field input { width:100%; padding:7px 8px; border:2px solid #ddd; border-radius:6px; font-size:15px; font-weight:700; color:#d84315; background:#fff; }
+        body.dark-mode .vf-field input { background:#1a1a1a; border-color:#444; color:#ffa500; }
+        .vf-field input:focus { outline:none; border-color:#667eea; }
+        #canvasFormula { width:100%; height:300px; border:2px solid #ddd; border-radius:8px; background:#fafafa; display:block; touch-action:none; margin-bottom:12px; }
+        body.dark-mode #canvasFormula { background:#161616; border-color:#444; }
+        .vf-formula { margin-top:8px; padding:8px 10px; background:#fff; border:1px dashed #667eea; border-radius:6px; font-family:'Courier New',monospace; font-size:13px; line-height:1.55; white-space:pre-wrap; color:#1a237e; overflow-x:auto; }
+        body.dark-mode .vf-formula { background:#1a1a1a; color:#cbd5e0; }
+        #vfPrev { flex:0 0 96px; }
+
+        .jm-pill { font-size:12px; padding:9px 4px; line-height:1.25; }
+        .vu-box { margin-bottom:12px; padding:10px; background:#fff8f0; border:2px solid #ffd700; border-radius:8px; }
+        body.dark-mode .vu-box { background:#232323; border-color:#d4af37; }
+        .vu-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+        .vu-dot { width:10px; height:10px; border-radius:50%; flex:0 0 10px; }
+        .vu-name { flex:0 0 26px; font-size:14px; }
+        .vu-row label { flex:1; display:flex; flex-direction:column; gap:2px; font-size:11px; font-weight:700; color:#e65100; min-width:0; }
+        body.dark-mode .vu-row label { color:#ffa500; }
+        .vu-row input { width:100%; padding:6px 7px; border:2px solid #ddd; border-radius:6px; font-size:14px; font-weight:700; color:#d84315; background:#fff; }
+        body.dark-mode .vu-row input { background:#1a1a1a; border-color:#444; color:#ffa500; }
+        .vu-row input:focus { outline:none; border-color:#667eea; }
+        .vu-btns { display:flex; gap:8px; }
+        .vu-btn { flex:1; background:#fff; color:#555; border:2px solid #ddd; border-radius:8px; padding:8px 6px; font-size:12px; font-weight:700; cursor:pointer; }
+        .vu-btn:disabled { opacity:.4; cursor:not-allowed; }
+        body.dark-mode .vu-btn { background:#2d2d2d; border-color:#444; color:#ddd; }
+        #canvasUraian { width:100%; height:300px; border:2px solid #ddd; border-radius:8px; background:#fafafa; display:block; touch-action:none; margin-bottom:12px; }
+        body.dark-mode #canvasUraian { background:#161616; border-color:#444; }
+        #vuPrev { flex:0 0 96px; }
 
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
@@ -733,6 +771,8 @@
             #canvas { height: 560px; }
             #canvasAdd { height: 560px; }
             #canvasTerapan { height: 400px; }
+            #canvasFormula { height: 400px; }
+            #canvasUraian { height: 400px; }
             #canvasKuis { height: 640px; }
             .qz-pill { flex: 1 1 calc(25% - 6px); }
             header { padding: 12px 22px; }
@@ -768,12 +808,24 @@
             #tabTerapan canvas { grid-column: 1; grid-row: 2 / span 7; }
             #tabKuis .va-section { grid-template-rows: auto repeat(5, auto) 1fr; }
             #tabKuis canvas { grid-column: 1; grid-row: 2 / span 6; }
-            #canvas { height: clamp(480px, calc(100vh - 170px), 820px); }
-            #canvasAdd { height: clamp(480px, calc(100vh - 170px), 820px); }
-            #canvasTerapan { height: clamp(440px, calc(100vh - 190px), 720px); margin-bottom: 0; }
-            #canvasKuis { height: clamp(560px, calc(100vh - 190px), 820px); margin-bottom: 0; }
+            /* the drawing always fits the window: header + title + paddings are about 185px */
+            #canvas { height: clamp(300px, calc(100vh - 185px), 820px); }
+            #canvasAdd { height: clamp(380px, calc(100vh - 185px), 820px); }
+            #canvasTerapan { height: clamp(280px, calc(100vh - 185px), 720px); margin-bottom: 0; }
+            #canvasKuis { height: clamp(320px, calc(100vh - 185px), 820px); margin-bottom: 0; }
             .qz-pill { flex: 1 1 calc(50% - 6px); }
+            #canvasFormula { height: clamp(280px, calc(100vh - 235px), 720px); margin-bottom: 0; }
+            #canvasUraian { height: clamp(280px, calc(100vh - 235px), 720px); margin-bottom: 0; }
+            #tabJumlah .va-section.vf-section { grid-template-rows: auto repeat(4, auto) 1fr; }
+            #tabJumlah .va-section.vf-section > canvas { grid-column: 1; grid-row: 2 / span 5; }
+            .jm-switch { max-width: 520px; }
         }
+        /* ===== Perlindungan ringan & atribusi ===== */
+        html, body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+        input, textarea { -webkit-user-select: text; user-select: text; }
+        img, canvas { -webkit-user-drag: none; }
+        .app-credit { text-align: center; font-size: 12px; opacity: .7; padding: 14px 10px 22px; }
+        @media print { body > * { display: none !important; } body::before { content: 'Halaman ini tidak dapat dicetak.'; display: block; padding: 20px; } }
     </style>
 </head>
 <body>
@@ -835,7 +887,13 @@
     <div class="tab-panel" id="tabJumlah">
     <div class="va-wrap">
 
-        <div class="va-section">
+        <div class="jm-switch" id="jmSwitch">
+            <button type="button" class="jm-pill active" data-view="grafis">📈 Grafis</button>
+            <button type="button" class="jm-pill" data-view="rumus">🧮 Aturan cos &amp; sin</button>
+            <button type="button" class="jm-pill" data-view="uraian">📐 Uraian x–y</button>
+        </div>
+
+        <div class="va-section" id="vaGrafis">
             <h2>Simulasi Penjumlahan Vektor</h2>
 
             <div class="va-hint">Ketuk 2 atau 3 vektor sesuai urutan penjumlahan yang diinginkan:</div>
@@ -864,6 +922,52 @@
                         <button class="va-btn va-btn-ghost va-btn-voice" id="voiceBtn" title="Suara penjelasan" aria-pressed="false">🔇</button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="va-section vf-section" id="vfSection" style="display:none">
+            <h2>Jumlah Dua Vektor: Aturan Cosinus &amp; Sinus</h2>
+            <div class="vf-inputs">
+                <label class="vf-field"><span>Vektor A</span><input id="vfA" type="number" min="0.1" max="50" step="0.1" value="8" inputmode="decimal"></label>
+                <label class="vf-field"><span>Vektor B</span><input id="vfB" type="number" min="0.1" max="50" step="0.1" value="6" inputmode="decimal"></label>
+                <label class="vf-field"><span>Sudut α (°)</span><input id="vfAlpha" type="number" min="0" max="180" step="1" value="60" inputmode="decimal"></label>
+            </div>
+            <canvas id="canvasFormula"></canvas>
+            <div class="tp-card">
+                <div class="tp-badge" id="vfBadge"></div>
+                <div class="tp-title" id="vfTitle"></div>
+                <div class="tp-body" id="vfBody"></div>
+                <pre class="vf-formula" id="vfFormula"></pre>
+            </div>
+            <div class="tp-dots" id="vfDots"></div>
+            <div class="va-actions">
+                <button class="va-btn va-btn-ghost" id="vfPrev">‹ Kembali</button>
+                <button class="va-btn va-btn-primary" id="vfNext">Berikutnya ›</button>
+                <button class="va-btn va-btn-ghost va-btn-voice on" id="vfVoice" title="Suara penjelasan">🔊</button>
+            </div>
+        </div>
+
+        <div class="va-section vf-section" id="vuSection" style="display:none">
+            <h2>Jumlah Banyak Vektor: Metode Uraian</h2>
+            <div class="vu-box">
+                <div id="vuList"></div>
+                <div class="vu-btns">
+                    <button type="button" class="vu-btn" id="vuAdd">＋ Tambah vektor</button>
+                    <button type="button" class="vu-btn" id="vuDel">－ Hapus vektor</button>
+                </div>
+            </div>
+            <canvas id="canvasUraian"></canvas>
+            <div class="tp-card">
+                <div class="tp-badge" id="vuBadge"></div>
+                <div class="tp-title" id="vuTitle"></div>
+                <div class="tp-body" id="vuBody"></div>
+                <pre class="vf-formula" id="vuFormula"></pre>
+            </div>
+            <div class="tp-dots" id="vuDots"></div>
+            <div class="va-actions">
+                <button class="va-btn va-btn-ghost" id="vuPrev">‹ Kembali</button>
+                <button class="va-btn va-btn-primary" id="vuNext">Berikutnya ›</button>
+                <button class="va-btn va-btn-ghost va-btn-voice on" id="vuVoice" title="Suara penjelasan">🔊</button>
             </div>
         </div>
 
@@ -920,6 +1024,8 @@
         </div>
     </div>
     </div>
+
+    <footer class="app-credit">© Mamat Aan S · SMAN 1 Majalengka</footer>
 
     <script>
     window.ComponentVectorApp = (function() {
@@ -2528,7 +2634,7 @@
             const dpr = window.devicePixelRatio || 1;
             const rw = rect.width || 300, rh = rect.height || 300;
             // everything is drawn for a ~330x300 design size and scaled up on tablets / desktops
-            const sc = Math.max(0.85, Math.min(2.2, Math.min(rw / 330, rh / 300)));
+            const sc = Math.max(0.5, Math.min(2.2, Math.min(rw / 330, rh / 300)));
             W = rw / sc; H = rh / sc;
             canvas.width = rw * dpr; canvas.height = rh * dpr;
             ctx.setTransform(dpr * sc, 0, 0, dpr * sc, 0, 0);
@@ -2619,7 +2725,7 @@
 
         const PI = Math.PI;
         const COL = { w: '#1a237e', N: '#37474f', F: '#e53935', f: '#ef6c00', T: '#00897b', x: '#757575' };
-        const TRAY_H = 156;
+        let TRAY_H = 156, COLS = 2;   // wide canvases use 3 columns of chips, so the tray is shorter
         let isDark = false, W = 330, H = 480, SH = H - TRAY_H;
         let cur = 0, G = null, SC = 1;
         let drag = null, marker = null, raf = 0;
@@ -2841,9 +2947,10 @@
                 return keys.length === 0 || keys.some(b => !st.placed[f.id + ':' + b]);
             });
         }
+        function chipW() { return (W - 24 - 6 * (COLS - 1)) / COLS; }
         function chipRect(i) {
-            const cw = (W - 30) / 2;
-            return { x: 12 + (i % 2) * (cw + 6), y: SH + 32 + Math.floor(i / 2) * 40, w: cw, h: 34 };
+            const cw = chipW();
+            return { x: 12 + (i % COLS) * (cw + 6), y: SH + 32 + Math.floor(i / COLS) * 40, w: cw, h: 34 };
         }
         function drawChip(f, r, lifted) {
             ctx.save();
@@ -2915,7 +3022,7 @@
             const vf = visibleForces();
             vf.forEach((f, i) => { if (!(drag && drag.force === f)) drawChip(f, chipRect(i), false); });
             if (drag) {
-                const cw = (W - 30) / 2;
+                const cw = chipW();
                 drawChip(drag.force, { x: drag.x - cw / 2, y: drag.y - LIFT - 17, w: cw, h: 34 }, true);
             }
             // ✓ / ✗ marker
@@ -3083,8 +3190,10 @@
         function resizeCanvas() {
             const r = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
             const rw = r.width || 330, rh = r.height || 480;
-            SC = Math.max(0.85, Math.min(2.2, Math.min(rw / 330, rh / 480)));
-            W = rw / SC; H = rh / SC; SH = H - TRAY_H;
+            SC = Math.max(0.5, Math.min(2.2, Math.min(rw / 330, rh / 480)));
+            W = rw / SC; H = rh / SC;
+            COLS = W >= 470 ? 3 : 2; TRAY_H = COLS === 3 ? 124 : 156;
+            SH = H - TRAY_H;
             canvas.width = rw * dpr; canvas.height = rh * dpr;
             ctx.setTransform(dpr * SC, 0, 0, dpr * SC, 0, 0);
             G = SCENES[cur].layout(W, SH);
@@ -3104,6 +3213,499 @@
     </script>
 
     <script>
+    window.FormulaVectorApp = (function() {
+        const canvas = document.getElementById('canvasFormula');
+        const ctx = canvas.getContext('2d');
+        const inA = document.getElementById('vfA'), inB = document.getElementById('vfB'), inAl = document.getElementById('vfAlpha');
+        const badgeEl = document.getElementById('vfBadge'), titleEl = document.getElementById('vfTitle');
+        const bodyEl = document.getElementById('vfBody'), formulaEl = document.getElementById('vfFormula');
+        const dotsEl = document.getElementById('vfDots');
+        const prevBtn = document.getElementById('vfPrev'), nextBtn = document.getElementById('vfNext'), voiceBtn = document.getElementById('vfVoice');
+
+        const PI = Math.PI, TOTAL = 5;
+        const COL = { A: '#2d6cdf', B: '#2ea043', R: '#e53935', th: '#ef6c00', al: '#9c27b0', gray: '#757575' };
+        let isDark = false, W = 330, H = 300;
+        let step = 0, animT = 1, animRaf = 0;
+
+        const fmt = n => (Math.round(n * 100) / 100).toString().replace('.', ',');
+        const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+        const fg = () => isDark ? '#e0e0e0' : '#222';
+        const bg = () => isDark ? '#161616' : '#fafafa';
+        const sub = (p, a, b) => Math.max(0, Math.min(1, (p - a) / (b - a)));
+
+        function read() {
+            const a = clamp(parseFloat(String(inA.value).replace(',', '.')) || 0.1, 0.1, 50);
+            const b = clamp(parseFloat(String(inB.value).replace(',', '.')) || 0.1, 0.1, 50);
+            const al = clamp(isNaN(parseFloat(inAl.value)) ? 0 : parseFloat(String(inAl.value).replace(',', '.')), 0, 180);
+            return { a, b, al };
+        }
+        function calc() {
+            const { a, b, al } = read(), rad = al * PI / 180;
+            const R2 = a * a + b * b + 2 * a * b * Math.cos(rad);
+            const R = Math.sqrt(Math.max(0, R2));
+            const sinth = R > 1e-9 ? b * Math.sin(rad) / R : 0;
+            const base = a + b * Math.cos(rad);
+            const th = R > 1e-9 ? Math.atan2(b * Math.sin(rad), base) * 180 / PI : 0;
+            return { a, b, al, rad, R2, R, sinth, th, th2: al - th, obtuse: base < 0 && R > 1e-9, zero: R < 1e-6 };
+        }
+
+        // ===== Voice =====
+        const tts = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+        let voiceOn = true, idVoice = null;
+        function pickVoice() { if (tts) idVoice = speechSynthesis.getVoices().find(v => /^id([-_]|$)/i.test(v.lang)) || null; }
+        if (tts) { pickVoice(); if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', pickVoice); }
+        function speak(t) {
+            if (!tts || !voiceOn) return;
+            speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(t); u.lang = 'id-ID'; if (idVoice) u.voice = idVoice; u.rate = 0.95;
+            speechSynthesis.speak(u);
+        }
+        if (!tts) voiceBtn.style.display = 'none';
+        voiceBtn.addEventListener('click', () => {
+            voiceOn = !voiceOn; voiceBtn.classList.toggle('on', voiceOn); voiceBtn.textContent = voiceOn ? '🔊' : '🔇';
+            if (voiceOn) speak(content(step).speech); else if (tts) speechSynthesis.cancel();
+        });
+
+        // ===== Step texts =====
+        function content(i) {
+            const c = calc();
+            const { a, b, al } = c;
+            const cosv = Math.cos(c.rad);
+            const out = [
+                { title: 'Gambar kedua vektor',
+                  body: `Gambar vektor A = ${fmt(a)} dan B = ${fmt(b)} dengan pangkal berimpit di titik asal. Sudut di antara keduanya adalah α = ${fmt(al)}°.`,
+                  formula: '',
+                  speech: `Langkah 1. Gambar vektor A sebesar ${fmt(a)} dan vektor B sebesar ${fmt(b)} dengan pangkal berimpit. Sudut di antara keduanya adalah alfa sama dengan ${fmt(al)} derajat.` },
+                { title: 'Bentuk jajaran genjang',
+                  body: 'Lengkapi jajaran genjang dengan garis putus-putus. Pada segitiga yang terbentuk, sudut di depan resultan R adalah 180° − α.',
+                  formula: `180° − α = 180° − ${fmt(al)}° = ${fmt(180 - al)}°`,
+                  speech: `Langkah 2. Lengkapi jajaran genjang dengan garis putus-putus. Pada segitiga yang terbentuk, sudut di depan resultan R adalah 180 derajat dikurangi alfa, yaitu ${fmt(180 - al)} derajat.` },
+                { title: 'Aturan cosinus: cari besar R',
+                  body: 'Gambar diagonalnya sebagai resultan R, lalu hitung panjangnya dengan aturan cosinus.',
+                  formula: `R² = A² + B² + 2·A·B·cos α\nR² = ${fmt(a)}² + ${fmt(b)}² + 2·${fmt(a)}·${fmt(b)}·cos ${fmt(al)}°\nR² = ${fmt(a * a)} + ${fmt(b * b)} + ${fmt(2 * a * b * cosv)}\nR² = ${fmt(c.R2)}\nR = ${fmt(c.R)}`,
+                  speech: `Langkah 3. Hitung besar resultan dengan aturan cosinus. R kuadrat sama dengan A kuadrat ditambah B kuadrat ditambah dua A B kosinus alfa. Hasilnya R kuadrat sama dengan ${fmt(c.R2)}, sehingga R sama dengan ${fmt(c.R)}.` },
+                c.zero
+                  ? { title: 'Aturan sinus: cari arah R',
+                      body: 'Kedua vektor sama besar dan berlawanan arah, sehingga resultannya nol dan tidak memiliki arah.',
+                      formula: 'R = 0',
+                      speech: 'Langkah 4. Kedua vektor sama besar dan berlawanan arah, sehingga resultannya nol dan tidak memiliki arah.' }
+                  : { title: 'Aturan sinus: cari arah R',
+                      body: `Pada segitiga, sudut θ antara R dan A berhadapan dengan sisi B. Gunakan aturan sinus.${c.obtuse ? ' Karena A + B cos α bernilai negatif, θ adalah sudut tumpul: θ = 180° − arcsin.' : ''}`,
+                      formula: `R / sin(180° − α) = B / sin θ\nsin θ = B · sin α / R\nsin θ = ${fmt(b)} · sin ${fmt(al)}° / ${fmt(c.R)}\nsin θ = ${fmt(c.sinth)}\nθ = ${c.obtuse ? '180° − arcsin(' + fmt(c.sinth) + ') = ' : ''}${fmt(c.th)}°`,
+                      speech: `Langkah 4. Cari arah resultan dengan aturan sinus. R dibagi sinus 180 derajat dikurangi alfa sama dengan B dibagi sinus teta. Maka sinus teta sama dengan ${fmt(c.sinth)}, sehingga teta sama dengan ${fmt(c.th)} derajat terhadap vektor A.` },
+                { title: 'Hasil akhir',
+                  body: c.zero ? 'Resultan kedua vektor bernilai nol.' : `Resultan R = ${fmt(c.R)} satuan, membentuk sudut θ = ${fmt(c.th)}° terhadap vektor A dan ${fmt(c.th2)}° terhadap vektor B.`,
+                  formula: c.zero ? 'R = 0' : `R = ${fmt(c.R)} satuan\nθ (terhadap A) = ${fmt(c.th)}°\nθ₂ = α − θ = ${fmt(al)}° − ${fmt(c.th)}° = ${fmt(c.th2)}° (terhadap B)`,
+                  speech: c.zero ? 'Langkah 5. Resultan kedua vektor bernilai nol.' : `Langkah 5. Hasil akhirnya, resultan R sama dengan ${fmt(c.R)} satuan, membentuk sudut ${fmt(c.th)} derajat terhadap vektor A, dan ${fmt(c.th2)} derajat terhadap vektor B.` }
+            ];
+            return out[i];
+        }
+
+        // ===== Drawing =====
+        function prog(i) { return i < step ? 1 : (i === step ? animT : 0); }
+        function line(a, b, color, lw, dash, p) {
+            if (p === undefined) p = 1; if (p <= 0.005) return;
+            ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = lw; if (dash) ctx.setLineDash(dash);
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(a.x + (b.x - a.x) * p, a.y + (b.y - a.y) * p); ctx.stroke(); ctx.restore();
+        }
+        function arrow(a, b, color, lw, p) {
+            if (p <= 0.005) return;
+            const pl = Math.min(1, p / 0.88), t = { x: a.x + (b.x - a.x) * pl, y: a.y + (b.y - a.y) * pl };
+            ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw;
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(t.x, t.y); ctx.stroke();
+            if (p < 0.88) { ctx.beginPath(); ctx.arc(t.x, t.y, lw * 0.9 + 1, 0, 2 * PI); ctx.fill(); }
+            const hp = sub(p, 0.88, 1);
+            if (hp > 0 && Math.hypot(b.x - a.x, b.y - a.y) > 6) {
+                const ang = Math.atan2(b.y - a.y, b.x - a.x), hl = (9 + lw) * hp;
+                ctx.beginPath(); ctx.moveTo(b.x, b.y);
+                ctx.lineTo(b.x - hl * Math.cos(ang - 0.4), b.y - hl * Math.sin(ang - 0.4));
+                ctx.lineTo(b.x - hl * Math.cos(ang + 0.4), b.y - hl * Math.sin(ang + 0.4));
+                ctx.closePath(); ctx.fill();
+            }
+            ctx.restore();
+        }
+        function text(str, x, y, color, p, align, size) {
+            const al = sub(p, 0.75, 1); if (al <= 0) return;
+            ctx.save(); ctx.globalAlpha = al; ctx.font = `bold ${size || 14}px Arial`;
+            ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
+            ctx.lineWidth = 4; ctx.strokeStyle = bg(); ctx.strokeText(str, x, y); ctx.fillStyle = color; ctx.fillText(str, x, y); ctx.restore();
+        }
+        function arc(c, r, a0, a1, color, p) {
+            if (p <= 0.005) return;
+            ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.arc(c.x, c.y, r, a0, a0 + (a1 - a0) * p); ctx.stroke(); ctx.restore();
+        }
+
+        function draw() {
+            const c = calc();
+            ctx.clearRect(0, 0, W, H); ctx.fillStyle = bg(); ctx.fillRect(0, 0, W, H);
+            ctx.strokeStyle = isDark ? '#242424' : '#eee'; ctx.lineWidth = 1;
+            for (let x = 0; x < W; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+            for (let y = 0; y < H; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+            const bx = c.b * Math.cos(c.rad), by = c.b * Math.sin(c.rad);
+            const pts = [{ x: 0, y: 0 }, { x: c.a, y: 0 }, { x: bx, y: by }, { x: c.a + bx, y: by }];
+            const minX = Math.min(...pts.map(p => p.x)), maxX = Math.max(...pts.map(p => p.x));
+            const minY = Math.min(...pts.map(p => p.y)), maxY = Math.max(...pts.map(p => p.y));
+            const spanX = Math.max(maxX - minX, 1e-6), spanY = Math.max(maxY - minY, 1e-6);
+            const u = Math.min((W - 110) / spanX, (H - 100) / spanY, 80);
+            const ox = (W - spanX * u) / 2 - minX * u, oy = (H + spanY * u) / 2 + minY * u;
+            const P = (x, y) => ({ x: ox + x * u, y: oy - y * u });
+            const O = P(0, 0), Ap = P(c.a, 0), Bp = P(bx, by), Sp = P(c.a + bx, by);
+
+            // step 0: A, B and the angle alpha
+            const p0 = prog(0);
+            arrow(O, Ap, COL.A, 4, sub(p0, 0, 0.6));
+            arrow(O, Bp, COL.B, 4, sub(p0, 0.3, 0.9));
+            text(`A = ${fmt(c.a)}`, (O.x + Ap.x) / 2, O.y + 18, COL.A, sub(p0, 0, 0.6), 'center', 14);
+            text(`B = ${fmt(c.b)}`, (O.x + Bp.x) / 2 - 8, (O.y + Bp.y) / 2 - 12, COL.B, sub(p0, 0.3, 0.9), 'right', 14);
+            const ra = Math.min(34, Math.max(16, Math.hypot(Ap.x - O.x, Ap.y - O.y) * 0.4));
+            arc(O, ra, -c.rad, 0, COL.al, sub(p0, 0.6, 1));
+            if (c.al > 6) text('α', O.x + ra * 0.62 * Math.cos(c.rad / 2) + 2, O.y - ra * 0.62 * Math.sin(c.rad / 2), COL.al, sub(p0, 0.6, 1), 'center', 13);
+
+            // step 1: parallelogram (dashed) and the angle opposite R
+            const p1 = prog(1);
+            line(Bp, Sp, COL.A, 2, [6, 5], sub(p1, 0, 0.6));
+            line(Ap, Sp, COL.B, 2, [6, 5], sub(p1, 0.2, 0.8));
+            if (c.al > 3 && c.al < 177) {
+                const r2 = 22;
+                arc(Ap, r2, -PI, -c.rad, COL.gray, sub(p1, 0.6, 1));
+            }
+
+            // step 2: resultant R
+            const p2 = prog(2);
+            arrow(O, Sp, COL.R, 4.5, p2);
+            const mid = { x: (O.x + Sp.x) / 2, y: (O.y + Sp.y) / 2 };
+            const dx = Sp.x - O.x, dy = Sp.y - O.y, dl = Math.hypot(dx, dy) || 1;
+            text('R', O.x + dx * 0.8 + dy / dl * 13, O.y + dy * 0.8 - dx / dl * 13, COL.R, p2, 'center', 16);
+
+            // step 3: theta (R relative to A);  step 4: theta2 (R relative to B)
+            const p3 = prog(3), p4 = prog(4);
+            if (!c.zero) {
+                const thr = c.th * PI / 180, r3 = ra + 12;
+                arc(O, r3, -thr, 0, COL.th, p3);
+                if (c.th > 6) text('θ', O.x + (r3 + 16) * Math.cos(thr / 2), O.y - (r3 + 16) * Math.sin(thr / 2), COL.th, p3, 'center', 14);
+                if (c.th2 > 0.5) {
+                    arc(O, r3, -c.rad, -thr, COL.th, p4);
+                    const mid2 = thr + (c.th2 * PI / 180) / 2;
+                    if (c.th2 > 6) text('θ₂', O.x + (r3 + 18) * Math.cos(mid2), O.y - (r3 + 18) * Math.sin(mid2), COL.th, p4, 'center', 13);
+                }
+            }
+            // legend with the numeric angle values (keeps the drawing uncluttered)
+            const legend = [
+                [`R = ${fmt(c.R)}`, COL.R, p2],
+                [`α = ${fmt(c.al)}°`, COL.al, prog(0)],
+                [`180° − α = ${fmt(180 - c.al)}°`, COL.gray, prog(1)],
+                [`θ = ${fmt(c.th)}°`, COL.th, p3],
+                [`θ₂ = ${fmt(c.th2)}°`, COL.th, p4]
+            ];
+            legend.forEach((l, i) => text(l[0], 8, 14 + i * 17, l[1], l[2], 'left', 12));
+            ctx.save(); ctx.fillStyle = fg(); ctx.beginPath(); ctx.arc(O.x, O.y, 3.5, 0, 2 * PI); ctx.fill(); ctx.restore();
+        }
+
+        function updatePanel() {
+            const c = content(step);
+            badgeEl.textContent = `Langkah ${step + 1} dari ${TOTAL}`;
+            titleEl.textContent = c.title; bodyEl.textContent = c.body;
+            formulaEl.textContent = c.formula; formulaEl.style.display = c.formula ? '' : 'none';
+            dotsEl.innerHTML = '';
+            for (let i = 0; i < TOTAL; i++) {
+                const d = document.createElement('span');
+                d.className = 'tp-dot' + (i < step ? ' done' : '') + (i === step ? ' cur' : '');
+                dotsEl.appendChild(d);
+            }
+            prevBtn.disabled = step === 0; nextBtn.disabled = step === TOTAL - 1;
+        }
+        function animateStep() {
+            cancelAnimationFrame(animRaf); animT = 0;
+            const t0 = performance.now();
+            (function tick(now) { animT = Math.min(1, (now - t0) / 1800); draw(); if (animT < 1) animRaf = requestAnimationFrame(tick); })(t0);
+        }
+        function goStep(i, speakIt) {
+            step = clamp(i, 0, TOTAL - 1); updatePanel(); animateStep();
+            if (speakIt) speak(content(step).speech);
+        }
+        function refresh() { cancelAnimationFrame(animRaf); animT = 1; updatePanel(); draw(); }
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+            const rw = rect.width || 300, rh = rect.height || 300;
+            const sc = Math.max(0.5, Math.min(2.2, Math.min(rw / 330, rh / 300)));
+            W = rw / sc; H = rh / sc;
+            canvas.width = rw * dpr; canvas.height = rh * dpr;
+            ctx.setTransform(dpr * sc, 0, 0, dpr * sc, 0, 0);
+        }
+        const isVisible = () => document.getElementById('tabJumlah').classList.contains('active') && document.getElementById('vfSection').style.display !== 'none';
+
+        [inA, inB, inAl].forEach(el => el.addEventListener('input', refresh));
+        prevBtn.addEventListener('click', () => goStep(step - 1, true));
+        nextBtn.addEventListener('click', () => goStep(step + 1, true));
+        window.addEventListener('resize', () => { if (isVisible()) { resizeCanvas(); draw(); } });
+        updatePanel();
+
+        return {
+            onDarkModeToggle: function(d) { isDark = d; if (isVisible()) draw(); },
+            onShow: function() { if (!isVisible()) return; resizeCanvas(); animT = 1; draw(); },
+            restart: function() { goStep(0, false); }
+        };
+    })();
+    </script>
+
+    <script>
+    window.UraianVectorApp = (function() {
+        const canvas = document.getElementById('canvasUraian');
+        const ctx = canvas.getContext('2d');
+        const listEl = document.getElementById('vuList');
+        const addBtn = document.getElementById('vuAdd'), delBtn = document.getElementById('vuDel');
+        const badgeEl = document.getElementById('vuBadge'), titleEl = document.getElementById('vuTitle');
+        const bodyEl = document.getElementById('vuBody'), formulaEl = document.getElementById('vuFormula');
+        const dotsEl = document.getElementById('vuDots');
+        const prevBtn = document.getElementById('vuPrev'), nextBtn = document.getElementById('vuNext'), voiceBtn = document.getElementById('vuVoice');
+
+        const PI = Math.PI, TOTAL = 6, MIN_N = 3, MAX_N = 5;
+        const PAL = ['#1e88e5', '#43a047', '#fb8c00', '#8e24aa', '#6d4c41'];
+        const COLR = '#e53935', COLX = '#00acc1', COLY = '#f9a825';
+        const SUBN = ['₁', '₂', '₃', '₄', '₅'];
+        let vecs = [{ F: 10, th: 30 }, { F: 8, th: 120 }, { F: 6, th: 240 }];
+        let isDark = false, W = 330, H = 300, step = 0, animT = 1, animRaf = 0;
+
+        const fmt = n => (Math.round(n * 100) / 100).toString().replace('.', ',');
+        const fmtp = n => n < 0 ? `(${fmt(n)})` : fmt(n);
+        const fmt4 = n => (Math.round(n * 10000) / 10000).toString().replace('.', ',');
+        const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+        const fg = () => isDark ? '#e0e0e0' : '#222';
+        const bg = () => isDark ? '#161616' : '#fafafa';
+        const sub = (p, a, b) => Math.max(0, Math.min(1, (p - a) / (b - a)));
+        const nm = i => 'F' + SUBN[i];
+
+        function calc() {
+            const rows = vecs.map(v => {
+                const F = clamp(isNaN(v.F) ? 0 : v.F, 0, 99), th = ((isNaN(v.th) ? 0 : v.th) % 360 + 360) % 360, r = th * PI / 180;
+                return { F, th, fx: F * Math.cos(r), fy: F * Math.sin(r) };
+            });
+            const Rx = rows.reduce((s, r) => s + r.fx, 0), Ry = rows.reduce((s, r) => s + r.fy, 0);
+            const R = Math.hypot(Rx, Ry);
+            const cosv = R > 1e-9 ? clamp(Rx / R, -1, 1) : 0;
+            const alpha = Math.acos(cosv) * 180 / PI;
+            const thR = R < 1e-9 ? 0 : (Ry < 0 ? 360 - alpha : alpha);
+            return { rows, Rx, Ry, R, cosv, alpha, thR, zero: R < 1e-6 };
+        }
+
+        // ===== Voice =====
+        const tts = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+        let voiceOn = true, idVoice = null;
+        function pickVoice() { if (tts) idVoice = speechSynthesis.getVoices().find(v => /^id([-_]|$)/i.test(v.lang)) || null; }
+        if (tts) { pickVoice(); if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', pickVoice); }
+        function speak(t) {
+            if (!tts || !voiceOn) return;
+            speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(t); u.lang = 'id-ID'; if (idVoice) u.voice = idVoice; u.rate = 0.95;
+            speechSynthesis.speak(u);
+        }
+        if (!tts) voiceBtn.style.display = 'none';
+        voiceBtn.addEventListener('click', () => {
+            voiceOn = !voiceOn; voiceBtn.classList.toggle('on', voiceOn); voiceBtn.textContent = voiceOn ? '🔊' : '🔇';
+            if (voiceOn) speak(content(step).speech); else if (tts) speechSynthesis.cancel();
+        });
+
+        // ===== Step texts =====
+        function content(i) {
+            const c = calc(), n = c.rows.length;
+            const joinX = c.rows.map(r => fmtp(r.fx)).join(' + '), joinY = c.rows.map(r => fmtp(r.fy)).join(' + ');
+            const sumX = c.rows.map((r, k) => `${nm(k)}ₓ`).join(' + '), sumY = c.rows.map((r, k) => `${nm(k)}ᵧ`).join(' + ');
+            return [
+                { title: `Gambar ${n} vektor pada sumbu x dan y`,
+                  body: 'Gambar semua vektor dari titik asal. Sudut tiap vektor diukur dari sumbu x positif, berlawanan arah jarum jam.',
+                  formula: c.rows.map((r, k) => `${nm(k)} = ${fmt(r.F)} pada ${fmt(r.th)}°`).join('\n'),
+                  speech: `Langkah 1. Gambar ${n} vektor dari titik asal pada sumbu x dan y. Sudut tiap vektor diukur dari sumbu x positif, berlawanan arah jarum jam.` },
+                { title: 'Uraikan tiap vektor (rumus cos & sin)',
+                  body: 'Uraikan setiap vektor menjadi komponen pada sumbu x dengan rumus cosinus dan komponen pada sumbu y dengan rumus sinus.',
+                  formula: 'Fₓ = F · cos θ\nFᵧ = F · sin θ\n' + c.rows.map((r, k) => `${nm(k)}ₓ = ${fmt(r.F)}·cos ${fmt(r.th)}° = ${fmt(r.fx)}\n${nm(k)}ᵧ = ${fmt(r.F)}·sin ${fmt(r.th)}° = ${fmt(r.fy)}`).join('\n'),
+                  speech: 'Langkah 2. Uraikan setiap vektor menjadi komponen. Komponen sumbu x sama dengan F kali kosinus teta. Komponen sumbu y sama dengan F kali sinus teta.' },
+                { title: 'Jumlahkan komponen tiap sumbu',
+                  body: 'Jumlahkan semua komponen pada sumbu x untuk mendapat Rₓ, dan semua komponen pada sumbu y untuk mendapat Rᵧ. Perhatikan tanda positif dan negatif.',
+                  formula: `Rₓ = ${sumX}\nRₓ = ${joinX}\nRₓ = ${fmt(c.Rx)}\n\nRᵧ = ${sumY}\nRᵧ = ${joinY}\nRᵧ = ${fmt(c.Ry)}`,
+                  speech: `Langkah 3. Jumlahkan komponen pada tiap sumbu. R x sama dengan ${fmt(c.Rx)}, dan R y sama dengan ${fmt(c.Ry)}.` },
+                { title: 'Hitung besar resultan',
+                  body: 'Rₓ dan Rᵧ saling tegak lurus, sehingga besar resultan dihitung dengan teorema Pythagoras.',
+                  formula: `R = √(Rₓ² + Rᵧ²)\nR = √(${fmtp(c.Rx)}² + ${fmtp(c.Ry)}²)\nR = √${fmt(c.Rx * c.Rx + c.Ry * c.Ry)}\nR = ${fmt(c.R)}`,
+                  speech: `Langkah 4. Besar resultan dihitung dengan Pythagoras. R sama dengan akar dari R x kuadrat ditambah R y kuadrat, yaitu ${fmt(c.R)}.` },
+                c.zero
+                  ? { title: 'Arah resultan', body: 'Resultan bernilai nol, sehingga tidak memiliki arah.', formula: 'R = 0', speech: 'Langkah 5. Resultan bernilai nol, sehingga tidak memiliki arah.' }
+                  : { title: 'Arah resultan (rumus cos)',
+                      body: `Cari sudut resultan dengan rumus cosinus.${c.Ry < 0 ? ' Karena Rᵧ negatif, resultan berada di bawah sumbu x, sehingga θ = 360° − arccos.' : ''}`,
+                      formula: `cos θ = Rₓ / R\ncos θ = ${fmtp(c.Rx)} / ${fmt(c.R)} = ${fmt4(c.cosv)}\n${c.Ry < 0 ? `θ = 360° − arccos(${fmt4(c.cosv)}) = 360° − ${fmt(c.alpha)}° = ` : 'θ = arccos(' + fmt4(c.cosv) + ') = '}${fmt(c.thR)}°`,
+                      speech: `Langkah 5. Arah resultan dicari dengan rumus kosinus. Kosinus teta sama dengan R x dibagi R. Maka teta sama dengan ${fmt(c.thR)} derajat dari sumbu x positif.` },
+                { title: 'Hasil akhir',
+                  body: c.zero ? 'Resultan semua vektor bernilai nol.' : `Resultan dari ${n} vektor adalah R = ${fmt(c.R)} satuan dengan arah θ = ${fmt(c.thR)}° terhadap sumbu x positif.`,
+                  formula: c.zero ? 'R = 0' : `Rₓ = ${fmt(c.Rx)}\nRᵧ = ${fmt(c.Ry)}\nR = ${fmt(c.R)}\nθ = ${fmt(c.thR)}°`,
+                  speech: c.zero ? 'Langkah 6. Resultan semua vektor bernilai nol.' : `Langkah 6. Hasil akhirnya, resultan R sama dengan ${fmt(c.R)} satuan, dengan arah ${fmt(c.thR)} derajat terhadap sumbu x positif.` }
+            ][i];
+        }
+
+        // ===== Drawing =====
+        function prog(i) { return i < step ? 1 : (i === step ? animT : 0); }
+        function line(a, b, color, lw, dash, p) {
+            if (p === undefined) p = 1; if (p <= 0.005) return;
+            ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = lw; if (dash) ctx.setLineDash(dash);
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(a.x + (b.x - a.x) * p, a.y + (b.y - a.y) * p); ctx.stroke(); ctx.restore();
+        }
+        function arrow(a, b, color, lw, p) {
+            if (p <= 0.005) return;
+            const pl = Math.min(1, p / 0.88), t = { x: a.x + (b.x - a.x) * pl, y: a.y + (b.y - a.y) * pl };
+            ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw;
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(t.x, t.y); ctx.stroke();
+            if (p < 0.88) { ctx.beginPath(); ctx.arc(t.x, t.y, lw * 0.9 + 1, 0, 2 * PI); ctx.fill(); }
+            const hp = sub(p, 0.88, 1);
+            if (hp > 0 && Math.hypot(b.x - a.x, b.y - a.y) > 6) {
+                const ang = Math.atan2(b.y - a.y, b.x - a.x), hl = (9 + lw) * hp;
+                ctx.beginPath(); ctx.moveTo(b.x, b.y);
+                ctx.lineTo(b.x - hl * Math.cos(ang - 0.4), b.y - hl * Math.sin(ang - 0.4));
+                ctx.lineTo(b.x - hl * Math.cos(ang + 0.4), b.y - hl * Math.sin(ang + 0.4));
+                ctx.closePath(); ctx.fill();
+            }
+            ctx.restore();
+        }
+        function text(str, x, y, color, p, align, size) {
+            const al = sub(p, 0.75, 1); if (al <= 0) return;
+            ctx.save(); ctx.globalAlpha = al; ctx.font = `bold ${size || 14}px Arial`;
+            ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
+            ctx.lineWidth = 4; ctx.strokeStyle = bg(); ctx.strokeText(str, x, y); ctx.fillStyle = color; ctx.fillText(str, x, y); ctx.restore();
+        }
+
+        function draw() {
+            const c = calc(), n = c.rows.length;
+            ctx.clearRect(0, 0, W, H); ctx.fillStyle = bg(); ctx.fillRect(0, 0, W, H);
+            // fit: origin in the middle, scale from the largest coordinate
+            let mx = Math.abs(c.Rx), my = Math.abs(c.Ry);
+            c.rows.forEach(r => { mx = Math.max(mx, Math.abs(r.fx)); my = Math.max(my, Math.abs(r.fy)); });
+            mx = Math.max(mx, 1); my = Math.max(my, 1);
+            const u = Math.min((W / 2 - 34) / mx, (H / 2 - 28) / my, 40);
+            const O = { x: W / 2, y: H / 2 + 8 }, P = (x, y) => ({ x: O.x + x * u, y: O.y - y * u });
+            // grid + axes
+            ctx.strokeStyle = isDark ? '#242424' : '#eee'; ctx.lineWidth = 1;
+            for (let x = O.x % 30; x < W; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+            for (let y = O.y % 30; y < H; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+            const ax = isDark ? '#aaa' : '#777';
+            line({ x: 6, y: O.y }, { x: W - 6, y: O.y }, ax, 1.6); line({ x: O.x, y: H - 6 }, { x: O.x, y: 6 }, ax, 1.6);
+            ctx.save(); ctx.fillStyle = ax; ctx.font = 'bold 13px Arial'; ctx.textAlign = 'right'; ctx.fillText('x', W - 8, O.y - 6); ctx.textAlign = 'left'; ctx.fillText('y', O.x + 7, 16); ctx.restore();
+
+            // step 0: all vectors, one after another
+            const p0 = prog(0);
+            c.rows.forEach((r, i) => {
+                const st0 = 0.6 * i / (n - 1), pi = sub(p0, st0, st0 + 0.4);
+                const tip = P(r.fx, r.fy), col = PAL[i];
+                arrow(O, tip, col, 3.5, pi);
+                const L = Math.hypot(tip.x - O.x, tip.y - O.y) || 1;
+                text(nm(i), tip.x + (tip.x - O.x) / L * 15, tip.y + (tip.y - O.y) / L * 15, col, pi, 'center', 14);
+            });
+
+            // step 1: projections on the axes
+            const p1 = prog(1);
+            c.rows.forEach((r, i) => {
+                const tip = P(r.fx, r.fy), col = PAL[i], st1 = 0.65 * i / (n - 1), pi = sub(p1, st1, st1 + 0.35);
+                line(tip, { x: tip.x, y: O.y }, col, 1.6, [4, 4], pi);
+                line(tip, { x: O.x, y: tip.y }, col, 1.6, [4, 4], pi);
+                if (pi > 0.9) { ctx.save(); ctx.fillStyle = col; [[tip.x, O.y], [O.x, tip.y]].forEach(q => { ctx.beginPath(); ctx.arc(q[0], q[1], 3.5, 0, 2 * PI); ctx.fill(); }); ctx.restore(); }
+            });
+
+            // step 2: Rx and Ry
+            const p2 = prog(2), Rt = P(c.Rx, c.Ry), Xt = P(c.Rx, 0);
+            arrow(O, Xt, COLX, 5, sub(p2, 0, 0.5));
+            arrow(Xt, Rt, COLY, 5, sub(p2, 0.5, 1));
+            text('Rₓ', (O.x + Xt.x) / 2, O.y + (c.Ry >= 0 ? 16 : -16), COLX, sub(p2, 0, 0.5), 'center', 14);
+            text('Rᵧ', Xt.x + (c.Rx >= 0 ? 16 : -16), (Xt.y + Rt.y) / 2, COLY, sub(p2, 0.5, 1), 'center', 14);
+
+            // step 3: R
+            const p3 = prog(3);
+            arrow(O, Rt, COLR, 5, p3);
+            const Lr = Math.hypot(Rt.x - O.x, Rt.y - O.y) || 1;
+            text('R', Rt.x + (Rt.x - O.x) / Lr * 15, Rt.y + (Rt.y - O.y) / Lr * 15, COLR, p3, 'center', 16);
+
+            // step 4: angle of R (counter-clockwise from +x)
+            const p4 = prog(4);
+            if (!c.zero && p4 > 0.01) {
+                ctx.save(); ctx.strokeStyle = COLR; ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.arc(O.x, O.y, 30, 0, -c.thR * PI / 180 * p4, true); ctx.stroke(); ctx.restore();
+                const mid = c.thR * PI / 360;
+                text('θ', O.x + 44 * Math.cos(mid), O.y - 44 * Math.sin(mid), COLR, p4, 'center', 14);
+            }
+
+            // legend
+            const lg = [];
+            c.rows.forEach((r, i) => lg.push([`${nm(i)} = ${fmt(r.F)} @ ${fmt(r.th)}°`, PAL[i], 1]));
+            if (step >= 2) lg.push([`Rₓ=${fmt(c.Rx)}  Rᵧ=${fmt(c.Ry)}`, COLX, p2]);
+            if (step >= 3) lg.push([`R = ${fmt(c.R)}`, COLR, p3]);
+            if (step >= 4 && !c.zero) lg.push([`θ = ${fmt(c.thR)}°`, COLR, p4]);
+            lg.forEach((l, i) => text(l[0], 8, 13 + i * 15, l[1], l[2] >= 1 ? 1 : l[2], 'left', 11));
+        }
+
+        function updatePanel() {
+            const c = content(step);
+            badgeEl.textContent = `Langkah ${step + 1} dari ${TOTAL}`;
+            titleEl.textContent = c.title; bodyEl.textContent = c.body;
+            formulaEl.textContent = c.formula; formulaEl.style.display = c.formula ? '' : 'none';
+            dotsEl.innerHTML = '';
+            for (let i = 0; i < TOTAL; i++) {
+                const d = document.createElement('span');
+                d.className = 'tp-dot' + (i < step ? ' done' : '') + (i === step ? ' cur' : '');
+                dotsEl.appendChild(d);
+            }
+            prevBtn.disabled = step === 0; nextBtn.disabled = step === TOTAL - 1;
+        }
+        function animateStep() {
+            cancelAnimationFrame(animRaf); animT = 0;
+            const t0 = performance.now(), DUR = 2200;
+            (function tick(now) { animT = Math.min(1, (now - t0) / DUR); draw(); if (animT < 1) animRaf = requestAnimationFrame(tick); })(t0);
+        }
+        function goStep(i, speakIt) {
+            step = clamp(i, 0, TOTAL - 1); updatePanel(); animateStep();
+            if (speakIt) speak(content(step).speech);
+        }
+        function refresh() { cancelAnimationFrame(animRaf); animT = 1; updatePanel(); draw(); }
+
+        // ===== Inputs =====
+        function buildList() {
+            listEl.innerHTML = '';
+            vecs.forEach((v, i) => {
+                const row = document.createElement('div');
+                row.className = 'vu-row';
+                row.innerHTML = `<span class="vu-dot" style="background:${PAL[i]}"></span><b class="vu-name" style="color:${PAL[i]}">${nm(i)}</b>
+                    <label>besar<input type="number" step="0.1" min="0" max="99" inputmode="decimal" value="${v.F}"></label>
+                    <label>sudut (°)<input type="number" step="1" min="0" max="360" inputmode="decimal" value="${v.th}"></label>`;
+                const ins = row.querySelectorAll('input');
+                ins[0].addEventListener('input', () => { v.F = parseFloat(String(ins[0].value).replace(',', '.')); refresh(); });
+                ins[1].addEventListener('input', () => { v.th = parseFloat(String(ins[1].value).replace(',', '.')); refresh(); });
+                listEl.appendChild(row);
+            });
+            addBtn.disabled = vecs.length >= MAX_N; delBtn.disabled = vecs.length <= MIN_N;
+        }
+        const DEFAULTS = [{ F: 5, th: 300 }, { F: 4, th: 60 }];
+        addBtn.addEventListener('click', () => { if (vecs.length < MAX_N) { vecs.push({ ...DEFAULTS[vecs.length - 3] }); buildList(); goStep(0, false); } });
+        delBtn.addEventListener('click', () => { if (vecs.length > MIN_N) { vecs.pop(); buildList(); goStep(0, false); } });
+        prevBtn.addEventListener('click', () => goStep(step - 1, true));
+        nextBtn.addEventListener('click', () => goStep(step + 1, true));
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+            const rw = rect.width || 300, rh = rect.height || 300;
+            const sc = Math.max(0.5, Math.min(2.2, Math.min(rw / 330, rh / 300)));
+            W = rw / sc; H = rh / sc;
+            canvas.width = rw * dpr; canvas.height = rh * dpr;
+            ctx.setTransform(dpr * sc, 0, 0, dpr * sc, 0, 0);
+        }
+        const isVisible = () => document.getElementById('tabJumlah').classList.contains('active') && document.getElementById('vuSection').style.display !== 'none';
+        window.addEventListener('resize', () => { if (isVisible()) { resizeCanvas(); draw(); } });
+        buildList(); updatePanel();
+
+        return {
+            onDarkModeToggle: function(d) { isDark = d; if (isVisible()) draw(); },
+            onShow: function() { if (!isVisible()) return; resizeCanvas(); animT = 1; draw(); }
+        };
+    })();
+    </script>
+
+    <script>
         // ===== Shared: tab switching + dark mode =====
         const sharedDarkModeBtn = document.getElementById('darkModeBtn');
         let sharedIsDarkMode = false;
@@ -3116,6 +3718,8 @@
             window.AdditionVectorApp.onDarkModeToggle(sharedIsDarkMode);
             window.ApplicationVectorApp.onDarkModeToggle(sharedIsDarkMode);
             window.QuizVectorApp.onDarkModeToggle(sharedIsDarkMode);
+            window.FormulaVectorApp.onDarkModeToggle(sharedIsDarkMode);
+            window.UraianVectorApp.onDarkModeToggle(sharedIsDarkMode);
         });
 
         const tabButtons = document.querySelectorAll('.tab-btn');
@@ -3135,6 +3739,8 @@
                 } else if (targetId === 'tabJumlah') {
                     title.textContent = '➕ Penjumlahan Vektor';
                     window.AdditionVectorApp.onShow();
+                    window.FormulaVectorApp.onShow();
+                    window.UraianVectorApp.onShow();
                 } else if (targetId === 'tabTerapan') {
                     title.textContent = '🧩 Penerapan Vektor';
                     window.ApplicationVectorApp.onShow();
@@ -3183,6 +3789,41 @@
         window.addEventListener('resize', () => {
             if (document.fullscreenElement) applyFullscreenCanvasSizing();
         });
+
+        // ===== Sub-tabs inside "Jumlah": Grafis / Aturan cos & sin / Uraian x-y =====
+        document.querySelectorAll('#jmSwitch .jm-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                document.querySelectorAll('#jmSwitch .jm-pill').forEach(x => x.classList.toggle('active', x === pill));
+                if ('speechSynthesis' in window) speechSynthesis.cancel();
+                const view = pill.dataset.view;
+                document.getElementById('vaGrafis').style.display = view === 'grafis' ? '' : 'none';
+                document.getElementById('vfSection').style.display = view === 'rumus' ? '' : 'none';
+                document.getElementById('vuSection').style.display = view === 'uraian' ? '' : 'none';
+                if (view === 'grafis') window.AdditionVectorApp.onShow();
+                else if (view === 'rumus') window.FormulaVectorApp.onShow();
+                else window.UraianVectorApp.onShow();
+            });
+        });
+    </script>
+
+    <script>
+    // Penghalang ringan (bukan pengaman mutlak): menyulitkan salin, simpan, dan lihat kode lewat cara biasa.
+    (function() {
+        const isField = t => t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+        document.addEventListener('contextmenu', e => { if (!isField(e.target)) e.preventDefault(); });
+        document.addEventListener('selectstart', e => { if (!isField(e.target)) e.preventDefault(); });
+        document.addEventListener('copy', e => { if (!isField(e.target)) e.preventDefault(); });
+        document.addEventListener('cut', e => { if (!isField(e.target)) e.preventDefault(); });
+        document.addEventListener('dragstart', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            const k = (e.key || '').toLowerCase(), mod = e.ctrlKey || e.metaKey;
+            const blocked = e.key === 'F12' ||
+                (mod && (k === 's' || k === 'u' || k === 'p')) ||
+                (mod && e.shiftKey && (k === 'i' || k === 'j' || k === 'c'));
+            if (blocked) { e.preventDefault(); e.stopPropagation(); return false; }
+        }, true);
+        try { console.log('%c© Mamat Aan S · SMAN 1 Majalengka', 'font-weight:bold;color:#667eea'); } catch (_) {}
+    })();
     </script>
 </body>
 </html>
