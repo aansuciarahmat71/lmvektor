@@ -1,0 +1,3188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Maya Vektor</title>
+    <style>
+        /* ===== Tab bar (lives centered inside the header) ===== */
+        .tab-bar {
+            display: flex;
+            gap: 6px;
+        }
+
+        .tab-btn {
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.92);
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            text-align: center;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #fff;
+            color: #667eea;
+            border-color: #fff;
+        }
+
+        body.dark-mode .tab-btn.active {
+            color: #4a5568;
+        }
+
+        /* On narrow screens only the active tab shows its label (others show just the icon) so three tabs fit in the header */
+        @media (max-width: 560px) {
+            .tab-btn { padding: 6px 8px; }
+            .tab-bar { gap: 4px; }
+            .tab-btn:not(.active) .tab-lbl { display: none; }
+        }
+
+        .angle-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding: 8px 10px;
+            background: #fff8f0;
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #e65100;
+        }
+        .angle-input-row input[type="number"] {
+            flex: 1;
+            min-width: 0;
+            padding: 7px 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #d84315;
+            background: #fff;
+        }
+        .angle-input-row input[type="number"]:focus { outline: none; border-color: #667eea; }
+        .voice-toggle { background:#fff; border:2px solid #ddd; color:#333; border-radius:8px; padding:5px 9px; font-size:15px; cursor:pointer; }
+        .voice-toggle.on { background:linear-gradient(135deg,#667eea,#764ba2); border-color:#667eea; color:#fff; }
+        body.dark-mode .voice-toggle:not(.on) { background:#1a1a1a; border-color:#444; color:#ddd; }
+        body.dark-mode .angle-input-row { background: #232323; border-color: #d4af37; color: #ffa500; }
+        body.dark-mode .angle-input-row input[type="number"] { background: #1a1a1a; border-color: #444; color: #ffa500; }
+
+        .angle-modal-backdrop {
+            position: fixed; inset: 0; z-index: 1000;
+            background: rgba(0,0,0,0.5);
+            display: none; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .angle-modal-backdrop.show { display: flex; }
+        .angle-modal {
+            background: #fff; color: #333;
+            border-radius: 14px; padding: 20px 18px 16px;
+            max-width: 340px; width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .angle-modal h3 { font-size: 16px; color: #667eea; margin-bottom: 10px; }
+        .angle-modal p { font-size: 14px; line-height: 1.5; margin-bottom: 16px; }
+        .angle-modal button {
+            background: linear-gradient(135deg,#667eea,#764ba2);
+            border: none; color: #fff; font-weight: 700; font-size: 14px;
+            padding: 10px 28px; border-radius: 9px; cursor: pointer;
+        }
+        body.dark-mode .angle-modal { background: #2d2d2d; color: #e0e0e0; }
+        body.dark-mode .angle-modal h3 { color: #a0aec0; }
+
+        #canvasTerapan {
+            width:100%; height:300px; border:2px solid #ddd; border-radius:8px;
+            background:#fafafa; display:block; touch-action:none; margin-bottom:12px;
+        }
+        body.dark-mode #canvasTerapan { background:#161616; border-color:#444; }
+        .tp-card { background:#f4f6ff; border:2px solid #667eea; border-radius:10px; padding:12px; margin-bottom:10px; }
+        body.dark-mode .tp-card { background:#232323; border-color:#a0aec0; }
+        .tp-badge { font-size:11px; font-weight:700; color:#764ba2; text-transform:uppercase; letter-spacing:.4px; }
+        body.dark-mode .tp-badge { color:#a0aec0; }
+        .tp-title { font-size:16px; font-weight:800; color:#667eea; margin:2px 0 6px; }
+        body.dark-mode .tp-title { color:#cbd5e0; }
+        .tp-body { font-size:13.5px; line-height:1.55; }
+        .tp-dots { display:flex; gap:6px; justify-content:center; margin:10px 0; }
+        .tp-dot { width:9px; height:9px; border-radius:50%; background:#ccc; }
+        .tp-dot.done { background:#9fb0f5; }
+        .tp-dot.cur { background:#667eea; transform:scale(1.35); }
+        #tpPrev { flex:0 0 96px; }
+
+        #canvasKuis {
+            width:100%; height:480px; border:2px solid #ddd; border-radius:8px;
+            background:#fafafa; display:block; touch-action:none; margin-bottom:10px; user-select:none; -webkit-user-select:none;
+        }
+        body.dark-mode #canvasKuis { background:#161616; border-color:#444; }
+        .qz-pills { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+        .qz-pill { flex:1 1 calc(50% - 6px); background:#eee; color:#555; border:2px solid #ddd; border-radius:9px; padding:8px 6px; font-size:12px; font-weight:700; cursor:pointer; }
+        .qz-pill.active { background:linear-gradient(135deg,#667eea,#764ba2); border-color:#667eea; color:#fff; }
+        .qz-pill.done:not(.active) { background:#e8f5e9; border-color:#2e7d32; color:#2e7d32; }
+        body.dark-mode .qz-pill:not(.active):not(.done) { background:#232323; border-color:#444; color:#ccc; }
+        body.dark-mode .qz-pill.done:not(.active) { background:#1b3a1e; color:#81c784; border-color:#2e7d32; }
+        .qz-desc { font-size:13px; line-height:1.5; margin-bottom:10px; padding:10px 12px; border-left:4px solid #667eea; background:#f4f6ff; border-radius:0 8px 8px 0; }
+        body.dark-mode .qz-desc { background:#232323; }
+        .qz-feedback { display:flex; gap:10px; align-items:flex-start; font-size:13.5px; line-height:1.5; padding:10px 12px; border-radius:10px; margin-bottom:10px; border:2px solid transparent; }
+        .qz-feedback.info { background:#f4f6ff; border-color:#c5cdfa; color:#444; }
+        .qz-feedback.ok { background:#e8f5e9; border-color:#2e7d32; color:#1b5e20; }
+        .qz-feedback.no { background:#ffebee; border-color:#c62828; color:#b71c1c; }
+        body.dark-mode .qz-feedback.info { background:#232323; border-color:#444; color:#ddd; }
+        body.dark-mode .qz-feedback.ok { background:#1b3a1e; color:#a5d6a7; }
+        body.dark-mode .qz-feedback.no { background:#3d1a1a; color:#ef9a9a; }
+        .qz-ico { font-size:22px; font-weight:800; line-height:1.1; }
+        .qz-score { font-size:12px; font-weight:700; opacity:.8; text-align:center; margin-bottom:8px; }
+        #qzNext.pulse { animation: qzpulse 1.2s infinite; }
+        @keyframes qzpulse { 0%,100% { box-shadow:0 0 0 0 rgba(102,126,234,.6); } 50% { box-shadow:0 0 0 8px rgba(102,126,234,0); } }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ===== Penjumlahan Vektor tab (namespaced va-) ===== */
+        .va-wrap { max-width: 640px; margin: 0 auto; padding: 14px; }
+
+        .va-section {
+            background: #fff;
+            border-radius: 0 0 12px 12px;
+            padding: 18px 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.08);
+        }
+        body.dark-mode .va-section { background:#2d2d2d; box-shadow:0 4px 15px rgba(0,0,0,.5); }
+
+        .va-container > .va-section:first-child { border-radius: 0 0 12px 12px; margin-top: 0; }
+
+        .va-section h2 {
+            font-size: 15px;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 9px;
+            margin-bottom: 13px;
+            font-weight: 700;
+        }
+        body.dark-mode .va-section h2 { color:#a0aec0; border-bottom-color:#a0aec0; }
+
+        .va-hint { font-size:12px; opacity:.7; margin-bottom:8px; }
+
+        .va-chip-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+        .va-chip {
+            flex:1 1 90px;
+            border:2px solid #ddd;
+            border-radius:10px;
+            padding:10px 8px;
+            text-align:center;
+            cursor:pointer;
+            background:#fafafa;
+            transition:all .2s;
+            user-select:none;
+        }
+        body.dark-mode .va-chip { background:#1f1f1f; border-color:#444; }
+        .va-chip .va-name { font-weight:800; font-size:16px; }
+        .va-chip .va-comp { font-size:11px; opacity:.75; margin-top:2px; }
+        .va-chip.selected { box-shadow:0 0 0 2px var(--c) inset; border-color: var(--c); background: color-mix(in srgb, var(--c) 15%, transparent); }
+
+        .va-method-row { display:flex; gap:8px; margin-bottom:12px; }
+        .va-method-btn {
+            flex:1;
+            padding:12px 6px;
+            border-radius:10px;
+            border:2px solid #ddd;
+            background:#fafafa;
+            text-align:center;
+            cursor:pointer;
+            font-weight:700;
+            font-size:13px;
+            transition:all .2s;
+        }
+        body.dark-mode .va-method-btn { background:#1f1f1f; border-color:#444; }
+        .va-method-btn.active { border-color:#667eea; background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+        .va-method-btn .va-sub { display:block; font-size:10px; font-weight:400; opacity:.85; margin-top:2px; }
+
+        .va-canvas-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        #canvasAdd {
+            width:100%;
+            height:460px;
+            border:2px solid #ddd;
+            border-radius:8px;
+            background:#fafafa;
+            display:block;
+            touch-action:none;
+        }
+        body.dark-mode #canvasAdd { background:#161616; border-color:#444; }
+
+        .va-overlay-controls {
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            bottom: 66px;
+            background: rgba(255,255,255,0.94);
+            border-radius: 10px;
+            padding: 8px 8px 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+        }
+        body.dark-mode .va-overlay-controls {
+            background: rgba(26,26,26,0.9);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+        }
+
+        .va-actions { display:flex; gap:10px; }
+        .va-btn {
+            flex:1;
+            padding:11px;
+            border-radius:9px;
+            border:none;
+            font-weight:700;
+            font-size:13px;
+            cursor:pointer;
+            transition:transform .15s, opacity .15s;
+        }
+        .va-btn:active { transform:scale(.96); }
+        .va-btn-primary { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+        .va-btn-primary:disabled { opacity:.4; cursor:not-allowed; }
+        .va-btn-ghost { background:#eee; color:#555; flex:0 0 80px; }
+        .va-btn-voice { flex:0 0 46px; padding:11px 0; font-size:16px; }
+        .va-btn-voice.on { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+        body.dark-mode .va-btn-ghost { background:#3a3a3a; color:#ddd; }
+
+        .va-chip { position: relative; }
+        .va-chip-badge {
+            position: absolute;
+            top: -7px;
+            left: -7px;
+            width: 19px;
+            height: 19px;
+            border-radius: 50%;
+            background: #e53935;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 5px rgba(0,0,0,.35);
+        }
+
+        .va-method-btn.va-btn-disabled { opacity: .35; pointer-events: none; }
+
+        .va-order-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            min-height: 30px;
+        }
+        .va-order-label { font-size: 12px; font-weight: 700; opacity: .75; }
+        .va-order-empty { font-size: 12px; opacity: .65; }
+        .va-order-pill {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border-radius: 20px;
+            padding: 4px 4px 4px 10px;
+            font-weight: 800;
+            font-size: 13px;
+            color: #fff;
+        }
+        .va-order-num { font-size: 10px; opacity: .85; }
+        .va-order-arrow {
+            background: rgba(255,255,255,.28);
+            border: none;
+            color: #fff;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 13px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .va-order-arrow:active { transform: scale(.9); }
+
+        .va-step-note {
+            font-size:11px;
+            text-align:center;
+            margin-bottom:8px;
+            min-height:14px;
+            font-weight:600;
+            color:#667eea;
+        }
+        body.dark-mode .va-step-note { color:#a0aec0; }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+
+        body.dark-mode {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        body.dark-mode header {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+        }
+
+        /* Three equal flex tracks so the center column (tab-bar) is truly
+           centered in the header regardless of how wide the title or the
+           controls on either side happen to be. */
+        .header-left,
+        .header-center,
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+        .header-left { flex: 1 1 0; min-width: 0; }
+        .header-center { flex: 0 0 auto; }
+        .header-right { flex: 1 1 0; min-width: max-content; }
+        .header-left { justify-content: flex-start; }
+        .header-center { justify-content: center; }
+        .header-right { justify-content: flex-end; }
+
+        h1 {
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        button {
+            background-color: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 6px 9px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.6);
+            transform: scale(1.05);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+        }
+
+        body.dark-mode .section {
+            background-color: #2d2d2d;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        .section h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        body.dark-mode .section h2 {
+            color: #a0aec0;
+            border-bottom-color: #a0aec0;
+        }
+
+        canvas {
+            width: 100%;
+            height: 500px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+            cursor: crosshair;
+            display: block;
+        }
+
+        body.dark-mode canvas {
+            background-color: #1a1a1a;
+            border-color: #444;
+        }
+
+        .info-box {
+            background-color: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        body.dark-mode .info-box {
+            background-color: #1a1a2e;
+            border-left-color: #a0aec0;
+        }
+
+        .value-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .value-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        body.dark-mode .value-item {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+        }
+
+        .value-item .label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .value-item .value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .value-item .unit {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .formula-box {
+            background-color: #fff8f0;
+            border: 2px solid #ffd700;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        body.dark-mode .formula-box {
+            background-color: #1a1a1a;
+            border-color: #d4af37;
+        }
+
+        .formula-box .formula-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #ff6b00;
+        }
+
+        body.dark-mode .formula-box .formula-title {
+            color: #ffb347;
+        }
+
+        .slider-group {
+            margin: 15px 0;
+        }
+
+        .slider-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        body.dark-mode input[type="range"] {
+            background: #444;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #764ba2;
+            transform: scale(1.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            background: #764ba2;
+            transform: scale(1.2);
+        }
+
+        .slider-value {
+            display: inline-block;
+            margin-left: 10px;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        body.dark-mode .slider-value {
+            background: #4a5568;
+        }
+
+        .instruction {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+
+        body.dark-mode .instruction {
+            background-color: #1b5e20;
+            border-left-color: #81c784;
+        }
+
+        .component-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .component-item {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            border: 2px solid #ddd;
+        }
+
+        body.dark-mode .component-item {
+            background: #1a1a1a;
+            border-color: #444;
+        }
+
+        .component-item .comp-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        body.dark-mode .component-item .comp-label {
+            color: #aaa;
+        }
+
+        .component-item .comp-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        body.dark-mode .component-item .comp-value {
+            color: #a0aec0;
+        }
+
+        .angle-display {
+            text-align: center;
+            padding: 12px;
+            background: #fff3e0;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+
+        body.dark-mode .angle-display {
+            background: #1a1a1a;
+            border: 2px solid #ff6b00;
+        }
+
+        .reset-button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .reset-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        #datetime {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 50;
+            font-family: 'Courier New', monospace;
+        }
+
+        body.dark-mode #datetime {
+            background: rgba(160, 174, 192, 0.9);
+            color: #1e1e1e;
+        }
+
+        canvas {
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+    
+        /* ===== Responsive layout: phone (default) / tablet / desktop ===== */
+        @media (min-width: 600px) {
+            .va-wrap { max-width: 860px; }
+            #canvas { height: 560px; }
+            #canvasAdd { height: 560px; }
+            #canvasTerapan { height: 400px; }
+            #canvasKuis { height: 640px; }
+            .qz-pill { flex: 1 1 calc(25% - 6px); }
+            header { padding: 12px 22px; }
+            h1 { font-size: 16px; }
+            .tab-btn { font-size: 13px; padding: 8px 14px; }
+        }
+        @media (min-width: 900px) {
+            .container { grid-template-columns: 1fr; max-width: 1240px; padding: 20px 24px; }
+            .va-wrap { max-width: 1240px; padding: 20px 24px; }
+            #tabKomponen .section,
+            #tabJumlah .va-section,
+            #tabTerapan .va-section,
+            #tabKuis .va-section {
+                display: grid;
+                grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr);
+                column-gap: 24px;
+                align-content: start;
+            }
+            #tabKomponen .section > h2,
+            #tabJumlah .va-section > h2,
+            #tabTerapan .va-section > h2,
+            #tabKuis .va-section > h2 { grid-column: 1 / -1; }
+            #tabKomponen .section > :not(h2):not(.canvas-wrapper),
+            #tabJumlah .va-section > :not(h2):not(.va-canvas-wrapper),
+            #tabTerapan .va-section > :not(h2):not(canvas),
+            #tabKuis .va-section > :not(h2):not(canvas) { grid-column: 2; }
+            /* left column = the drawing, spanning every row of the right column */
+            #tabKomponen .section { grid-template-rows: auto repeat(2, auto) 1fr; }
+            #tabKomponen .canvas-wrapper { grid-column: 1; grid-row: 2 / span 3; }
+            #tabJumlah .va-section { grid-template-rows: auto repeat(4, auto) 1fr; }
+            #tabJumlah .va-canvas-wrapper { grid-column: 1; grid-row: 2 / span 5; }
+            #tabTerapan .va-section { grid-template-rows: auto repeat(6, auto) 1fr; }
+            #tabTerapan canvas { grid-column: 1; grid-row: 2 / span 7; }
+            #tabKuis .va-section { grid-template-rows: auto repeat(5, auto) 1fr; }
+            #tabKuis canvas { grid-column: 1; grid-row: 2 / span 6; }
+            #canvas { height: clamp(480px, calc(100vh - 170px), 820px); }
+            #canvasAdd { height: clamp(480px, calc(100vh - 170px), 820px); }
+            #canvasTerapan { height: clamp(440px, calc(100vh - 190px), 720px); margin-bottom: 0; }
+            #canvasKuis { height: clamp(560px, calc(100vh - 190px), 820px); margin-bottom: 0; }
+            .qz-pill { flex: 1 1 calc(50% - 6px); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <h1 id="pageTitle">📐 Vektor Komponen</h1>
+        </div>
+        <div class="header-center">
+            <div class="tab-bar">
+                <div class="tab-btn active" id="tabBtnKomponen" data-tab="tabKomponen" title="Komponen Vektor"><span class="tab-ico">📐</span><span class="tab-lbl"> Komponen</span></div>
+                <div class="tab-btn" id="tabBtnJumlah" data-tab="tabJumlah" title="Penjumlahan Vektor"><span class="tab-ico">➕</span><span class="tab-lbl"> Jumlah</span></div>
+                <div class="tab-btn" id="tabBtnTerapan" data-tab="tabTerapan" title="Penerapan Komponen Vektor"><span class="tab-ico">🧩</span><span class="tab-lbl"> Penerapan</span></div>
+                <div class="tab-btn" id="tabBtnKuis" data-tab="tabKuis" title="Kuis Gaya pada Benda"><span class="tab-ico">🎯</span><span class="tab-lbl"> Kuis</span></div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-controls">
+                <button id="fullscreenBtn" title="Fullscreen">⛶</button>
+                <button id="darkModeBtn" title="Dark Mode">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="angle-modal-backdrop" id="angleModal">
+        <div class="angle-modal" role="dialog" aria-modal="true">
+            <h3 id="angleModalTitle"></h3>
+            <p id="angleModalText"></p>
+            <button type="button" id="angleModalOk">Mengerti</button>
+        </div>
+    </div>
+
+    <!-- ===== TAB 1: KOMPONEN VEKTOR ===== -->
+    <div class="tab-panel active" id="tabKomponen">
+    <div class="container">
+        <!-- Canvas Section -->
+        <div class="section">
+            <h2>Kanvas Simulasi</h2>
+            <div class="instruction">
+                💡 Geser ujung vektor (kepala anak panah) untuk mengubah panjang dan sudut. Geser panel "Nilai Saat Ini" untuk memindahkan posisinya. Geser area kosong untuk menggeser gambar. Cubit untuk zoom.
+            </div>
+            <div class="angle-input-row">
+                <label for="angleInput">Sudut θ:</label>
+                <input type="number" id="angleInput" min="0" max="360" step="0.1" inputmode="decimal" value="30">
+                <span>°</span>
+                <button type="button" class="voice-toggle" id="kResetView" title="Kembalikan tampilan (reset geser &amp; zoom)">⟲</button>
+                <button type="button" class="voice-toggle on" id="kVoiceBtn" title="Suara petunjuk" aria-pressed="true">🔊</button>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="canvas"></canvas>
+                <div id="datetime"></div>
+            </div>
+        </div>
+
+
+    </div>
+    </div>
+
+    <!-- ===== TAB 2: PENJUMLAHAN VEKTOR ===== -->
+    <div class="tab-panel" id="tabJumlah">
+    <div class="va-wrap">
+
+        <div class="va-section">
+            <h2>Simulasi Penjumlahan Vektor</h2>
+
+            <div class="va-hint">Ketuk 2 atau 3 vektor sesuai urutan penjumlahan yang diinginkan:</div>
+            <div class="va-chip-row" id="chipRow"></div>
+
+            <div class="va-order-row" id="orderRow"></div>
+
+            <div class="va-method-row">
+                <div class="va-method-btn active" id="btnSegitiga" data-method="segitiga">
+                    Segitiga
+                    <span class="va-sub">Ujung ke pangkal</span>
+                </div>
+                <div class="va-method-btn" id="btnJajaran" data-method="jajaran">
+                    Jajaran Genjang
+                    <span class="va-sub">Pangkal berimpit (2 vektor)</span>
+                </div>
+            </div>
+
+            <div class="va-canvas-wrapper">
+                <canvas id="canvasAdd"></canvas>
+                <div class="va-overlay-controls">
+                    <div class="va-step-note" id="stepNote">Ketuk "Animasikan" untuk melihat resultannya</div>
+                    <div class="va-actions">
+                        <button class="va-btn va-btn-primary" id="playBtn">▶ Animasikan</button>
+                        <button class="va-btn va-btn-ghost" id="resetAddBtn">Ulangi</button>
+                        <button class="va-btn va-btn-ghost va-btn-voice" id="voiceBtn" title="Suara penjelasan" aria-pressed="false">🔇</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+    <!-- ===== TAB 3: PENERAPAN KOMPONEN VEKTOR ===== -->
+    <div class="tab-panel" id="tabTerapan">
+    <div class="va-wrap">
+        <div class="va-section">
+            <h2>Penerapan Komponen Vektor</h2>
+            <div class="va-hint">Pilih gambar yang ingin dipelajari cara menggambar vektornya:</div>
+            <div class="va-method-row">
+                <div class="va-method-btn active" id="btnTerapan1">Benda ditarik tali<span class="va-sub">Gaya tarik 80 N, sudut θ</span></div>
+                <div class="va-method-btn" id="btnTerapan2">Benda di bidang miring<span class="va-sub">Uraikan gaya berat w</span></div>
+            </div>
+            <div class="angle-input-row">
+                <label for="terapanAngle">Sudut θ:</label>
+                <input type="number" id="terapanAngle" min="10" max="70" step="1" inputmode="decimal" value="30">
+                <span>°</span>
+                <button type="button" class="voice-toggle on" id="tVoiceBtn" title="Suara penjelasan" aria-pressed="true">🔊</button>
+            </div>
+            <canvas id="canvasTerapan"></canvas>
+            <div class="tp-card">
+                <div class="tp-badge" id="tpBadge"></div>
+                <div class="tp-title" id="tpTitle"></div>
+                <div class="tp-body" id="tpBody"></div>
+            </div>
+            <div class="tp-dots" id="tpDots"></div>
+            <div class="va-actions">
+                <button class="va-btn va-btn-ghost" id="tpPrev">‹ Kembali</button>
+                <button class="va-btn va-btn-primary" id="tpNext">Berikutnya ›</button>
+                <button class="va-btn va-btn-ghost" id="tpRestart" title="Ulangi dari awal">↺</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- ===== TAB 4: KUIS GAYA PADA BENDA ===== -->
+    <div class="tab-panel" id="tabKuis">
+    <div class="va-wrap">
+        <div class="va-section">
+            <h2>Kuis: Gaya yang Bekerja pada Benda</h2>
+            <div class="qz-pills" id="qzPills"></div>
+            <div class="qz-desc" id="qzDesc"></div>
+            <canvas id="canvasKuis"></canvas>
+            <div class="qz-feedback info" id="qzFeedback"></div>
+            <div class="qz-score" id="qzScore"></div>
+            <div class="va-actions">
+                <button class="va-btn va-btn-ghost" id="qzReset" title="Ulangi soal ini">↺ Ulangi</button>
+                <button class="va-btn va-btn-primary" id="qzNext" disabled>Soal berikutnya ›</button>
+                <button class="va-btn va-btn-ghost va-btn-voice on" id="qzSound" title="Suara benar/salah">🔊</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+    window.ComponentVectorApp = (function() {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        let magnitude = 20;
+        let angle = 30; // in degrees
+        let isDragging = false;
+        let isDarkMode = false;
+        let zoomLevel = 1;
+        let lastTouchDistance = 0;
+        let panX = 0, panY = 0;          // view offset (screen pixels) from dragging empty space
+        let isPanning = false;
+        let panStart = { x: 0, y: 0, px: 0, py: 0 };
+        let lastTouchMid = null;
+        let lastTapTime = 0;
+        function clampPan() {
+            const lim = Math.max(canvas.width, canvas.height) * 1.2 * zoomLevel;
+            panX = Math.max(-lim, Math.min(lim, panX));
+            panY = Math.max(-lim, Math.min(lim, panY));
+        }
+        function resetView() { panX = 0; panY = 0; zoomLevel = 1; draw(); }
+        
+        // Panel position
+        let panelX = 10;
+        let panelY = 10;
+        let panelMoved = false; // until the user drags the panel it stays in the top-right corner
+        let isPanelDragging = false;
+        let panelDragStartX = 0;
+        let panelDragStartY = 0;
+
+        const origin = { x: 0, y: 0 };
+        const scale = 10; // pixels per cm
+
+        // Initialize
+        function init() {
+            resizeCanvas();
+            updateDisplay();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            draw();
+        }
+
+        // Update datetime display
+        function updateDateTime() {
+            const now = new Date();
+            const date = now.toLocaleDateString('id-ID', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            const time = now.toLocaleTimeString('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('datetime').textContent = `${date} | ${time}`;
+        }
+
+        // Resize canvas to fit container
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            origin.x = canvas.width * 0.2;
+            origin.y = canvas.height * 0.5;
+        }
+
+        // Get vector end point
+        function getVectorEnd() {
+            const rad = (angle * Math.PI) / 180;
+            return {
+                x: origin.x + magnitude * scale * Math.cos(rad),
+                y: origin.y - magnitude * scale * Math.sin(rad)
+            };
+        }
+
+        // Convert raw screen (canvas) coordinates to world coordinates,
+        // undoing the zoom transform applied in draw() so dragging/hit-testing
+        // still lines up with the visually zoomed vector.
+        function screenToWorld(x, y) {
+            const w = canvas.width, h = canvas.height;
+            return {
+                x: (x - w / 2 - panX) / zoomLevel + w / 2,
+                y: (y - h / 2 - panY) / zoomLevel + h / 2
+            };
+        }
+
+        // Convert world coordinates to raw screen coordinates (inverse of screenToWorld)
+        function worldToScreen(x, y) {
+            const w = canvas.width, h = canvas.height;
+            return {
+                x: (x - w / 2) * zoomLevel + w / 2 + panX,
+                y: (y - h / 2) * zoomLevel + h / 2 + panY
+            };
+        }
+
+        // Update from vector end point
+        function updateFromPoint(x, y) {
+            const dx = x - origin.x;
+            const dy = origin.y - y;
+            magnitude = Math.sqrt(dx * dx + dy * dy) / scale;
+            if (magnitude < 5) magnitude = 5;
+            if (magnitude > 50) magnitude = 50;
+            angle = Math.atan2(dy, dx) * 180 / Math.PI;
+            if (angle < 0) angle += 360;
+            updateDisplay();
+            draw();
+        }
+
+        // Update all displays
+        const angleInput = document.getElementById('angleInput');
+
+        // Keep the angle input in sync when the vector is dragged
+        function updateDisplay() {
+            if (angleInput && document.activeElement !== angleInput) {
+                angleInput.value = (Math.round(angle * 10) / 10).toString();
+            }
+        }
+
+        // Typing an angle updates the vector (magnitude unchanged)
+        const angleModal = document.getElementById('angleModal');
+        const angleModalTitle = document.getElementById('angleModalTitle');
+        const angleModalText = document.getElementById('angleModalText');
+        const angleModalMsgs = {
+            0: 'Jika vektor berada di sumbu-x, maka tidak memiliki komponen vektor pada sumbu y (Vy = 0)',
+            90: 'Ketika vektor berada di sumbu-y, maka tidak memiliki komponen vektor pada sumbu x (Vx = 0)'
+        };
+        const angleModalSpeech = {
+            0: 'Jika vektor berada di sumbu x, maka tidak memiliki komponen vektor pada sumbu y. V y sama dengan nol.',
+            90: 'Ketika vektor berada di sumbu y, maka tidak memiliki komponen vektor pada sumbu x. V x sama dengan nol.'
+        };
+
+        // ===== Voice guidance (Web Speech API) =====
+        const kVoiceBtn = document.getElementById('kVoiceBtn');
+        const kTts = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+        let kVoiceOn = true;
+        let kIdVoice = null;
+        let introSpoken = false;
+        const introText = 'Petunjuk. Geser ujung vektor, yaitu kepala anak panah, untuk mengubah panjang dan sudut. Geser panel Nilai Saat Ini untuk memindahkan posisinya. Geser area kosong untuk menggeser gambar. Cubit untuk zoom.';
+        function kPickVoice() { if (kTts) kIdVoice = speechSynthesis.getVoices().find(v => /^id([-_]|$)/i.test(v.lang)) || null; }
+        if (kTts) { kPickVoice(); if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', kPickVoice); }
+        function kSpeak(text, onStart) {
+            if (!kTts || !kVoiceOn) return;
+            speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'id-ID';
+            if (kIdVoice) u.voice = kIdVoice;
+            u.rate = 0.95;
+            if (onStart) u.onstart = onStart;
+            speechSynthesis.speak(u);
+        }
+        function kStop() { if (kTts) speechSynthesis.cancel(); }
+        function tabKomponenActive() { return document.getElementById('tabKomponen').classList.contains('active'); }
+        // Browsers often block speech until the first tap/click, so try now and
+        // again on the first user gesture if the first attempt never started.
+        let introAttempts = 0;
+        function speakIntro() {
+            if (introSpoken || !kVoiceOn || !kTts || !tabKomponenActive() || introAttempts >= 4) return;
+            introAttempts++;
+            kSpeak(introText, () => { introSpoken = true; });
+        }
+        ['pointerdown', 'keydown', 'touchstart'].forEach(ev =>
+            document.addEventListener(ev, () => { if (!introSpoken) speakIntro(); }, { passive: true }));
+        if (!kTts) kVoiceBtn.style.display = 'none';
+        kVoiceBtn.addEventListener('click', () => {
+            kVoiceOn = !kVoiceOn;
+            kVoiceBtn.classList.toggle('on', kVoiceOn);
+            kVoiceBtn.setAttribute('aria-pressed', kVoiceOn);
+            kVoiceBtn.textContent = kVoiceOn ? '🔊' : '🔇';
+            if (kVoiceOn) { introSpoken = true; kSpeak(introText); } else kStop();
+        });
+        setTimeout(speakIntro, 400);
+
+        let angleModalTimer = null;
+        let lastPopupValue = null; // avoid re-showing for the same typed value
+
+        function maybeShowAnglePopup() {
+            clearTimeout(angleModalTimer);
+            const v = parseFloat(angleInput.value.replace(',', '.'));
+            if (v !== 0 && v !== 90) { lastPopupValue = null; return; }
+            if (lastPopupValue === v) return;
+            lastPopupValue = v;
+            angleModalTitle.textContent = (v === 0) ? 'Vektor di sumbu-x' : 'Vektor di sumbu-y';
+            angleModalText.textContent = angleModalMsgs[v];
+            angleModal.classList.add('show');
+            kSpeak(angleModalSpeech[v]);
+        }
+        function closeAngleModal() { angleModal.classList.remove('show'); kStop(); }
+        document.getElementById('angleModalOk').addEventListener('click', closeAngleModal);
+        angleModal.addEventListener('click', (e) => { if (e.target === angleModal) closeAngleModal(); });
+
+        angleInput.addEventListener('input', () => {
+            const v = parseFloat(angleInput.value.replace(',', '.'));
+            clearTimeout(angleModalTimer);
+            if (isNaN(v)) return;
+            angle = ((v % 360) + 360) % 360;
+            draw();
+            // debounce so typing "0,5" or "9" -> "90" doesn't trigger prematurely
+            angleModalTimer = setTimeout(maybeShowAnglePopup, 700);
+        });
+        angleInput.addEventListener('change', maybeShowAnglePopup);
+        angleInput.addEventListener('blur', updateDisplay);
+
+        // Draw function
+        function draw() {
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Clear canvas
+            ctx.fillStyle = isDarkMode ? '#1a1a1a' : '#fafafa';
+            ctx.fillRect(0, 0, w, h);
+
+            // Save and apply zoom
+            ctx.save();
+            ctx.translate(w / 2 + panX, h / 2 + panY);
+            ctx.scale(zoomLevel, zoomLevel);
+            ctx.translate(-w / 2, -h / 2);
+
+            // Draw grid
+            ctx.strokeStyle = isDarkMode ? '#333' : '#e0e0e0';
+            ctx.lineWidth = 1;
+            const gridSize = 50;
+            // grid covers whatever part of the world is currently visible (after pan/zoom)
+            const vMinX = (0 - w / 2 - panX) / zoomLevel + w / 2, vMaxX = (w - w / 2 - panX) / zoomLevel + w / 2;
+            const vMinY = (0 - h / 2 - panY) / zoomLevel + h / 2, vMaxY = (h - h / 2 - panY) / zoomLevel + h / 2;
+            for (let i = Math.floor(vMinX / gridSize) * gridSize; i <= vMaxX; i += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(i, vMinY);
+                ctx.lineTo(i, vMaxY);
+                ctx.stroke();
+            }
+            for (let i = Math.floor(vMinY / gridSize) * gridSize; i <= vMaxY; i += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(vMinX, i);
+                ctx.lineTo(vMaxX, i);
+                ctx.stroke();
+            }
+
+            // Draw axes
+            ctx.strokeStyle = isDarkMode ? '#666' : '#333';
+            ctx.lineWidth = 2;
+            
+            // X axis
+            ctx.beginPath();
+            ctx.moveTo(origin.x, origin.y);
+            ctx.lineTo(origin.x + 300, origin.y);
+            ctx.stroke();
+            
+            // Y axis
+            ctx.beginPath();
+            ctx.moveTo(origin.x, origin.y);
+            ctx.lineTo(origin.x, origin.y - 300);
+            ctx.stroke();
+
+            // Draw axis arrows
+            drawArrow(origin.x + 300, origin.y, origin.x + 310, origin.y, isDarkMode ? '#666' : '#333');
+            drawArrow(origin.x, origin.y - 300, origin.x, origin.y - 310, isDarkMode ? '#666' : '#333');
+
+            // Draw axis labels
+            ctx.fillStyle = isDarkMode ? '#aaa' : '#333';
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText('x', origin.x + 320, origin.y + 5);
+            ctx.fillText('y', origin.x - 15, origin.y - 310);
+
+            // Draw unit markers on axes
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            for (let i = 1; i <= 5; i++) {
+                const pos = i * scale * 10;
+                ctx.fillText(i * 10, origin.x + pos, origin.y + 15);
+            }
+            ctx.textAlign = 'right';
+            for (let i = 1; i <= 5; i++) {
+                const pos = i * scale * 10;
+                ctx.fillText(i * 10, origin.x - 10, origin.y - pos + 5);
+            }
+
+            // Get vector end point
+            const end = getVectorEnd();
+            const end2 = end;
+            const rad = (angle * Math.PI) / 180;
+            const vx = magnitude * Math.cos(rad);
+            const vy = magnitude * Math.sin(rad);
+
+            // Point on the x-axis directly below/above the vector tip
+            const xAxisPoint = { x: end.x, y: origin.y };
+            // Point on the y-axis directly left/right of the vector tip
+            const yAxisPoint = { x: origin.x, y: end.y };
+
+            // Dashed projection lines connecting the vector tip to each axis
+            ctx.strokeStyle = isDarkMode ? '#666' : '#999';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([5, 5]);
+
+            // Projection line to the x-axis
+            ctx.beginPath();
+            ctx.moveTo(end.x, end.y);
+            ctx.lineTo(xAxisPoint.x, xAxisPoint.y);
+            ctx.stroke();
+
+            // Projection line to the y-axis
+            ctx.beginPath();
+            ctx.moveTo(end.x, end.y);
+            ctx.lineTo(yAxisPoint.x, yAxisPoint.y);
+            ctx.stroke();
+
+            ctx.setLineDash([]);
+
+            // Draw Vx as an arrow lying on the x-axis
+            drawVector(origin.x, origin.y, xAxisPoint.x, xAxisPoint.y, '#c41c3b', 3);
+
+            // Draw Vy as an arrow lying on the y-axis
+            drawVector(origin.x, origin.y, yAxisPoint.x, yAxisPoint.y, '#0d47a1', 3);
+
+            // Draw Vx label on the X-axis
+            ctx.fillStyle = '#c41c3b';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Vₓ = ${vx.toFixed(2)}`, (origin.x + xAxisPoint.x) / 2, origin.y + 25);
+
+            // Draw Vy label on the Y-axis (always here, never on the main vector)
+            ctx.fillStyle = '#0d47a1';
+            ctx.textAlign = 'right';
+            ctx.fillText(`Vᵧ = ${vy.toFixed(2)}`, origin.x - 10, (origin.y + yAxisPoint.y) / 2 + 5);
+
+            // Draw |V| label on main vector (diagonal)
+            ctx.fillStyle = '#667eea';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            const midX = (origin.x + end2.x) / 2;
+            const midY = (origin.y + end2.y) / 2;
+            // Offset label perpendicular to vector
+            const offsetDist = 25;
+            const offsetX = -Math.sin(rad) * offsetDist;
+            const offsetY = Math.cos(rad) * offsetDist;
+            ctx.fillText(`|V| = ${magnitude.toFixed(2)}`, midX + offsetX, midY + offsetY);
+
+            // Draw main vector
+            drawVector(origin.x, origin.y, end2.x, end2.y, '#667eea', 3);
+
+            // Draw angle arc
+            drawAngleArc(origin.x, origin.y, 40, 0, angle);
+
+            // Draw origin point
+            ctx.fillStyle = '#667eea';
+            ctx.beginPath();
+            ctx.arc(origin.x, origin.y, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw end point (draggable)
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            ctx.arc(end.x, end.y, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Restore zoom
+            ctx.restore();
+
+            // Draw values on canvas (outside zoom)
+            drawValuesOnCanvas();
+        }
+
+        function drawVector(fromX, fromY, toX, toY, color, width) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = width;
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+
+            // Draw arrowhead
+            const headlen = 15;
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawArrow(fromX, fromY, toX, toY, color) {
+            const headlen = 10;
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawAngleArc(cx, cy, radius, startAngle, endAngle) {
+            ctx.strokeStyle = '#ffa500';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, -startAngle * Math.PI / 180, -endAngle * Math.PI / 180, true);
+            ctx.stroke();
+
+            // Draw angle label
+            const midAngle = endAngle / 2;
+            const labelRad = midAngle * Math.PI / 180;
+            const labelX = cx + (radius + 20) * Math.cos(labelRad);
+            const labelY = cy - (radius + 20) * Math.sin(labelRad);
+            ctx.fillStyle = '#ffa500';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${angle.toFixed(1)}°`, labelX, labelY);
+        }
+
+        let panelHeight = 70; // updated dynamically each draw to match actual content height
+
+        function drawValuesOnCanvas() {
+            const rad = (angle * Math.PI) / 180;
+            const vx = magnitude * Math.cos(rad);
+            const vy = magnitude * Math.sin(rad);
+
+            const boxWidth = (canvas.width - 20) / 2; // Seukuran lebar kanvas minus padding
+            const padding = 8;
+            const availableWidth = boxWidth - padding * 2;
+            if (!panelMoved) { panelX = canvas.width - boxWidth - 10; panelY = 10; }
+            else { panelX = Math.max(0, Math.min(panelX, canvas.width - boxWidth)); }
+            const startX = panelX;
+
+            const textDark = isDarkMode ? '#e0e0e0' : '#1a1a1a';
+            const textMag = isDarkMode ? '#ff6b6b' : '#c41c3b';
+            const textAngle = isDarkMode ? '#ffa500' : '#d84315';
+            const textResult = isDarkMode ? '#4444ff' : '#0d47a1';
+
+            const m = magnitude.toFixed(1), a = angle.toFixed(1);
+            // Each component takes two lines: the result (big and bold) and the formula behind it (smaller).
+            const rows = [
+                { big: true,  seg: [{ t: 'Vₓ = ', c: textDark }, { t: `${vx.toFixed(2)} cm`, c: textResult }] },
+                { big: false, seg: [{ t: '= ', c: textDark }, { t: m, c: textMag }, { t: ' · cos(', c: textDark }, { t: `${a}°`, c: textAngle }, { t: ')', c: textDark }] },
+                { big: true,  seg: [{ t: 'Vᵧ = ', c: textDark }, { t: `${vy.toFixed(2)} cm`, c: textResult }] },
+                { big: false, seg: [{ t: '= ', c: textDark }, { t: m, c: textMag }, { t: ' · sin(', c: textDark }, { t: `${a}°`, c: textAngle }, { t: ')', c: textDark }] }
+            ];
+            const fontOf = (big, size) => `${big ? 'bold ' : ''}${size}px 'Courier New', monospace`;
+            const widthOf = (row, size) => { ctx.font = fontOf(row.big, size); return row.seg.reduce((w, g) => w + ctx.measureText(g.t).width, 0); };
+            // Largest sizes that still fit the box width (formula lines are the widest)
+            let bigSize = 17, smallSize = 13;
+            while (smallSize > 10 && rows.some(r => !r.big && widthOf(r, smallSize) > availableWidth)) smallSize -= 0.5;
+            while (bigSize > 12 && rows.some(r => r.big && widthOf(r, bigSize) > availableWidth)) bigSize -= 0.5;
+
+            const titleH = 22;
+            const bigH = bigSize + 7, smallH = smallSize + 6, gap = 5;
+            panelHeight = titleH + (bigH + smallH) * 2 + gap + 8;
+            const startY = panelY;
+
+            // Background box
+            ctx.fillStyle = isDarkMode ? 'rgba(0,0,0,0.6)' : 'rgba(255,248,240,0.95)';
+            ctx.fillRect(startX, startY, boxWidth, panelHeight);
+            ctx.strokeStyle = isDarkMode ? '#d4af37' : '#ffd700';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(startX, startY, boxWidth, panelHeight);
+
+            // Title
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#e65100';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText('Nilai Saat Ini:', startX + padding, startY + 17);
+
+            let y = startY + titleH;
+            rows.forEach((row, i) => {
+                const size = row.big ? bigSize : smallSize;
+                y += row.big ? bigH : smallH;
+                if (i === 2) y += gap;
+                let x = startX + padding;
+                ctx.font = fontOf(row.big, size);
+                ctx.textAlign = 'left';
+                row.seg.forEach(g => { ctx.fillStyle = g.c; ctx.fillText(g.t, x, y - 4); x += ctx.measureText(g.t).width; });
+            });
+        }
+
+        // Check if mouse is over panel
+        function isMouseOverPanel(x, y) {
+            const boxWidth = (canvas.width - 20) / 2;
+            return x >= panelX && x <= panelX + boxWidth && y >= panelY && y <= panelY + panelHeight;
+        }
+
+// Event listeners
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Check if clicking on panel
+            if (isMouseOverPanel(x, y)) {
+                isPanelDragging = true;
+                panelMoved = true;
+                panelDragStartX = x - panelX;
+                panelDragStartY = y - panelY;
+                canvas.style.cursor = 'grabbing';
+            } else {
+                // Check if clicking on vector endpoint (compare in screen space so the
+                // tap target matches what's visually drawn after pinch-zoom)
+                const end = getVectorEnd();
+                const endScreen = worldToScreen(end.x, end.y);
+                const dist = Math.sqrt((x - endScreen.x) ** 2 + (y - endScreen.y) ** 2);
+                if (dist < 15) {
+                    isDragging = true;
+                } else {
+                    isPanning = true;
+                    panStart = { x: x, y: y, px: panX, py: panY };
+                    canvas.style.cursor = 'grabbing';
+                }
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Handle panel dragging
+            if (isPanelDragging) {
+                panelX = x - panelDragStartX;
+                panelY = y - panelDragStartY;
+                
+                // Keep panel within bounds
+                const boxWidth = (canvas.width - 20) / 2;
+                if (panelX < 0) panelX = 0;
+                if (panelY < 0) panelY = 0;
+                if (panelX + boxWidth > canvas.width) panelX = canvas.width - boxWidth;
+                if (panelY + panelHeight > canvas.height) panelY = canvas.height - panelHeight;
+                
+                draw();
+            } else if (isDragging) {
+                const world = screenToWorld(x, y);
+                updateFromPoint(world.x, world.y);
+            } else if (isPanning) {
+                panX = panStart.px + (x - panStart.x);
+                panY = panStart.py + (y - panStart.y);
+                clampPan();
+                draw();
+            } else {
+                // Change cursor when hovering over panel
+                if (isMouseOverPanel(x, y)) {
+                    canvas.style.cursor = 'grab';
+                } else {
+                    canvas.style.cursor = 'crosshair';
+                }
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isPanning = false;
+            isDragging = false;
+            isPanelDragging = false;
+            canvas.style.cursor = 'crosshair';
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isPanning = false;
+            isDragging = false;
+            isPanelDragging = false;
+            canvas.style.cursor = 'crosshair';
+        });
+
+        // Touch events
+        canvas.addEventListener('dblclick', resetView);
+        document.getElementById('kResetView').addEventListener('click', resetView);
+
+        canvas.addEventListener('touchstart', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            
+            if (e.touches.length === 2) {
+                // Pinch zoom
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                lastTouchDistance = Math.hypot(
+                    touch2.clientX - touch1.clientX,
+                    touch2.clientY - touch1.clientY
+                );
+                lastTouchMid = { x: (touch1.clientX + touch2.clientX) / 2, y: (touch1.clientY + touch2.clientY) / 2 };
+                isPanning = false; isDragging = false; isPanelDragging = false;
+            } else if (e.touches.length === 1) {
+                // Single touch drag
+                const touch = e.touches[0];
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                
+                // Check if touching panel
+                if (isMouseOverPanel(x, y)) {
+                    isPanelDragging = true;
+                    panelMoved = true;
+                    panelDragStartX = x - panelX;
+                    panelDragStartY = y - panelY;
+                } else {
+                    // Check if touching vector endpoint (compare in screen space so the
+                    // tap target matches what's visually drawn after pinch-zoom)
+                    const end = getVectorEnd();
+                    const endScreen = worldToScreen(end.x, end.y);
+                    const dist = Math.sqrt((x - endScreen.x) ** 2 + (y - endScreen.y) ** 2);
+                    if (dist < 15) {
+                        isDragging = true;
+                    } else {
+                        isPanning = true;
+                        panStart = { x: x, y: y, px: panX, py: panY };
+                    }
+                }
+            }
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2) {
+                // Pinch zoom
+                const touch1 = e.touches[0];
+                const touch2 = e.touches[1];
+                const currentDistance = Math.hypot(
+                    touch2.clientX - touch1.clientX,
+                    touch2.clientY - touch1.clientY
+                );
+                
+                if (lastTouchDistance > 0) {
+                    const ratio = currentDistance / lastTouchDistance;
+                    zoomLevel *= ratio;
+                    
+                    // Limit zoom
+                    if (zoomLevel < 0.5) zoomLevel = 0.5;
+                    if (zoomLevel > 3) zoomLevel = 3;
+                    
+                    lastTouchDistance = currentDistance;
+                }
+                // two-finger drag also moves the view
+                const mid = { x: (touch1.clientX + touch2.clientX) / 2, y: (touch1.clientY + touch2.clientY) / 2 };
+                if (lastTouchMid) { panX += mid.x - lastTouchMid.x; panY += mid.y - lastTouchMid.y; clampPan(); }
+                lastTouchMid = mid;
+                draw();
+            } else if (e.touches.length === 1) {
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                
+                if (isPanelDragging) {
+                    panelX = x - panelDragStartX;
+                    panelY = y - panelDragStartY;
+                    
+                    // Keep panel within bounds
+                    const boxWidth = (canvas.width - 20) / 2;
+                    if (panelX < 0) panelX = 0;
+                    if (panelY < 0) panelY = 0;
+                    if (panelX + boxWidth > canvas.width) panelX = canvas.width - boxWidth;
+                    if (panelY + panelHeight > canvas.height) panelY = canvas.height - panelHeight;
+                    
+                    draw();
+                } else if (isDragging) {
+                    const world = screenToWorld(x, y);
+                    updateFromPoint(world.x, world.y);
+                } else if (isPanning) {
+                    panX = panStart.px + (x - panStart.x);
+                    panY = panStart.py + (y - panStart.y);
+                    clampPan();
+                    draw();
+                }
+            }
+        });
+
+        canvas.addEventListener('touchend', (e) => {
+            // double-tap on empty space resets the view
+            const now = Date.now();
+            const moved = isPanning && (Math.abs(panX - panStart.px) > 6 || Math.abs(panY - panStart.py) > 6);
+            if (e.touches.length === 0 && isPanning && !moved) {
+                if (now - lastTapTime < 320) { resetView(); lastTapTime = 0; } else { lastTapTime = now; }
+            }
+            isPanning = false;
+            isDragging = false;
+            isPanelDragging = false;
+            lastTouchDistance = 0;
+            lastTouchMid = null;
+        });
+
+
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert('Error fullscreen: ' + err.message);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            draw();
+        });
+
+        // Block right-click and download
+        canvas.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        document.addEventListener('keydown', (e) => {
+            // Block Ctrl+S / Cmd+S (Save)
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                return false;
+            }
+            // Block Ctrl+P / Cmd+P (Print)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Disable drag and drop
+        document.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+            return false;
+        });
+
+        // Start
+        init();
+
+        return {
+            onDarkModeToggle: function(dark) {
+                isDarkMode = dark;
+                draw();
+            },
+            onShow: function() {
+                resizeCanvas();
+                draw();
+                speakIntro();
+            }
+        };
+    })();
+    </script>
+
+    <script>
+    window.AdditionVectorApp = (function() {
+        const canvas = document.getElementById('canvasAdd');
+        const ctx = canvas.getContext('2d');
+        const chipRow = document.getElementById('chipRow');
+        const orderRow = document.getElementById('orderRow');
+        const playBtn = document.getElementById('playBtn');
+        const resetBtn = document.getElementById('resetAddBtn');
+        const stepNote = document.getElementById('stepNote');
+        const btnSegitiga = document.getElementById('btnSegitiga');
+        const btnJajaran = document.getElementById('btnJajaran');
+
+        let isDarkMode = false;
+
+        // Vector definitions (grid units)
+        const vectors = {
+            A: { x: 4, y: 1, color: '#2d6cdf', name: 'A' },
+            B: { x: 2, y: 3, color: '#2ea043', name: 'B' },
+            C: { x: -3, y: 2, color: '#9c27b0', name: 'C' }
+        };
+
+        // Free starting positions (pangkal) for each vector before animating —
+        // they do NOT meet at the origin until the animation runs.
+        const anchors = {
+            A: { x: -4.5, y: -2.5 },
+            B: { x: 3.5, y: -3.5 },
+            C: { x: -3.5, y: 3 }
+        };
+
+        let selected = ['A', 'B'];   // order matters: this IS the order of summation
+        const MAX_VECTORS = Object.keys(vectors).length; // cap = how many vectors exist (tap to pick, up to this many)
+        let method = 'segitiga';
+        let animTv = [0, 0];         // per-vector "sliding into place" progress, in selection order
+        let animTg  = 0;             // progress of forming the parallelogram ghost sides (jajaran, 2 vectors only)
+        let animT2  = 0;             // progress of the resultant vector growing in
+        let animating = false;
+        let animDone = false;
+        let animStart = 0;
+        const MOVE_MS_BASE = 800;    // time to slide each vector into place
+        const ARRANGE_MS_BASE = 700; // jajaran genjang only: forming the parallel sides
+        const RESULT_MS_BASE = 800;
+
+        // ===== Voice narration (Web Speech API, works offline if the device has an Indonesian TTS voice) =====
+        const voiceBtn = document.getElementById('voiceBtn');
+        const ttsSupported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+        let voiceOn = false;
+        let idVoice = null;
+        function pickVoice() {
+            if (!ttsSupported) return;
+            const vs = speechSynthesis.getVoices();
+            idVoice = vs.find(v => /^id([-_]|$)/i.test(v.lang)) || null;
+        }
+        if (ttsSupported) { pickVoice(); speechSynthesis.addEventListener && speechSynthesis.addEventListener('voiceschanged', pickVoice); }
+        function speak(text) {
+            if (!ttsSupported || !voiceOn) return;
+            speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'id-ID';
+            if (idVoice) u.voice = idVoice;
+            u.rate = 0.95;
+            speechSynthesis.speak(u);
+        }
+        function stopSpeech() { speechToken++; speechDone = true; if (ttsSupported) speechSynthesis.cancel(); }
+        let scale = 40;
+        let originX = 0, originY = 0;
+        const PANEL_H = 50;
+        const PANEL_MARGIN = 8;
+        const PANEL_GAP = 6; // gap between diagram and value panel
+        const TOP_LABEL_GAP = 30; // reserved space at top for the "R = A + B" text
+        const OVERLAY_RESERVE = 100; // extra space so the floating Animasikan/Ulangi overlay never covers the diagram
+
+        function mag(v) { return Math.hypot(v.x, v.y); }
+        function angleDeg(v) {
+            let a = Math.atan2(v.y, v.x) * 180 / Math.PI;
+            if (a < 0) a += 360;
+            return a;
+        }
+        function fmt(n) { return (Math.round(n * 100) / 100).toString().replace('.', ','); }
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            const w = rect.width || canvas.clientWidth || 300;
+            const h = rect.height || canvas.clientHeight || 340;
+            canvas.width = w * dpr;
+            canvas.height = h * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            fitScale(w, h);
+        }
+
+        // Cumulative chain positions in the CHOSEN order (tip-to-tail), assuming
+        // the whole chain is anchored at the origin. This is what makes the
+        // summation order-sensitive: vector i always slides toward the point
+        // where vectors 0..i-1 (in the chosen order) would end.
+        function chainCumulative(keys) {
+            let cum = { x: 0, y: 0 };
+            const cums = [cum];
+            keys.forEach(k => {
+                const v = vectors[k];
+                cum = { x: cum.x + v.x, y: cum.y + v.y };
+                cums.push(cum);
+            });
+            return cums; // length keys.length+1; cums[i] = sum of first i vectors, cums[last] = Rfinal
+        }
+
+        function fitScale(w, h) {
+            const reserveBottom = PANEL_H + PANEL_MARGIN * 2 + PANEL_GAP + OVERLAY_RESERVE;
+            const drawableTop = TOP_LABEL_GAP;
+            const drawableH = Math.max(80, h - reserveBottom - drawableTop);
+            const pts = [{x:0,y:0}];
+            const keys = selected;
+            if (keys.length < 2) { scale = 40; originX = w*0.32; originY = drawableTop + drawableH*0.68; return; }
+            const cums = chainCumulative(keys);
+            keys.forEach((k, i) => {
+                const v = vectors[k], a = anchors[k];
+                pts.push(a, { x: a.x+v.x, y: a.y+v.y });
+                pts.push(cums[i], cums[i+1]);
+            });
+            pts.push(cums[cums.length-1]); // Rfinal
+            let maxX=1, maxY=1, minX=-1, minY=-1;
+            pts.forEach(p=>{ maxX=Math.max(maxX,p.x); maxY=Math.max(maxY,p.y); minX=Math.min(minX,p.x); minY=Math.min(minY,p.y); });
+            const spanX = maxX - minX + 2;
+            const spanY = maxY - minY + 2;
+            const availW = w * 0.9;
+            const availH = drawableH * 0.85;
+            scale = Math.max(16, Math.min(availW/spanX, availH/spanY, Math.max(55, Math.min(w * 0.16, 85))));
+            originX = w*0.5 - (minX+maxX)/2*scale;
+            originY = drawableTop + drawableH*0.5 + (minY+maxY)/2*scale;
+        }
+
+        function toScreen(x, y) { return { x: originX + x*scale, y: originY - y*scale }; }
+
+        function drawGrid(w, h) {
+            ctx.strokeStyle = isDarkMode ? '#2a2a2a' : '#e5e5e5';
+            ctx.lineWidth = 1;
+            const step = scale;
+            let startX = originX % step;
+            for (let x = startX; x < w; x += step) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+            let startY = originY % step;
+            for (let y = startY; y < h; y += step) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+
+            ctx.strokeStyle = isDarkMode ? '#555' : '#bbb';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(0, originY); ctx.lineTo(w, originY); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(originX, 0); ctx.lineTo(originX, h); ctx.stroke();
+        }
+
+        function drawArrow(from, to, color, lineWidth, dashed) {
+            const p1 = toScreen(from.x, from.y);
+            const p2 = toScreen(to.x, to.y);
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = lineWidth;
+            if (dashed) ctx.setLineDash([6,5]);
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            const ang = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+            const headLen = 11 + lineWidth;
+            if (Math.hypot(p2.x-p1.x, p2.y-p1.y) > 4) {
+                ctx.beginPath();
+                ctx.moveTo(p2.x, p2.y);
+                ctx.lineTo(p2.x - headLen*Math.cos(ang-0.4), p2.y - headLen*Math.sin(ang-0.4));
+                ctx.lineTo(p2.x - headLen*Math.cos(ang+0.4), p2.y - headLen*Math.sin(ang+0.4));
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function drawLabel(pos, text, color) {
+            const p = toScreen(pos.x, pos.y);
+            ctx.save();
+            ctx.font = 'bold 15px Arial';
+            const tw = ctx.measureText(text).width;
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.roundRect ? ctx.roundRect(p.x-tw/2-5, p.y-11, tw+10, 22, 5) : ctx.rect(p.x-tw/2-5, p.y-11, tw+10, 22);
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, p.x, p.y+1);
+            ctx.restore();
+        }
+
+        function lerpPt(a, b, t) { return { x: a.x + (b.x-a.x)*t, y: a.y + (b.y-a.y)*t }; }
+
+        function drawRoundRect(x, y, w, h, r) {
+            ctx.beginPath();
+            if (ctx.roundRect) { ctx.roundRect(x, y, w, h, r); }
+            else {
+                ctx.moveTo(x+r, y);
+                ctx.arcTo(x+w, y, x+w, y+h, r);
+                ctx.arcTo(x+w, y+h, x, y+h, r);
+                ctx.arcTo(x, y+h, x, y, r);
+                ctx.arcTo(x, y, x+w, y, r);
+            }
+        }
+
+        function drawBottomPanel(w, h, hasValue, RmagShown, thetaShown) {
+            const panelW = w - PANEL_MARGIN * 2;
+            const panelX = PANEL_MARGIN;
+            const panelY = h - PANEL_H - PANEL_MARGIN;
+
+            ctx.save();
+            const grad = ctx.createLinearGradient(panelX, panelY, panelX + panelW, panelY + PANEL_H);
+            grad.addColorStop(0, isDarkMode ? '#4a5568' : '#667eea');
+            grad.addColorStop(1, isDarkMode ? '#2d3748' : '#764ba2');
+            ctx.fillStyle = grad;
+            drawRoundRect(panelX, panelY, panelW, PANEL_H, 10);
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(panelX + panelW/2, panelY + 8);
+            ctx.lineTo(panelX + panelW/2, panelY + PANEL_H - 8);
+            ctx.stroke();
+
+            const cx1 = panelX + panelW * 0.25;
+            const cx2 = panelX + panelW * 0.75;
+            ctx.textAlign = 'center';
+
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.font = '10px Arial';
+            ctx.fillText('|R| (Resultan)', cx1, panelY + 17);
+            ctx.fillText('Arah θ', cx2, panelY + 17);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 15px Arial';
+            ctx.fillText(hasValue ? (fmt(RmagShown) + ' satuan') : '-', cx1, panelY + 37);
+            ctx.fillText(hasValue ? (fmt(thetaShown) + '°') : '-', cx2, panelY + 37);
+
+            ctx.restore();
+        }
+
+        function draw() {
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0,0,w,h);
+            drawGrid(w,h);
+
+            const keys = selected;
+            if (keys.length < 2) {
+                ctx.save();
+                ctx.fillStyle = isDarkMode ? '#888':'#999';
+                ctx.font = '13px Arial';
+                ctx.textAlign='center';
+                ctx.fillText('Pilih minimal 2 vektor terlebih dahulu', w/2, h/2);
+                ctx.restore();
+                drawBottomPanel(w, h, false, 0, 0);
+                return;
+            }
+            const N = keys.length;
+            const origin = {x:0,y:0};
+            const cums = chainCumulative(keys);      // fixed final chain targets, independent of animation
+            const Rfinal = cums[N];
+            const useJajaran = method === 'jajaran' && N === 2;
+
+            const tv = (animating || animDone) ? animTv : new Array(N).fill(0);
+            const tg = (animating || animDone) ? animTg  : 0;
+            const t2 = (animating || animDone) ? animT2  : 0;
+
+            // Draw each vector sliding tip-to-tail, in the chosen order.
+            keys.forEach((k, i) => {
+                const v = vectors[k];
+                const a = anchors[k];
+                const target = useJajaran ? origin : cums[i]; // jajaran genjang: both vectors share the origin
+                const start = lerpPt(a, target, tv[i] || 0);
+                const end = { x: start.x + v.x, y: start.y + v.y };
+                drawArrow(start, end, v.color, 4, false);
+                drawLabel({x:(start.x+end.x)/2, y:(start.y+end.y)/2 + 0.35}, v.name, v.color);
+            });
+
+            // Ghost parallel sides only make sense for the classic 2-vector jajaran genjang method
+            if (useJajaran && tg > 0) {
+                const v1 = vectors[keys[0]], v2 = vectors[keys[1]];
+                const v1End = { x: v1.x, y: v1.y }, v2End = { x: v2.x, y: v2.y };
+                const gv1Start = lerpPt(origin, v2End, tg);
+                const gv1End = { x: gv1Start.x+v1.x, y: gv1Start.y+v1.y };
+                const gv2Start = lerpPt(origin, v1End, tg);
+                const gv2End = { x: gv2Start.x+v2.x, y: gv2Start.y+v2.y };
+                drawArrow(gv1Start, gv1End, v1.color, 2.5, true);
+                drawArrow(gv2Start, gv2End, v2.color, 2.5, true);
+            }
+
+            if (t2 > 0) {
+                const Rpt = { x: Rfinal.x*t2, y: Rfinal.y*t2 };
+                drawArrow(origin, Rpt, '#e53935', 5, false);
+                if (t2 > 0.15) drawLabel({x: Rpt.x*0.5 - 0.4, y: Rpt.y*0.5 - 0.3}, 'R', '#e53935');
+            }
+
+            const o = toScreen(0,0);
+            ctx.fillStyle = isDarkMode ? '#ccc' : '#555';
+            ctx.beginPath(); ctx.arc(o.x, o.y, 3.5, 0, Math.PI*2); ctx.fill();
+
+            // Floating "R = A + B (+ C)" text, fades in only once the resultant starts growing
+            if (t2 > 0) {
+                ctx.save();
+                ctx.globalAlpha = Math.min(1, t2 * 1.6);
+                ctx.font = 'bold 17px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#e53935';
+                ctx.fillText(`R = ${keys.join(' + ')}`, w/2, 26);
+                ctx.restore();
+            }
+
+            if (t2 > 0) {
+                const RmagFinal = mag(Rfinal);
+                const RmagShown = RmagFinal * t2;
+                drawBottomPanel(w, h, true, RmagShown, angleDeg(Rfinal));
+            } else {
+                drawBottomPanel(w, h, false, 0, 0);
+            }
+        }
+
+        function buildChips() {
+            chipRow.innerHTML = '';
+            Object.keys(vectors).forEach(key => {
+                const v = vectors[key];
+                const orderIdx = selected.indexOf(key);
+                const chip = document.createElement('div');
+                chip.className = 'va-chip' + (orderIdx > -1 ? ' selected' : '');
+                chip.style.setProperty('--c', v.color);
+                const badge = orderIdx > -1 ? `<div class="va-chip-badge">${orderIdx+1}</div>` : '';
+                chip.innerHTML = `${badge}<div class="va-name" style="color:${v.color}">${v.name}</div><div class="va-comp">(${v.x}, ${v.y})</div>`;
+                chip.addEventListener('click', () => toggleVector(key));
+                chipRow.appendChild(chip);
+            });
+        }
+
+        // Shows the currently chosen summation order with ‹ › buttons to swap
+        // a vector's position with its neighbor — this is how the order (e.g.
+        // B first then A, or any order of 3 vectors) gets changed explicitly.
+        function buildOrderRow() {
+            orderRow.innerHTML = '';
+            if (selected.length < 2) {
+                orderRow.innerHTML = '<div class="va-order-empty">Ketuk vektor di atas sesuai urutan penjumlahan yang diinginkan</div>';
+                return;
+            }
+            const label = document.createElement('div');
+            label.className = 'va-order-label';
+            label.textContent = 'Urutan: ';
+            orderRow.appendChild(label);
+            selected.forEach((key, idx) => {
+                const v = vectors[key];
+                const pill = document.createElement('div');
+                pill.className = 'va-order-pill';
+                pill.style.background = v.color;
+                const leftBtn = idx > 0 ? `<button class="va-order-arrow" data-dir="left" data-idx="${idx}" title="Geser ke kiri">‹</button>` : '';
+                const rightBtn = idx < selected.length-1 ? `<button class="va-order-arrow" data-dir="right" data-idx="${idx}" title="Geser ke kanan">›</button>` : '';
+                pill.innerHTML = `${leftBtn}<span class="va-order-num">${idx+1}</span>${v.name}${rightBtn}`;
+                orderRow.appendChild(pill);
+            });
+            orderRow.querySelectorAll('.va-order-arrow').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (animating) return;
+                    const idx = parseInt(btn.dataset.idx, 10);
+                    const swapWith = btn.dataset.dir === 'left' ? idx - 1 : idx + 1;
+                    [selected[idx], selected[swapWith]] = [selected[swapWith], selected[idx]];
+                    onSelectionChanged();
+                });
+            });
+        }
+
+        function resetAnimState() {
+            animTv = new Array(selected.length).fill(0);
+            animTg = 0; animT2 = 0; animDone = false;
+        }
+
+        function updateMethodAvailability() {
+            const disable = selected.length > 2;
+            btnJajaran.classList.toggle('va-btn-disabled', disable);
+            if (disable && method === 'jajaran') {
+                method = 'segitiga';
+                btnSegitiga.classList.add('active');
+                btnJajaran.classList.remove('active');
+            }
+        }
+
+        function onSelectionChanged() {
+            if (!animating) stopSpeech();
+            updateMethodAvailability();
+            resetAnimState();
+            buildChips();
+            buildOrderRow();
+            resizeCanvas();
+            draw();
+            updatePlayState();
+            stepNote.textContent = selected.length < 2
+                ? 'Pilih minimal 2 vektor untuk dijumlahkan'
+                : 'Ketuk "Animasikan" untuk melihat resultannya';
+        }
+
+        function toggleVector(key) {
+            if (animating) return;
+            if (selected.includes(key)) {
+                selected = selected.filter(k => k !== key);
+            } else {
+                if (selected.length >= MAX_VECTORS) selected.shift();
+                selected.push(key);
+            }
+            onSelectionChanged();
+        }
+
+        function updatePlayState() {
+            playBtn.disabled = selected.length < 2 || animating;
+        }
+
+        function setMethod(m) {
+            if (animating) return;
+            if (m === 'jajaran' && selected.length > 2) return; // jajaran genjang only defined for 2 vectors
+            method = m;
+            btnSegitiga.classList.toggle('active', m==='segitiga');
+            btnJajaran.classList.toggle('active', m==='jajaran');
+            resetAnimState();
+            draw();
+            stepNote.textContent = 'Ketuk "Animasikan" untuk melihat resultannya';
+        }
+
+        // ===== Narration-driven animation: each step waits until its sentence has been fully spoken =====
+        let phases = [], phaseIdx = 0, phaseStart = 0;
+        let speechDone = true, speechToken = 0;
+
+        function startSpeech(text) {
+            const token = ++speechToken;
+            if (!ttsSupported || !voiceOn) { speechDone = true; return; }
+            speechDone = false;
+            const finish = () => { if (token === speechToken) speechDone = true; };
+            speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'id-ID';
+            if (idVoice) u.voice = idVoice;
+            u.rate = 0.95;
+            u.onend = finish;
+            u.onerror = finish;
+            speechSynthesis.speak(u);
+            // safety net: some browsers never fire onend
+            setTimeout(finish, text.length * 130 + 3000);
+        }
+
+        function buildPhases(keys, useJajaran) {
+            const out = [];
+            keys.forEach((kk, i) => {
+                const text = i === 0
+                    ? `Langkah 1. Vektor ${kk} digeser sampai pangkalnya berada di titik asal.`
+                    : (useJajaran
+                        ? `Langkah ${i+1}. Vektor ${kk} juga digeser ke titik asal, sehingga pangkal kedua vektor berimpit.`
+                        : `Langkah ${i+1}. Vektor ${kk} digeser sehingga pangkalnya berimpit dengan ujung vektor ${keys[i-1]}.`);
+                const note = i === 0
+                    ? `Menggeser vektor ${kk} ke titik pangkal (0,0)...`
+                    : (useJajaran ? `Menggeser vektor ${kk} ke titik pangkal (0,0)...` : `Menggeser vektor ${kk} ke ujung vektor ${keys[i-1]}...`);
+                out.push({ kind: 'move', i, base: MOVE_MS_BASE, text, note });
+            });
+            if (useJajaran) {
+                out.push({ kind: 'arrange', base: ARRANGE_MS_BASE,
+                    text: 'Langkah 3. Dibuat garis putus-putus yang sejajar dengan masing-masing vektor, sehingga terbentuk jajaran genjang.',
+                    note: `Membentuk jajaran genjang dari ${keys[0]} dan ${keys[1]}...` });
+            }
+            out.push({ kind: 'result', base: RESULT_MS_BASE,
+                text: useJajaran
+                    ? 'Terakhir, resultan R digambar dari titik asal ke titik sudut yang berseberangan, yaitu diagonal jajaran genjang.'
+                    : 'Terakhir, resultan R digambar dari titik asal ke ujung vektor yang terakhir.',
+                note: `Menggambar resultan R = ${keys.join(' + ')}...` });
+            const Rv = keys.reduce((a, k) => ({ x: a.x + vectors[k].x, y: a.y + vectors[k].y }), { x: 0, y: 0 });
+            out.push({ kind: 'summary', base: 0,
+                text: `Resultan R sama dengan ${keys.join(' ditambah ')}. Besarnya ${fmt(mag(Rv))} satuan, dengan arah ${fmt(angleDeg(Rv))} derajat terhadap sumbu x.`,
+                note: 'Resultan R selesai digambar ✓' });
+            return out;
+        }
+
+        function beginPhase(now) {
+            const ph = phases[phaseIdx];
+            phaseStart = now;
+            ph.dur = ph.base * (voiceOn ? 1.6 : 1);
+            stepNote.textContent = ph.note;
+            startSpeech(ph.text);
+        }
+
+        function playAnim() {
+            if (selected.length < 2 || animating) return;
+            animating = true; animDone = false;
+            animTv = new Array(selected.length).fill(0);
+            animTg = 0; animT2 = 0;
+            playBtn.disabled = true;
+            phases = buildPhases(selected.slice(), method === 'jajaran' && selected.length === 2);
+            phaseIdx = 0;
+            requestAnimationFrame(now => { beginPhase(now); step(now); });
+        }
+
+        function step(now) {
+            const keys = selected;
+            const N = keys.length;
+            const useJajaran = method === 'jajaran' && N === 2;
+            const ph = phases[phaseIdx];
+            const p = ph.dur > 0 ? Math.min(1, (now - phaseStart) / ph.dur) : 1;
+            const e = easeOutCubic(p);
+
+            if (ph.kind === 'move') {
+                for (let j = 0; j < N; j++) animTv[j] = j < ph.i ? 1 : (j === ph.i ? e : 0);
+                animTg = 0; animT2 = 0;
+            } else if (ph.kind === 'arrange') {
+                animTv = new Array(N).fill(1); animTg = e; animT2 = 0;
+            } else if (ph.kind === 'result') {
+                animTv = new Array(N).fill(1); animTg = useJajaran ? 1 : 0; animT2 = e;
+            } else {
+                animTv = new Array(N).fill(1); animTg = useJajaran ? 1 : 0; animT2 = 1;
+            }
+            draw();
+
+            // A phase only ends when its motion is finished AND its sentence has been fully spoken
+            if (p >= 1 && speechDone) {
+                phaseIdx++;
+                if (phaseIdx >= phases.length) {
+                    animating = false; animDone = true;
+                    animTv = new Array(N).fill(1); animTg = useJajaran ? 1 : 0; animT2 = 1;
+                    draw();
+                    stepNote.textContent = 'Resultan R selesai digambar ✓';
+                    updatePlayState();
+                    return;
+                }
+                beginPhase(now);
+            }
+            requestAnimationFrame(step);
+        }
+
+        function easeOutCubic(x) { return 1 - Math.pow(1-x, 3); }
+
+        function resetAnim() {
+            if (animating) return;
+            stopSpeech();
+            resetAnimState();
+            draw();
+            updatePlayState();
+            stepNote.textContent = 'Ketuk "Animasikan" untuk melihat resultannya';
+        }
+
+        btnSegitiga.addEventListener('click', () => setMethod('segitiga'));
+        btnJajaran.addEventListener('click', () => setMethod('jajaran'));
+        playBtn.addEventListener('click', playAnim);
+        if (!ttsSupported) { voiceBtn.style.display = 'none'; }
+        voiceBtn.addEventListener('click', () => {
+            voiceOn = !voiceOn;
+            voiceBtn.classList.toggle('on', voiceOn);
+            voiceBtn.setAttribute('aria-pressed', voiceOn);
+            voiceBtn.textContent = voiceOn ? '🔊' : '🔇';
+            if (voiceOn) speak('Suara penjelasan aktif.'); else stopSpeech();
+        });
+        resetBtn.addEventListener('click', resetAnim);
+        window.addEventListener('resize', () => {
+            if (document.getElementById('tabJumlah').classList.contains('active')) {
+                resizeCanvas(); draw();
+            }
+        });
+
+        // init (chips/order row only; canvas sizes when tab is shown)
+        buildChips();
+        buildOrderRow();
+        updatePlayState();
+
+        return {
+            onDarkModeToggle: function(dark) {
+                isDarkMode = dark;
+                draw();
+            },
+            onShow: function() {
+                resizeCanvas();
+                draw();
+            }
+        };
+    })();
+    </script>
+
+    <script>
+    window.ApplicationVectorApp = (function() {
+        const canvas = document.getElementById('canvasTerapan');
+        const ctx = canvas.getContext('2d');
+        const btnS1 = document.getElementById('btnTerapan1');
+        const btnS2 = document.getElementById('btnTerapan2');
+        const angleInput = document.getElementById('terapanAngle');
+        const voiceBtn = document.getElementById('tVoiceBtn');
+        const stepBadge = document.getElementById('tpBadge');
+        const stepTitle = document.getElementById('tpTitle');
+        const stepBody = document.getElementById('tpBody');
+        const dotsEl = document.getElementById('tpDots');
+        const prevBtn = document.getElementById('tpPrev');
+        const nextBtn = document.getElementById('tpNext');
+        const restartBtn = document.getElementById('tpRestart');
+
+        function total() { return scenario === 0 ? 6 : 5; }
+        const PI = Math.PI;
+        let isDark = false;
+        let scenario = 0;      // 0 = benda ditarik tali, 1 = bidang miring
+        let step = 0;          // index of the step currently being drawn (0..5)
+        let animT = 1;         // progress (0..1) of the newest element
+        let animRaf = 0;
+        let theta = 30;        // degrees
+        let W = 300, H = 300;
+
+        const COL = {
+            w: '#1a237e', N: '#37474f', F: '#e53935', f: '#ef6c00',
+            Fx: '#2ea043', Fy: '#9c27b0', wx: '#fb8c00', wy: '#fb8c00'
+        };
+
+        function fmt(n) { return (Math.round(n * 100) / 100).toString().replace('.', ','); }
+        function clampTheta() { return Math.min(scenario === 0 ? 70 : 60, Math.max(10, theta)); }
+
+        // ===== Voice =====
+        const tts = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+        let voiceOn = true, idVoice = null;
+        function pickVoice() { if (tts) idVoice = speechSynthesis.getVoices().find(v => /^id([-_]|$)/i.test(v.lang)) || null; }
+        if (tts) { pickVoice(); if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', pickVoice); }
+        function speak(t) {
+            if (!tts || !voiceOn) return;
+            speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(t);
+            u.lang = 'id-ID'; if (idVoice) u.voice = idVoice; u.rate = 0.95;
+            speechSynthesis.speak(u);
+        }
+        if (!tts) voiceBtn.style.display = 'none';
+        voiceBtn.addEventListener('click', () => {
+            voiceOn = !voiceOn;
+            voiceBtn.classList.toggle('on', voiceOn);
+            voiceBtn.setAttribute('aria-pressed', voiceOn);
+            voiceBtn.textContent = voiceOn ? '🔊' : '🔇';
+            if (voiceOn) speak(content(step).speech); else if (tts) speechSynthesis.cancel();
+        });
+
+        // ===== Step texts =====
+        function content(i) {
+            const th = clampTheta();
+            const rad = th * PI / 180;
+            if (scenario === 0) {
+                const fx = 80 * Math.cos(rad), fy = 80 * Math.sin(rad);
+                return [
+                    { title: 'Siapkan benda dan sumbu',
+                      body: 'Gambar benda sebagai kotak di atas bidang datar. Tentukan sumbu: x mendatar dan y tegak, dengan titik asal di pusat benda (titik tangkap semua gaya).',
+                      speech: 'Langkah 1. Gambar benda sebagai kotak di atas bidang datar. Tentukan sumbu x mendatar dan sumbu y tegak, dengan titik asal di pusat benda.' },
+                    { title: 'Gambar gaya berat w',
+                      body: 'Gaya berat w selalu vertikal ke bawah, digambar dari pusat benda.',
+                      speech: 'Langkah 2. Gambar gaya berat w. Arahnya selalu vertikal ke bawah, dari pusat benda.' },
+                    { title: 'Gambar gaya normal N',
+                      body: 'Gaya normal N digambar dari titik sentuh antara benda dan bidang. Arahnya tegak lurus bidang sentuh dan menjauhi bidang, jadi ke atas (berlawanan arah dengan w).',
+                      speech: 'Langkah 3. Gambar gaya normal N dari titik sentuh antara benda dan bidang. Arahnya tegak lurus bidang sentuh, yaitu ke atas, berlawanan dengan gaya berat.' },
+                    { title: 'Gambar gaya tarik F = 80 N',
+                      body: `Dari pusat benda, gambar F = 80 N miring ${fmt(th)}° di atas sumbu x. Buat garis acuan mendatar (putus-putus) lalu tandai sudut θ antara garis acuan dan F.`,
+                      speech: `Langkah 4. Gambar gaya tarik F sebesar 80 newton. Arahnya miring ${fmt(th)} derajat di atas sumbu x. Buat garis acuan mendatar, lalu tandai sudut theta antara garis acuan dan F.` },
+                    { title: 'Gambar gaya gesek f',
+                      body: 'Gaya gesek f digambar tepat di permukaan bidang, mulai dari titik sentuh benda dengan bidang. Arahnya sejajar bidang dan berlawanan dengan arah gerak benda, jadi ke kiri.',
+                      speech: 'Langkah 5. Gambar gaya gesek f tepat di permukaan bidang, mulai dari titik sentuh benda dengan bidang. Arahnya sejajar bidang dan berlawanan dengan arah gerak benda, yaitu ke kiri.' },
+                    { title: 'Uraikan F menjadi komponen',
+                      body: `Fₓ = F cos θ sejajar sumbu x dan Fᵧ = F sin θ sejajar sumbu y. Gambar Fₓ dari titik asal, lalu Fᵧ dari ujung Fₓ sampai ke ujung F. Dengan F = 80 N dan θ = ${fmt(th)}°: Fₓ = ${fmt(fx)} N dan Fᵧ = ${fmt(fy)} N.`,
+                      speech: `Langkah 6. Uraikan F menjadi komponen. F x sama dengan F kali kosinus theta, sejajar sumbu x. F y sama dengan F kali sinus theta, sejajar sumbu y. Dengan F 80 newton dan theta ${fmt(th)} derajat, F x sama dengan ${fmt(fx)} newton dan F y sama dengan ${fmt(fy)} newton.` }
+                ][i];
+            }
+            const ws = 100 * Math.sin(rad), wc = 100 * Math.cos(rad);
+            return [
+                { title: 'Gambar bidang miring, benda, dan sumbu',
+                  body: `Gambar bidang miring dengan sudut θ = ${fmt(th)}° terhadap bidang datar dan tandai θ di kaki bidang miring. Letakkan benda (kotak) di atasnya, lalu pasang sumbu miring: sumbu x sejajar bidang miring dan sumbu y tegak lurus bidang.`,
+                  speech: `Langkah 1. Gambar bidang miring dengan sudut theta ${fmt(th)} derajat terhadap bidang datar, dan tandai theta di kaki bidang miring. Letakkan benda di atasnya, lalu pasang sumbu miring. Sumbu x sejajar bidang miring, dan sumbu y tegak lurus bidang.` },
+                { title: 'Gambar gaya berat w',
+                  body: 'Gaya berat w tetap vertikal ke bawah dari pusat benda, bukan tegak lurus bidang miring.',
+                  speech: 'Langkah 2. Gambar gaya berat w. Arahnya tetap vertikal ke bawah dari pusat benda, bukan tegak lurus bidang miring.' },
+                { title: 'Gambar gaya normal N',
+                  body: 'Gaya normal N digambar dari titik sentuh antara benda dan bidang miring. Arahnya tegak lurus bidang dan menjauhi bidang, sehingga berada pada sumbu y.',
+                  speech: 'Langkah 3. Gambar gaya normal N dari titik sentuh antara benda dan bidang miring. Arahnya tegak lurus bidang dan menjauhi bidang, sehingga berada pada sumbu y.' },
+                { title: 'Gambar gaya gesek f',
+                  body: 'Gaya gesek f digambar tepat di permukaan bidang miring, mulai dari titik sentuh benda. Arahnya sejajar bidang (sumbu x) dan berlawanan dengan kecenderungan benda meluncur, jadi ke atas bidang.',
+                  speech: 'Langkah 4. Gambar gaya gesek f tepat di permukaan bidang miring, mulai dari titik sentuh benda. Arahnya sejajar bidang dan berlawanan dengan kecenderungan benda meluncur, yaitu ke atas bidang.' },
+                { title: 'Uraikan w menjadi komponen',
+                  body: `N dan f sudah berada pada sumbu, hanya w yang perlu diuraikan. Sudut antara w dan sumbu y sama dengan θ. Maka w sin θ sejajar bidang (ke bawah) dan w cos θ tegak lurus bidang (ke dalam bidang). Misal m = 10 kg, g = 10 m/s² sehingga w = 100 N, dan θ = ${fmt(th)}°: w sin θ = ${fmt(ws)} N dan w cos θ = ${fmt(wc)} N.`,
+                  speech: `Langkah 5. N dan f sudah berada pada sumbu, hanya w yang perlu diuraikan. Sudut antara w dan sumbu y sama dengan theta. Maka w sinus theta sejajar bidang ke bawah, dan w kosinus theta tegak lurus bidang ke dalam. Misalkan w 100 newton dan theta ${fmt(th)} derajat. Maka w sinus theta sama dengan ${fmt(ws)} newton, dan w kosinus theta sama dengan ${fmt(wc)} newton.` }
+            ][i];
+        }
+
+        // ===== Drawing helpers (everything is drawn progressively, like a pen drawing it) =====
+        function prog(i) { return i < step ? 1 : (i === step ? animT : 0); }
+        function sub(p, a, b) { return Math.max(0, Math.min(1, (p - a) / (b - a))); }
+        const fg = () => isDark ? '#e0e0e0' : '#222';
+        const bg = () => isDark ? '#161616' : '#fafafa';
+
+        function line(a, b, color, lw, dash, p) {
+            if (p === undefined) p = 1;
+            if (p <= 0.005) return;
+            const t = { x: a.x + (b.x - a.x) * p, y: a.y + (b.y - a.y) * p };
+            ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = lw;
+            if (dash) ctx.setLineDash(dash);
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(t.x, t.y); ctx.stroke(); ctx.restore();
+        }
+        // The shaft grows from the tail with a small "pen dot" at its tip; the arrowhead is drawn last.
+        function arrow(a, b, color, lw, p, dash) {
+            if (p <= 0.005) return;
+            const pl = Math.min(1, p / 0.88);
+            const t = { x: a.x + (b.x - a.x) * pl, y: a.y + (b.y - a.y) * pl };
+            ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw;
+            if (dash) ctx.setLineDash(dash);
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(t.x, t.y); ctx.stroke(); ctx.setLineDash([]);
+            if (p < 0.88 && !dash) { ctx.beginPath(); ctx.arc(t.x, t.y, lw * 0.9 + 1, 0, 2 * PI); ctx.fill(); }
+            const hp = sub(p, 0.88, 1);
+            const len = Math.hypot(b.x - a.x, b.y - a.y);
+            if (hp > 0 && len > 6) {
+                const ang = Math.atan2(b.y - a.y, b.x - a.x), hl = (9 + lw) * hp;
+                ctx.beginPath(); ctx.moveTo(b.x, b.y);
+                ctx.lineTo(b.x - hl * Math.cos(ang - 0.4), b.y - hl * Math.sin(ang - 0.4));
+                ctx.lineTo(b.x - hl * Math.cos(ang + 0.4), b.y - hl * Math.sin(ang + 0.4));
+                ctx.closePath(); ctx.fill();
+            }
+            ctx.restore();
+        }
+        // labels fade in once the vector is (almost) fully drawn
+        function text(str, x, y, color, p, align, size) {
+            const al = sub(p, 0.78, 1);
+            if (al <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = al;
+            ctx.font = `bold ${size || 14}px Arial`;
+            ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
+            ctx.lineWidth = 4; ctx.strokeStyle = bg(); ctx.strokeText(str, x, y);
+            ctx.fillStyle = color; ctx.fillText(str, x, y);
+            ctx.restore();
+        }
+        function arc(c, r, a0, a1, color, p) {
+            if (p === undefined) p = 1;
+            if (p <= 0.005) return;
+            ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(c.x, c.y, r, a0, a0 + (a1 - a0) * p); ctx.stroke(); ctx.restore();
+        }
+        const add = (a, v, k) => ({ x: a.x + v.x * k, y: a.y + v.y * k });
+
+        // ===== Scenario 1: box pulled by a rope =====
+        function drawS1() {
+            const th = clampTheta(), rad = th * PI / 180;
+            const gy = H * 0.74;
+            const C = { x: W * 0.34, y: gy - 32 };       // center of the box
+            const K = { x: C.x, y: gy };                   // contact point box/ground
+            const p0 = prog(0), pBase = sub(p0, 0, 0.45), pAx = sub(p0, 0.45, 1);
+            ctx.save(); ctx.globalAlpha = pBase;
+            ctx.fillStyle = isDark ? '#2a2a2a' : '#d9d9d9'; ctx.fillRect(0, gy, W, H - gy);
+            line({ x: 0, y: gy }, { x: W, y: gy }, isDark ? '#777' : '#888', 3);
+            ctx.fillStyle = isDark ? '#4a5a7a' : '#cfd8dc';
+            ctx.strokeStyle = fg(); ctx.lineWidth = 2;
+            ctx.fillRect(C.x - 32, C.y - 32, 64, 64); ctx.strokeRect(C.x - 32, C.y - 32, 64, 64);
+            ctx.fillStyle = fg(); ctx.beginPath(); ctx.arc(C.x, C.y, 3.5, 0, 2 * PI); ctx.fill();
+            ctx.restore();
+            // axes
+            const axc = isDark ? '#888' : '#999';
+            const xe = { x: C.x + Math.min(W * 0.55, 190), y: C.y };
+            arrow(C, xe, axc, 1.2, pAx, [5, 4]);
+            arrow(C, { x: C.x, y: C.y - 120 }, axc, 1.2, pAx, [5, 4]);
+            text('x', xe.x + 2, C.y + 12, axc, pAx, 'left');
+            text('y', C.x + 10, C.y - 118, axc, pAx, 'left');
+
+            // w (from the center of the box)
+            const pw = prog(1); const wT = { x: C.x, y: C.y + 74 };
+            arrow(C, wT, COL.w, 3.5, pw); text('w', C.x + 14, C.y + 70, COL.w, pw, 'left', 16);
+            // N (from the contact point between box and ground)
+            const pn = prog(2); const nT = { x: K.x, y: K.y - 104 };
+            arrow(K, nT, COL.N, 3.5, pn); text('N', K.x - 14, nT.y + 4, COL.N, pn, 'right', 16);
+            // F + reference line + angle
+            const pF = prog(3); const Fl = Math.min(118, W - C.x - 24);
+            const fT = { x: C.x + Fl * Math.cos(rad), y: C.y - Fl * Math.sin(rad) };
+            line(C, { x: C.x + Fl, y: C.y }, isDark ? '#aaa' : '#777', 1.5, [6, 5], sub(pF, 0, 0.5));
+            arrow(C, fT, COL.F, 4, pF);
+            text('F = 80 N', fT.x - 4, fT.y - 14, COL.F, pF, 'center', 15);
+            arc(C, 40, -rad, 0, COL.F, sub(pF, 0.4, 0.9));
+            text('θ', C.x + 56 * Math.cos(rad / 2), C.y - 56 * Math.sin(rad / 2) + 2, COL.F, pF, 'center', 15);
+            // f (exactly on the surface, from the contact point)
+            const pf = prog(4); const ffT = { x: K.x - 74, y: gy };
+            arrow(K, ffT, COL.f, 3.5, pf); text('f', K.x - 52, gy - 14, COL.f, pf, 'center', 16);
+            // components
+            const p5 = prog(5);
+            const fxT = { x: C.x + Fl * Math.cos(rad), y: C.y };
+            line(fT, fxT, isDark ? '#bbb' : '#666', 1.5, [4, 4], sub(p5, 0, 0.6));
+            arrow(C, fxT, COL.Fx, 4, sub(p5, 0, 0.6));
+            arrow(fxT, fT, COL.Fy, 4, sub(p5, 0.4, 1));
+            text('Fₓ = F cos θ', (C.x + fxT.x) / 2 + 6, C.y + 18, COL.Fx, sub(p5, 0, 0.6), 'center', 13);
+            text('Fᵧ = F sin θ', fxT.x + 8, (C.y + fT.y) / 2 + 2, COL.Fy, sub(p5, 0.4, 1), 'left', 13);
+        }
+
+        // ===== Scenario 2: box on an inclined plane =====
+        function drawS2() {
+            const th = clampTheta(), rad = th * PI / 180;
+            const cs = Math.cos(rad), sn = Math.sin(rad);
+            const u = { x: cs, y: -sn };           // along the slope, going up
+            const n = { x: -sn, y: -cs };          // away from the slope
+            const L = Math.min((W * 0.84) / cs, (H * 0.74) / sn);
+            // keep the whole drawing (incl. the labels left of a steep slope) inside the canvas
+            const P0 = { x: Math.min(Math.max(W * 0.08, (W - L * cs) / 2 + 15), W - 6 - L * cs), y: H * 0.88 };
+            const E = add(P0, u, L);
+            const C = add(add(P0, u, L * 0.5), n, 28);   // center of the block
+            const K = add(C, n, -28);                      // contact point block/slope (on the surface)
+            const p0 = prog(0), pBase = sub(p0, 0, 0.45), pAx = sub(p0, 0.45, 1);
+            ctx.save(); ctx.globalAlpha = pBase;
+            ctx.fillStyle = isDark ? '#2a2a2a' : '#e3e3e3';
+            ctx.beginPath(); ctx.moveTo(P0.x, P0.y); ctx.lineTo(E.x, E.y); ctx.lineTo(E.x, P0.y); ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = isDark ? '#999' : '#555'; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(P0.x, P0.y); ctx.lineTo(E.x, E.y); ctx.lineTo(E.x, P0.y); ctx.closePath(); ctx.stroke();
+            const h = 28;
+            const q = [add(add(C, u, -h), n, -h), add(add(C, u, h), n, -h), add(add(C, u, h), n, h), add(add(C, u, -h), n, h)];
+            ctx.fillStyle = isDark ? '#4a5a7a' : '#b8c9f5'; ctx.strokeStyle = fg(); ctx.lineWidth = 2;
+            ctx.beginPath(); q.forEach((pt, i) => i ? ctx.lineTo(pt.x, pt.y) : ctx.moveTo(pt.x, pt.y)); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = fg(); ctx.beginPath(); ctx.arc(C.x, C.y, 3.5, 0, 2 * PI); ctx.fill();
+            ctx.restore();
+            arc(P0, 44, -rad, 0, fg(), pBase);
+            text('θ', P0.x + 62 * Math.cos(rad / 2), P0.y - 62 * Math.sin(rad / 2) + 3, fg(), pBase, 'center', 15);
+            // sumbu miring
+            const axc = isDark ? '#999' : '#777';
+            const xe = add(C, u, 92), xn = add(C, u, -40), ye = add(C, n, 100);
+            arrow(xn, xe, axc, 1.2, pAx, [5, 4]); arrow(C, ye, axc, 1.2, pAx, [5, 4]);
+            text('x', xe.x + 8, xe.y - 2, axc, pAx, 'center', 14);
+            text('y', ye.x - 8, ye.y - 4, axc, pAx, 'center', 14);
+
+            const wL = 72;
+            // w
+            const pw = prog(1); const wT = { x: C.x, y: C.y + wL };
+            arrow(C, wT, COL.w, 3.5, pw); text('w', wT.x + 12, wT.y - 4, COL.w, pw, 'left', 16);
+            // N (from the contact point, perpendicular to the slope)
+            const pn = prog(2); const nT = add(K, n, 96);
+            arrow(K, nT, COL.N, 3.5, pn); text('N', nT.x - 10, nT.y - 6, COL.N, pn, 'right', 16);
+            // f (lying exactly on the slope surface, from the contact point, up the slope)
+            const pf = prog(3); const fT = add(K, u, 70);
+            arrow(K, fT, COL.F, 3.5, pf); text('f', fT.x + 6 * sn - 4, fT.y + 18, COL.F, pf, 'center', 16);
+            // components
+            const p5 = prog(4);
+            const sT = add(C, u, -wL * sn), cT = add(C, n, -wL * cs);
+            line(sT, wT, isDark ? '#bbb' : '#666', 1.5, [4, 4], sub(p5, 0, 0.6));
+            line(cT, wT, isDark ? '#bbb' : '#666', 1.5, [4, 4], sub(p5, 0, 0.6));
+            arrow(C, sT, COL.wx, 3.5, sub(p5, 0, 0.7)); arrow(C, cT, COL.wy, 3.5, sub(p5, 0.3, 1));
+            text('w sin θ', sT.x - 6, sT.y + 2, COL.wx, sub(p5, 0, 0.7), 'right', 14);
+            text('w cos θ', cT.x + 8, cT.y + 12, COL.wy, sub(p5, 0.3, 1), 'left', 14);
+            arc(C, 30, PI / 2 - rad, PI / 2, COL.w, sub(p5, 0.5, 1));
+            text('θ', C.x + 14 * Math.sin(rad) + 6, C.y + 44, COL.w, sub(p5, 0.5, 1), 'center', 13);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = bg(); ctx.fillRect(0, 0, W, H);
+            // faint grid
+            ctx.strokeStyle = isDark ? '#242424' : '#eee'; ctx.lineWidth = 1;
+            for (let x = 0; x < W; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+            for (let y = 0; y < H; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+            if (scenario === 0) drawS1(); else drawS2();
+            ctx.save(); ctx.font = '10px Arial'; ctx.fillStyle = isDark ? '#777' : '#999'; ctx.textAlign = 'right';
+            ctx.fillText('Panjang panah hanya ilustrasi', W - 6, H - 6); ctx.restore();
+        }
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            const rw = rect.width || 300, rh = rect.height || 300;
+            // everything is drawn for a ~330x300 design size and scaled up on tablets / desktops
+            const sc = Math.max(0.85, Math.min(2.2, Math.min(rw / 330, rh / 300)));
+            W = rw / sc; H = rh / sc;
+            canvas.width = rw * dpr; canvas.height = rh * dpr;
+            ctx.setTransform(dpr * sc, 0, 0, dpr * sc, 0, 0);
+        }
+
+        function updatePanel() {
+            const c = content(step);
+            stepBadge.textContent = `Langkah ${step + 1} dari ${total()}`;
+            stepTitle.textContent = c.title;
+            stepBody.textContent = c.body;
+            dotsEl.innerHTML = '';
+            for (let i = 0; i < total(); i++) {
+                const d = document.createElement('span');
+                d.className = 'tp-dot' + (i < step ? ' done' : '') + (i === step ? ' cur' : '');
+                dotsEl.appendChild(d);
+            }
+            prevBtn.disabled = step === 0;
+            nextBtn.disabled = step === total() - 1;
+        }
+
+        function animateStep() {
+            cancelAnimationFrame(animRaf);
+            animT = 0;
+            const t0 = performance.now();
+            const DUR = 2000; // slow, steady drawing speed so the vector looks hand-drawn
+            (function tick(now) {
+                animT = Math.min(1, (now - t0) / DUR);
+                draw();
+                if (animT < 1) animRaf = requestAnimationFrame(tick);
+            })(t0);
+        }
+
+        function goStep(i, speakIt) {
+            step = Math.max(0, Math.min(total() - 1, i));
+            updatePanel();
+            animateStep();
+            if (speakIt) speak(content(step).speech);
+        }
+
+        function setScenario(s) {
+            scenario = s;
+            btnS1.classList.toggle('active', s === 0);
+            btnS2.classList.toggle('active', s === 1);
+            theta = 30; angleInput.value = '30';
+            goStep(0, true);
+        }
+
+        btnS1.addEventListener('click', () => setScenario(0));
+        btnS2.addEventListener('click', () => setScenario(1));
+        prevBtn.addEventListener('click', () => goStep(step - 1, true));
+        nextBtn.addEventListener('click', () => goStep(step + 1, true));
+        restartBtn.addEventListener('click', () => goStep(0, true));
+        angleInput.addEventListener('input', () => {
+            const v = parseFloat(angleInput.value.replace(',', '.'));
+            if (isNaN(v)) return;
+            theta = v;
+            animT = 1; cancelAnimationFrame(animRaf);
+            updatePanel(); draw();
+        });
+        angleInput.addEventListener('change', () => { theta = clampTheta(); angleInput.value = String(theta); updatePanel(); draw(); });
+        window.addEventListener('resize', () => {
+            if (document.getElementById('tabTerapan').classList.contains('active')) { resizeCanvas(); draw(); }
+        });
+
+        updatePanel();
+
+        return {
+            onDarkModeToggle: function(dark) { isDark = dark; if (document.getElementById('tabTerapan').classList.contains('active')) draw(); },
+            onShow: function() {
+                if (!document.getElementById('tabTerapan').classList.contains('active')) return;
+                resizeCanvas(); animT = 1; draw();
+            }
+        };
+    })();
+    </script>
+
+    <script>
+    window.QuizVectorApp = (function() {
+        const canvas = document.getElementById('canvasKuis');
+        const ctx = canvas.getContext('2d');
+        const pillsEl = document.getElementById('qzPills');
+        const descEl = document.getElementById('qzDesc');
+        const fbEl = document.getElementById('qzFeedback');
+        const scoreEl = document.getElementById('qzScore');
+        const resetBtn = document.getElementById('qzReset');
+        const nextBtn = document.getElementById('qzNext');
+        const soundBtn = document.getElementById('qzSound');
+
+        const PI = Math.PI;
+        const COL = { w: '#1a237e', N: '#37474f', F: '#e53935', f: '#ef6c00', T: '#00897b', x: '#757575' };
+        const TRAY_H = 156;
+        let isDark = false, W = 330, H = 480, SH = H - TRAY_H;
+        let cur = 0, G = null, SC = 1;
+        let drag = null, marker = null, raf = 0;
+
+        const addv = (a, v, k) => ({ x: a.x + v.x * k, y: a.y + v.y * k });
+        const fg = () => isDark ? '#e0e0e0' : '#222';
+        const bg = () => isDark ? '#161616' : '#fafafa';
+        const sub = (p, a, b) => Math.max(0, Math.min(1, (p - a) / (b - a)));
+
+        // ================= Scenes =================
+        const SCENES = [
+            {   // 1. Benda di bidang datar
+                name: 'Datar', title: 'Soal 1 · Benda di bidang datar',
+                desc: 'Sebuah balok ditarik dengan tali pada lantai yang kasar. Seret vektor gaya yang benar-benar bekerja pada balok ke balok.',
+                layout(W, H) {
+                    const gy = H * 0.76, C = { x: W * 0.36, y: gy - 28 };
+                    const r = 30 * PI / 180, d = { x: Math.cos(r), y: -Math.sin(r) };
+                    const A = { x: C.x + 35, y: C.y };
+                    return { gy, C, K: { x: C.x, y: gy }, A, d, hand: addv(A, d, 128), bodies: [{ id: 'box', c: C, r: 48 }] };
+                },
+                drawScene(g) {
+                    ctx.fillStyle = isDark ? '#2a2a2a' : '#d9d9d9'; ctx.fillRect(0, g.gy, W, SH - g.gy);
+                    line({ x: 0, y: g.gy }, { x: W, y: g.gy }, isDark ? '#888' : '#777', 3);
+                    note('lantai kasar', 8, g.gy + 16);
+                    line(g.A, g.hand, '#8d6e63', 3);
+                    ctx.fillStyle = '#ffcc80'; ctx.strokeStyle = '#a1887f'; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.arc(g.hand.x, g.hand.y, 8, 0, 2 * PI); ctx.fill(); ctx.stroke();
+                    box(g.C.x - 35, g.C.y - 28, 70, 56, 'balok');
+                },
+                forces: [
+                    { id: 'w', label: 'w', name: 'gaya berat', color: COL.w,
+                      vec: { box: g => ({ a: g.C, b: { x: g.C.x, y: g.C.y + 70 } }) },
+                      ok: 'Gaya berat w bekerja pada pusat benda dan selalu mengarah vertikal ke bawah.' },
+                    { id: 'gerak', label: 'Fgerak', name: 'gaya ke arah gerak', color: COL.x, vec: {},
+                      no: 'Tidak ada gaya khusus ke arah gerak. Benda bergerak karena resultan gaya, bukan karena gaya gerak tersendiri.' },
+                    { id: 'N', label: 'N', name: 'gaya normal', color: COL.N,
+                      vec: { box: g => ({ a: g.K, b: { x: g.K.x, y: g.K.y - 86 } }) },
+                      ok: 'Lantai menahan balok, sehingga ada gaya normal N dari titik sentuh, tegak lurus bidang, ke atas.' },
+                    { id: 'F', label: 'F', name: 'gaya tarik tali', color: COL.F,
+                      vec: { box: g => ({ a: g.A, b: addv(g.A, g.d, 100) }) },
+                      ok: 'Tali menarik balok, sehingga ada gaya tarik F searah tali, miring ke atas.' },
+                    { id: 'f', label: 'f', name: 'gaya gesek', color: COL.f,
+                      vec: { box: g => ({ a: g.K, b: { x: g.K.x - 72, y: g.K.y } }) },
+                      ok: 'Lantai kasar, sehingga ada gaya gesek f tepat di permukaan bidang, berlawanan dengan arah gerak balok.' }
+                ]
+            },
+            {   // 2. Benda di bidang miring
+                name: 'Miring', title: 'Soal 2 · Benda di bidang miring',
+                desc: 'Sebuah balok diam di atas bidang miring yang kasar. Seret vektor gaya yang bekerja pada balok ke balok.',
+                layout(W, H) {
+                    const rad = 30 * PI / 180, cs = Math.cos(rad), sn = Math.sin(rad);
+                    const u = { x: cs, y: -sn }, n = { x: -sn, y: -cs };
+                    const L = Math.min((W * 0.84) / cs, (H * 0.74) / sn);
+                    const P0 = { x: Math.min(Math.max(W * 0.08, (W - L * cs) / 2 + 15), W - 6 - L * cs), y: H * 0.88 };
+                    const C = addv(addv(P0, u, L * 0.5), n, 28);
+                    return { rad, u, n, P0, E: addv(P0, u, L), C, K: addv(C, n, -28), bodies: [{ id: 'box', c: C, r: 48 }] };
+                },
+                drawScene(g) {
+                    ctx.fillStyle = isDark ? '#2a2a2a' : '#e3e3e3'; ctx.strokeStyle = isDark ? '#999' : '#555'; ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.moveTo(g.P0.x, g.P0.y); ctx.lineTo(g.E.x, g.E.y); ctx.lineTo(g.E.x, g.P0.y); ctx.closePath(); ctx.fill(); ctx.stroke();
+                    ctx.strokeStyle = fg(); ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.arc(g.P0.x, g.P0.y, 40, -g.rad, 0); ctx.stroke();
+                    label('θ = 30°', g.P0.x + 70, g.P0.y - 14, fg(), 'center', 13);
+                    note('bidang miring kasar', g.P0.x + 6, g.P0.y + 14);
+                    const q = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(s => addv(addv(g.C, g.u, 28 * s[0]), g.n, 28 * s[1]));
+                    ctx.fillStyle = isDark ? '#4a5a7a' : '#b8c9f5'; ctx.strokeStyle = fg();
+                    ctx.beginPath(); q.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)); ctx.closePath(); ctx.fill(); ctx.stroke();
+                },
+                forces: [
+                    { id: 'luncur', label: 'Fluncur', name: 'gaya meluncur', color: COL.x, vec: {},
+                      no: 'Gaya meluncur bukan gaya tersendiri. Itu hanya komponen w sin theta dari gaya berat.' },
+                    { id: 'w', label: 'w', name: 'gaya berat', color: COL.w,
+                      vec: { box: g => ({ a: g.C, b: { x: g.C.x, y: g.C.y + 70 } }) },
+                      ok: 'Gaya berat w tetap vertikal ke bawah dari pusat benda, bukan tegak lurus bidang miring.' },
+                    { id: 'f', label: 'f', name: 'gaya gesek', color: COL.f,
+                      vec: { box: g => ({ a: g.K, b: addv(g.K, g.u, 68) }) },
+                      ok: 'Gaya gesek f tepat di permukaan bidang miring, sejajar bidang dan mengarah ke atas, berlawanan dengan kecenderungan benda meluncur.' },
+                    { id: 'N', label: 'N', name: 'gaya normal', color: COL.N,
+                      vec: { box: g => ({ a: g.K, b: addv(g.K, g.n, 88) }) },
+                      ok: 'Gaya normal N dari titik sentuh, tegak lurus bidang miring dan menjauhi bidang.' }
+                ]
+            },
+            {   // 3. Katrol
+                name: 'Katrol', title: 'Soal 3 · Katrol',
+                desc: 'Dua benda digantung pada tali yang melewati katrol tetap. Seret vektor gaya ke benda yang dikenainya. Perhatikan benda 1 dan benda 2.',
+                layout(W, H) {
+                    const px = W * 0.5, r = 36, py = 80;
+                    const c1 = { x: px - r, y: 190 }, c2 = { x: px + r, y: 232 };
+                    return { px, py, r, c1, c2, bodies: [{ id: 'm1', c: c1, r: 38 }, { id: 'm2', c: c2, r: 38 }] };
+                },
+                drawScene(g) {
+                    ctx.strokeStyle = isDark ? '#999' : '#555'; ctx.lineWidth = 4;
+                    ctx.beginPath(); ctx.moveTo(g.px - 60, 14); ctx.lineTo(g.px + 60, 14); ctx.stroke();
+                    for (let x = g.px - 60; x <= g.px + 56; x += 12) line({ x, y: 14 }, { x: x + 8, y: 6 }, ctx.strokeStyle, 2);
+                    line({ x: g.px, y: 14 }, { x: g.px, y: g.py }, fg(), 3);
+                    ctx.fillStyle = isDark ? '#3a3a3a' : '#eceff1'; ctx.strokeStyle = fg(); ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.arc(g.px, g.py, g.r, 0, 2 * PI); ctx.fill(); ctx.stroke();
+                    ctx.fillStyle = fg(); ctx.beginPath(); ctx.arc(g.px, g.py, 4, 0, 2 * PI); ctx.fill();
+                    line({ x: g.px - g.r, y: g.py }, { x: g.c1.x, y: g.c1.y - 23 }, '#8d6e63', 3);
+                    line({ x: g.px + g.r, y: g.py }, { x: g.c2.x, y: g.c2.y - 26 }, '#8d6e63', 3);
+                    box(g.c1.x - 27, g.c1.y - 23, 54, 46, 'benda 1');
+                    box(g.c2.x - 31, g.c2.y - 26, 62, 52, 'benda 2');
+                },
+                forces: [
+                    { id: 'w1', label: 'w₁', name: 'berat benda 1', color: COL.w,
+                      vec: { m1: g => ({ a: g.c1, b: { x: g.c1.x, y: g.c1.y + 56 } }) },
+                      ok: 'Gaya berat benda 1 bekerja pada benda 1, vertikal ke bawah.',
+                      wrongBody: { m2: 'Gaya berat w satu bekerja pada benda 1, bukan pada benda 2.' } },
+                    { id: 'N', label: 'N', name: 'gaya normal', color: COL.N, vec: {},
+                      no: 'Kedua benda menggantung dan tidak bersentuhan dengan bidang, sehingga tidak ada gaya normal.' },
+                    { id: 'T', label: 'T', name: 'tegangan tali', color: COL.T,
+                      vec: { m1: g => ({ a: { x: g.c1.x, y: g.c1.y - 23 }, b: { x: g.c1.x, y: g.c1.y - 85 } }),
+                             m2: g => ({ a: { x: g.c2.x, y: g.c2.y - 26 }, b: { x: g.c2.x, y: g.c2.y - 88 } }) },
+                      ok: 'Tali menarik benda ke atas, sehingga ada gaya tegangan tali T pada benda ini. Pasang T pada kedua benda.' },
+                    { id: 'w2', label: 'w₂', name: 'berat benda 2', color: COL.w,
+                      vec: { m2: g => ({ a: g.c2, b: { x: g.c2.x, y: g.c2.y + 62 } }) },
+                      ok: 'Gaya berat benda 2 bekerja pada benda 2, vertikal ke bawah.',
+                      wrongBody: { m1: 'Gaya berat w dua bekerja pada benda 2, bukan pada benda 1.' } },
+                    { id: 'f', label: 'f', name: 'gaya gesek', color: COL.f, vec: {},
+                      no: 'Tidak ada bidang sentuh, sehingga tidak ada gaya gesek.' }
+                ]
+            },
+            {   // 4. Benda di meja dihubungkan tali dengan benda tergantung
+                name: 'Meja+Gantung', title: 'Soal 4 · Benda di meja dan benda tergantung',
+                desc: 'Balok A di atas meja licin dihubungkan tali melalui katrol dengan balok B yang tergantung. Seret vektor gaya ke balok yang dikenainya.',
+                layout(W, H) {
+                    const ty = 150, tx = W * 0.70;
+                    const A = { x: W * 0.28, y: ty - 26 };
+                    const P = { x: tx + 8, y: ty - 12 }, pr = 14;
+                    const B = { x: P.x + pr, y: ty + 92 };
+                    return { ty, tx, A, P, pr, B, K: { x: A.x, y: ty }, bodies: [{ id: 'A', c: A, r: 40 }, { id: 'B', c: B, r: 40 }] };
+                },
+                drawScene(g) {
+                    ctx.fillStyle = isDark ? '#6d4c41' : '#a1887f';
+                    ctx.fillRect(0, g.ty, g.tx, 14); ctx.fillRect(g.tx - 26, g.ty + 14, 12, SH - g.ty - 40);
+                    note('meja licin', 8, g.ty + 30);
+                    line({ x: g.A.x + 30, y: g.A.y }, { x: g.P.x, y: g.A.y }, '#8d6e63', 3);
+                    ctx.strokeStyle = '#8d6e63'; ctx.lineWidth = 3;
+                    ctx.beginPath(); ctx.arc(g.P.x, g.P.y, g.pr, -PI / 2, 0); ctx.stroke();
+                    line({ x: g.P.x + g.pr, y: g.P.y }, { x: g.B.x, y: g.B.y - 22 }, '#8d6e63', 3);
+                    ctx.fillStyle = isDark ? '#3a3a3a' : '#eceff1'; ctx.strokeStyle = fg(); ctx.lineWidth = 2.5;
+                    ctx.beginPath(); ctx.arc(g.P.x, g.P.y, g.pr, 0, 2 * PI); ctx.fill(); ctx.stroke();
+                    box(g.A.x - 30, g.A.y - 26, 60, 52, 'A');
+                    box(g.B.x - 25, g.B.y - 22, 50, 44, 'B');
+                },
+                forces: [
+                    { id: 'wB', label: 'wB', name: 'berat balok B', color: COL.w,
+                      vec: { B: g => ({ a: g.B, b: { x: g.B.x, y: g.B.y + 52 } }) },
+                      ok: 'Gaya berat balok B bekerja pada balok B, vertikal ke bawah.',
+                      wrongBody: { A: 'Gaya berat B bekerja pada balok B, bukan pada balok A.' } },
+                    { id: 'f', label: 'f', name: 'gaya gesek', color: COL.f, vec: {},
+                      no: 'Meja licin, sehingga tidak ada gaya gesek pada balok A.' },
+                    { id: 'T', label: 'T', name: 'tegangan tali', color: COL.T,
+                      vec: { A: g => ({ a: { x: g.A.x + 30, y: g.A.y }, b: { x: g.A.x + 100, y: g.A.y } }),
+                             B: g => ({ a: { x: g.B.x, y: g.B.y - 22 }, b: { x: g.B.x, y: g.B.y - 84 } }) },
+                      ok: 'Tali menghubungkan kedua balok. Pada balok A, T menarik ke arah katrol. Pada balok B, T menarik ke atas. Pasang T pada keduanya.' },
+                    { id: 'wA', label: 'wA', name: 'berat balok A', color: COL.w,
+                      vec: { A: g => ({ a: g.A, b: { x: g.A.x, y: g.A.y + 58 } }) },
+                      ok: 'Gaya berat balok A bekerja pada balok A, vertikal ke bawah.',
+                      wrongBody: { B: 'Gaya berat A bekerja pada balok A, bukan pada balok B.' } },
+                    { id: 'N', label: 'N', name: 'gaya normal', color: COL.N,
+                      vec: { A: g => ({ a: g.K, b: { x: g.K.x, y: g.K.y - 80 } }) },
+                      ok: 'Meja menahan balok A, sehingga ada gaya normal N dari titik sentuh, tegak lurus meja, ke atas.',
+                      wrongBody: { B: 'Balok B menggantung dan tidak menyentuh meja, sehingga tidak ada gaya normal pada balok B.' } }
+                ]
+            }
+        ];
+
+        const state = SCENES.map(() => ({ placed: {}, wrong: 0 }));
+        const totalPairs = s => s.forces.reduce((n, f) => n + Object.keys(f.vec).length, 0);
+
+        // ================= Drawing helpers =================
+        function line(a, b, color, lw, dash) {
+            ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = lw; if (dash) ctx.setLineDash(dash);
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); ctx.restore();
+        }
+        function arrow(a, b, color, lw, p) {
+            if (p <= 0.005) return;
+            const pl = Math.min(1, p / 0.88);
+            const t = { x: a.x + (b.x - a.x) * pl, y: a.y + (b.y - a.y) * pl };
+            ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw;
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(t.x, t.y); ctx.stroke();
+            if (p < 0.88) { ctx.beginPath(); ctx.arc(t.x, t.y, lw * 0.9 + 1, 0, 2 * PI); ctx.fill(); }
+            const hp = sub(p, 0.88, 1);
+            if (hp > 0) {
+                const ang = Math.atan2(b.y - a.y, b.x - a.x), hl = (9 + lw) * hp;
+                ctx.beginPath(); ctx.moveTo(b.x, b.y);
+                ctx.lineTo(b.x - hl * Math.cos(ang - 0.4), b.y - hl * Math.sin(ang - 0.4));
+                ctx.lineTo(b.x - hl * Math.cos(ang + 0.4), b.y - hl * Math.sin(ang + 0.4));
+                ctx.closePath(); ctx.fill();
+            }
+            ctx.restore();
+        }
+        function label(str, x, y, color, align, size, alpha) {
+            ctx.save(); if (alpha !== undefined) ctx.globalAlpha = alpha;
+            ctx.font = `bold ${size || 14}px Arial`; ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
+            ctx.lineWidth = 4; ctx.strokeStyle = bg(); ctx.strokeText(str, x, y);
+            ctx.fillStyle = color; ctx.fillText(str, x, y); ctx.restore();
+        }
+        function note(str, x, y) {
+            ctx.save(); ctx.font = '11px Arial'; ctx.fillStyle = isDark ? '#888' : '#777'; ctx.textAlign = 'left'; ctx.fillText(str, x, y); ctx.restore();
+        }
+        function box(x, y, w, h, txt) {
+            ctx.save(); ctx.fillStyle = isDark ? '#4a5a7a' : '#cfd8dc'; ctx.strokeStyle = fg(); ctx.lineWidth = 2;
+            ctx.fillRect(x, y, w, h); ctx.strokeRect(x, y, w, h); ctx.restore();
+            label(txt, x + w / 2, y + h / 2, isDark ? '#fff' : '#37474f', 'center', 12);
+        }
+        function rrect(x, y, w, h, r) {
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(x, y, w, h, r);
+            else { ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); }
+        }
+
+        // ================= Tray / chips =================
+        function visibleForces() {
+            const st = state[cur];
+            return SCENES[cur].forces.filter(f => {
+                const keys = Object.keys(f.vec);
+                return keys.length === 0 || keys.some(b => !st.placed[f.id + ':' + b]);
+            });
+        }
+        function chipRect(i) {
+            const cw = (W - 30) / 2;
+            return { x: 12 + (i % 2) * (cw + 6), y: SH + 32 + Math.floor(i / 2) * 40, w: cw, h: 34 };
+        }
+        function drawChip(f, r, lifted) {
+            ctx.save();
+            if (lifted) { ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4; }
+            ctx.fillStyle = isDark ? '#2d2d2d' : '#fff'; ctx.strokeStyle = f.color; ctx.lineWidth = 2;
+            rrect(r.x, r.y, r.w, r.h, 9); ctx.fill(); ctx.stroke(); ctx.restore();
+            const cy = r.y + r.h / 2;
+            arrow({ x: r.x + 8, y: cy }, { x: r.x + 30, y: cy }, f.color, 2.5, 1);
+            ctx.save(); ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+            ctx.font = 'bold 14px Arial'; ctx.fillStyle = f.color; ctx.fillText(f.label, r.x + 37, cy);
+            const lw = ctx.measureText(f.label).width;
+            ctx.font = '11px Arial'; ctx.fillStyle = isDark ? '#bbb' : '#555';
+            let nm = f.name; while (ctx.measureText(nm).width > r.w - 37 - lw - 14 && nm.length > 4) nm = nm.slice(0, -1);
+            ctx.fillText(nm, r.x + 37 + lw + 6, cy); ctx.restore();
+        }
+        function chipAt(x, y) {
+            const vf = visibleForces();
+            for (let i = 0; i < vf.length; i++) {
+                const r = chipRect(i);
+                if (x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) return vf[i];
+            }
+            return null;
+        }
+        const LIFT = 34; // dragged chip floats above the finger
+        function bodyAt(x, y) {
+            let best = null, bd = 1e9;
+            G.bodies.forEach(b => { const d = Math.hypot(x - b.c.x, y - b.c.y); if (d < b.r && d < bd) { best = b; bd = d; } });
+            return best;
+        }
+
+        // ================= Render =================
+        function placedProgress(key) {
+            const t0 = state[cur].anim && state[cur].anim[key];
+            return t0 ? Math.min(1, (performance.now() - t0) / 900) : 1;
+        }
+        function needsAnim() {
+            if (drag) return true;
+            if (marker && performance.now() - marker.t0 < 1400) return true;
+            const an = state[cur].anim || {};
+            return Object.keys(an).some(k => performance.now() - an[k] < 950);
+        }
+        function draw() {
+            const s = SCENES[cur], st = state[cur];
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = bg(); ctx.fillRect(0, 0, W, H);
+            ctx.strokeStyle = isDark ? '#242424' : '#eee'; ctx.lineWidth = 1;
+            for (let x = 0; x < W; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, SH); ctx.stroke(); }
+            for (let y = 0; y < SH; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+            s.drawScene(G);
+            // highlight body under the dragged chip
+            if (drag) {
+                const b = bodyAt(drag.x, drag.y - LIFT);
+                if (b) { ctx.save(); ctx.strokeStyle = '#667eea'; ctx.lineWidth = 3; ctx.setLineDash([6, 4]); ctx.beginPath(); ctx.arc(b.c.x, b.c.y, b.r, 0, 2 * PI); ctx.stroke(); ctx.restore(); }
+            }
+            // placed vectors
+            s.forces.forEach(f => Object.keys(f.vec).forEach(bid => {
+                const key = f.id + ':' + bid;
+                if (!st.placed[key]) return;
+                const v = f.vec[bid](G), p = placedProgress(key);
+                arrow(v.a, v.b, f.color, 4, p);
+                const dx = v.b.x - v.a.x, dy = v.b.y - v.a.y, len = Math.hypot(dx, dy) || 1;
+                const ux = dx / len, uy = dy / len;
+                label(f.label, v.b.x + ux * 14 + (Math.abs(ux) > 0.9 ? 0 : (ux >= 0 ? 8 : -8)), v.b.y + uy * 12 + (Math.abs(ux) > 0.9 ? -12 : 0), f.color, 'center', 15, sub(p, 0.75, 1));
+            }));
+            // tray
+            ctx.fillStyle = isDark ? '#1f1f1f' : '#eef1ff'; ctx.fillRect(0, SH, W, TRAY_H);
+            line({ x: 0, y: SH }, { x: W, y: SH }, '#667eea', 2);
+            label('Seret vektor gaya ke benda ↑', W / 2, SH + 16, isDark ? '#a0aec0' : '#667eea', 'center', 12);
+            const vf = visibleForces();
+            vf.forEach((f, i) => { if (!(drag && drag.force === f)) drawChip(f, chipRect(i), false); });
+            if (drag) {
+                const cw = (W - 30) / 2;
+                drawChip(drag.force, { x: drag.x - cw / 2, y: drag.y - LIFT - 17, w: cw, h: 34 }, true);
+            }
+            // ✓ / ✗ marker
+            if (marker) {
+                const t = (performance.now() - marker.t0) / 1400;
+                if (t < 1) {
+                    const sc = t < 0.2 ? 0.4 + 0.6 * (t / 0.2) * 1.15 : 1, al = t > 0.75 ? 1 - (t - 0.75) / 0.25 : 1;
+                    const dx = marker.ok ? 0 : Math.sin(t * 40) * 5 * (1 - t);
+                    ctx.save(); ctx.globalAlpha = al; ctx.translate(marker.x + dx, marker.y); ctx.scale(sc, sc);
+                    ctx.fillStyle = marker.ok ? '#2e7d32' : '#c62828'; ctx.shadowColor = 'rgba(0,0,0,.3)'; ctx.shadowBlur = 10;
+                    ctx.beginPath(); ctx.arc(0, 0, 28, 0, 2 * PI); ctx.fill(); ctx.shadowBlur = 0;
+                    ctx.strokeStyle = '#fff'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath();
+                    if (marker.ok) { ctx.moveTo(-13, 1); ctx.lineTo(-4, 11); ctx.lineTo(14, -10); }
+                    else { ctx.moveTo(-11, -11); ctx.lineTo(11, 11); ctx.moveTo(11, -11); ctx.lineTo(-11, 11); }
+                    ctx.stroke(); ctx.restore();
+                } else marker = null;
+            }
+        }
+        function loop() {
+            cancelAnimationFrame(raf);
+            (function tick() { draw(); if (needsAnim()) raf = requestAnimationFrame(tick); })();
+        }
+
+        // ================= Audio (beep + speech) =================
+        let soundOn = true, actx = null, idVoice = null;
+        const tts = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+        function pickVoice() { if (tts) idVoice = speechSynthesis.getVoices().find(v => /^id([-_]|$)/i.test(v.lang)) || null; }
+        if (tts) { pickVoice(); if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', pickVoice); }
+        function ac() {
+            if (!actx) { const C = window.AudioContext || window.webkitAudioContext; if (C) actx = new C(); }
+            if (actx && actx.state === 'suspended') actx.resume();
+            return actx;
+        }
+        function tone(f, t0, d, type, vol) {
+            const a = actx, o = a.createOscillator(), g = a.createGain();
+            o.type = type; o.frequency.value = f;
+            g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+            o.connect(g); g.connect(a.destination); o.start(t0); o.stop(t0 + d + 0.02);
+        }
+        function sfx(ok) {
+            if (!soundOn || !ac()) return;
+            const t = actx.currentTime;
+            if (ok) { tone(660, t, 0.14, 'sine', 0.3); tone(880, t + 0.13, 0.14, 'sine', 0.3); tone(1175, t + 0.26, 0.28, 'sine', 0.3); }
+            else { tone(200, t, 0.3, 'sawtooth', 0.22); tone(150, t + 0.2, 0.4, 'sawtooth', 0.22); }
+        }
+        let speakTimer = 0;
+        function speak(text, delay) {
+            if (!tts || !soundOn) return;
+            clearTimeout(speakTimer);
+            speakTimer = setTimeout(() => {
+                speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = 'id-ID'; if (idVoice) u.voice = idVoice; u.rate = 0.95;
+                speechSynthesis.speak(u);
+            }, delay || 0);
+        }
+        function stopAudio() { clearTimeout(speakTimer); if (tts) speechSynthesis.cancel(); }
+
+        // ================= Logic =================
+        function setFeedback(kind, html) {
+            fbEl.className = 'qz-feedback ' + kind;
+            fbEl.innerHTML = html;
+        }
+        function updateScore() {
+            const s = SCENES[cur], st = state[cur];
+            scoreEl.textContent = `Terpasang ${Object.keys(st.placed).length} dari ${totalPairs(s)} · Salah ${st.wrong}`;
+        }
+        function isDone(i) { return Object.keys(state[i].placed).length === totalPairs(SCENES[i]); }
+        function buildPills() {
+            pillsEl.innerHTML = '';
+            SCENES.forEach((s, i) => {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'qz-pill' + (i === cur ? ' active' : '') + (isDone(i) ? ' done' : '');
+                b.textContent = (isDone(i) ? '✓ ' : (i + 1) + '. ') + s.name;
+                b.addEventListener('click', () => { if (i !== cur) { stopAudio(); load(i); } });
+                pillsEl.appendChild(b);
+            });
+        }
+        function updateNext() {
+            nextBtn.disabled = !(isDone(cur) && cur < SCENES.length - 1);
+            nextBtn.classList.toggle('pulse', !nextBtn.disabled);
+        }
+        // Keep the whole canvas (incl. the tray of vectors) and the feedback box inside the screen,
+        // with a margin at the bottom, by scrolling the page a little when needed.
+        function ensureVisible() {
+            if (!isActive()) return;
+            const hdr = document.querySelector('header').offsetHeight;
+            const c = canvas.getBoundingClientRect(), f = fbEl.getBoundingClientRect();
+            const vh = window.innerHeight, margin = 16;
+            const up = c.top - hdr - 8;                       // < 0 means the canvas top is hidden under the header
+            let dy = Math.max(0, f.bottom + margin - vh);     // > 0 means the bottom is cut off
+            if (up < 0) dy = up; else dy = Math.min(dy, up);
+            if (Math.abs(dy) > 1) window.scrollBy({ top: dy, behavior: 'smooth' });
+        }
+        function load(i) {
+            cur = i; marker = null; drag = null;
+            G = SCENES[cur].layout(W, SH);
+            descEl.innerHTML = `<b>${SCENES[cur].title}</b><br>${SCENES[cur].desc}`;
+            setFeedback('info', 'Seret salah satu vektor di bawah ke benda. Hati-hati, ada vektor pengecoh!');
+            buildPills(); updateScore(); updateNext(); loop();
+            setTimeout(ensureVisible, 120);
+        }
+
+        function handleDrop(force, x, y) {
+            const body = bodyAt(x, y);
+            if (!body) return;               // dropped on empty space: just goes back to the tray
+            const st = state[cur], key = force.id + ':' + body.id;
+            if (force.vec[body.id]) {
+                if (st.placed[key]) { setFeedback('info', 'Vektor ini sudah terpasang pada benda tersebut.'); return; }
+                st.placed[key] = true;
+                st.anim = st.anim || {}; st.anim[key] = performance.now();
+                marker = { x: body.c.x, y: body.c.y - 6, ok: true, t0: performance.now() };
+                setFeedback('ok', `<span class="qz-ico">✓</span><span><b>Benar!</b> ${force.ok}</span>`);
+                sfx(true);
+                if (isDone(cur)) {
+                    const last = cur === SCENES.length - 1;
+                    const msg = last
+                        ? `Hebat! Semua soal selesai. Kesalahan pada soal ini ${st.wrong}. Kamu sudah memahami bahwa pada setiap benda bekerja gaya-gaya.`
+                        : `Hebat! Semua gaya pada soal ini sudah tepat. Lanjut ke soal berikutnya.`;
+                    setFeedback('ok', `<span class="qz-ico">🎉</span><span><b>Benar!</b> ${force.ok}<br><b>${msg}</b></span>`);
+                    speak('Benar! ' + force.ok + ' ' + msg, 450);
+                } else speak('Benar! ' + force.ok, 450);
+            } else {
+                st.wrong++;
+                const why = Object.keys(force.vec).length === 0 ? force.no
+                    : ((force.wrongBody && force.wrongBody[body.id]) || 'Gaya ini bekerja pada benda lain, bukan pada benda ini.');
+                marker = { x: body.c.x, y: body.c.y - 6, ok: false, t0: performance.now() };
+                setFeedback('no', `<span class="qz-ico">✗</span><span><b>Salah!</b> ${why}</span>`);
+                sfx(false);
+                speak('Salah. ' + why, 500);
+            }
+            buildPills(); updateScore(); updateNext();
+            setTimeout(ensureVisible, 80);
+        }
+
+        // ================= Input =================
+        function pos(e) { const r = canvas.getBoundingClientRect(); return { x: (e.clientX - r.left) / SC, y: (e.clientY - r.top) / SC }; }
+        canvas.addEventListener('pointerdown', e => {
+            const p = pos(e), f = chipAt(p.x, p.y);
+            if (!f) return;
+            ac();
+            drag = { force: f, x: p.x, y: p.y };
+            try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+            e.preventDefault(); loop();
+        });
+        canvas.addEventListener('pointermove', e => { if (!drag) return; const p = pos(e); drag.x = p.x; drag.y = p.y; });
+        function endDrag(e, cancel) {
+            if (!drag) return;
+            const d = drag; drag = null;
+            if (!cancel) handleDrop(d.force, d.x, d.y - LIFT);
+            loop();
+        }
+        canvas.addEventListener('pointerup', e => endDrag(e, false));
+        canvas.addEventListener('pointercancel', e => endDrag(e, true));
+
+        resetBtn.addEventListener('click', () => { stopAudio(); state[cur] = { placed: {}, wrong: 0 }; load(cur); });
+        nextBtn.addEventListener('click', () => { if (!nextBtn.disabled) { stopAudio(); load(cur + 1); } });
+        soundBtn.addEventListener('click', () => {
+            soundOn = !soundOn; soundBtn.textContent = soundOn ? '🔊' : '🔇';
+            soundBtn.classList.toggle('on', soundOn);
+            if (soundOn) { ac(); sfx(true); } else stopAudio();
+        });
+
+        function resizeCanvas() {
+            const r = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+            const rw = r.width || 330, rh = r.height || 480;
+            SC = Math.max(0.85, Math.min(2.2, Math.min(rw / 330, rh / 480)));
+            W = rw / SC; H = rh / SC; SH = H - TRAY_H;
+            canvas.width = rw * dpr; canvas.height = rh * dpr;
+            ctx.setTransform(dpr * SC, 0, 0, dpr * SC, 0, 0);
+            G = SCENES[cur].layout(W, SH);
+        }
+        const isActive = () => document.getElementById('tabKuis').classList.contains('active');
+        window.addEventListener('resize', () => { if (isActive()) { resizeCanvas(); loop(); } });
+
+        buildPills(); updateScore(); updateNext();
+        descEl.innerHTML = `<b>${SCENES[0].title}</b><br>${SCENES[0].desc}`;
+        setFeedback('info', 'Seret salah satu vektor di bawah ke benda. Hati-hati, ada vektor pengecoh!');
+
+        return {
+            onDarkModeToggle: function(d) { isDark = d; if (isActive()) loop(); },
+            onShow: function() { if (!isActive()) return; resizeCanvas(); loop(); setTimeout(ensureVisible, 350); }
+        };
+    })();
+    </script>
+
+    <script>
+        // ===== Shared: tab switching + dark mode =====
+        const sharedDarkModeBtn = document.getElementById('darkModeBtn');
+        let sharedIsDarkMode = false;
+
+        sharedDarkModeBtn.addEventListener('click', () => {
+            sharedIsDarkMode = !sharedIsDarkMode;
+            document.body.classList.toggle('dark-mode');
+            sharedDarkModeBtn.textContent = sharedIsDarkMode ? '☀️' : '🌙';
+            window.ComponentVectorApp.onDarkModeToggle(sharedIsDarkMode);
+            window.AdditionVectorApp.onDarkModeToggle(sharedIsDarkMode);
+            window.ApplicationVectorApp.onDarkModeToggle(sharedIsDarkMode);
+            window.QuizVectorApp.onDarkModeToggle(sharedIsDarkMode);
+        });
+
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetId = btn.getAttribute('data-tab');
+                tabButtons.forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(targetId).classList.add('active');
+
+                if ('speechSynthesis' in window) speechSynthesis.cancel();
+                const title = document.getElementById('pageTitle');
+                if (targetId === 'tabKomponen') {
+                    title.textContent = '📐 Vektor Komponen';
+                    window.ComponentVectorApp.onShow();
+                } else if (targetId === 'tabJumlah') {
+                    title.textContent = '➕ Penjumlahan Vektor';
+                    window.AdditionVectorApp.onShow();
+                } else if (targetId === 'tabTerapan') {
+                    title.textContent = '🧩 Penerapan Vektor';
+                    window.ApplicationVectorApp.onShow();
+                } else {
+                    title.textContent = '🎯 Kuis Gaya';
+                    window.QuizVectorApp.onShow();
+                }
+                applyFullscreenCanvasSizing();
+            });
+        });
+
+        // ===== Fullscreen: shrink the canvas to exactly the space left below the
+        // controls above it, so the overlay (Animasikan/Ulangi) and the value
+        // panel drawn at the bottom of the canvas are always fully visible on
+        // screen without needing to scroll. =====
+        function fitCanvasToViewport(canvasEl) {
+            if (!canvasEl) return;
+            const wrapper = canvasEl.parentElement;
+            const top = wrapper.getBoundingClientRect().top;
+            const bottomMargin = 12;
+            const available = window.innerHeight - top - bottomMargin;
+            canvasEl.style.height = Math.max(280, Math.floor(available)) + 'px';
+        }
+
+        function applyFullscreenCanvasSizing() {
+            const canvasKomponen = document.getElementById('canvas');
+            const canvasAdd = document.getElementById('canvasAdd');
+            if (document.fullscreenElement) {
+                fitCanvasToViewport(canvasKomponen);
+                fitCanvasToViewport(canvasAdd);
+            } else {
+                canvasKomponen.style.height = '';
+                canvasAdd.style.height = '';
+            }
+            // Refit whichever app is active (harmless no-op for the hidden tab's canvas)
+            if (window.ComponentVectorApp) window.ComponentVectorApp.onShow();
+            if (window.AdditionVectorApp) window.AdditionVectorApp.onShow();
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            window.scrollTo(0, 0);
+            // small delay lets the browser finish hiding its chrome so
+            // window.innerHeight reports the final fullscreen viewport size
+            setTimeout(applyFullscreenCanvasSizing, 60);
+        });
+        window.addEventListener('resize', () => {
+            if (document.fullscreenElement) applyFullscreenCanvasSizing();
+        });
+    </script>
+</body>
+</html>
