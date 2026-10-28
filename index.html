@@ -988,7 +988,8 @@
         <div class="section">
             <h2>Kanvas Simulasi</h2>
             <div class="instruction">
-                💡 Geser ujung vektor (kepala anak panah) untuk mengubah panjang dan sudut. Geser panel "Nilai Saat Ini" untuk memindahkan posisinya. Geser area kosong untuk menggeser gambar. Cubit untuk zoom.
+                💡 Geser ujung vektor (kepala anak panah) untuk mengubah panjang dan sudut. Geser panel "Nilai Saat Ini" untuk memindahkan posisinya. Geser area kosong untuk menggeser gambar. Cubit untuk zoom.<br>
+                🎯 Coba dulu untuk sudut <b>0°</b> dan <b>90°</b>, kemudian silakan eksplorasi sudut lainnya.
             </div>
             <div class="angle-input-row">
                 <label for="angleInput">Sudut θ:</label>
@@ -1312,7 +1313,7 @@
         let kVoiceOn = true;
         let kIdVoice = null;
         let introSpoken = false;
-        const introText = 'Petunjuk. Geser ujung vektor, yaitu kepala anak panah, untuk mengubah panjang dan sudut. Geser panel Nilai Saat Ini untuk memindahkan posisinya. Geser area kosong untuk menggeser gambar. Cubit untuk zoom.';
+        const introText = 'Petunjuk. Geser ujung vektor, yaitu kepala anak panah, untuk mengubah panjang dan sudut. Geser panel Nilai Saat Ini untuk memindahkan posisinya. Geser area kosong untuk menggeser gambar. Cubit untuk zoom. Coba dulu untuk sudut 0 derajat dan 90 derajat, kemudian silakan eksplorasi sudut lainnya.';
         function kPickVoice() { if (kTts) kIdVoice = speechSynthesis.getVoices().find(v => /^id([-_]|$)/i.test(v.lang)) || null; }
         if (kTts) { kPickVoice(); if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', kPickVoice); }
         function kSpeak(text, onStart) {
