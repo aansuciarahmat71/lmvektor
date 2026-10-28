@@ -7,41 +7,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lab Maya Vektor</title>
     <style>
-        /* ===== Tab bar (lives centered inside the header) ===== */
-        .tab-bar {
-            display: flex;
-            gap: 6px;
-        }
-
-        .tab-btn {
-            padding: 6px 10px;
+        /* ===== Menu dropdown (lives centered inside the header) ===== */
+        .menu-dd { position: relative; }
+        .menu-toggle {
+            padding: 7px 14px;
             border-radius: 8px;
-            border: 2px solid rgba(255,255,255,0.35);
-            background: rgba(255,255,255,0.12);
-            color: rgba(255,255,255,0.92);
+            border: 2px solid rgba(255,255,255,0.45);
+            background: rgba(255,255,255,0.15);
+            color: #fff;
             font-weight: 700;
-            font-size: 11px;
+            font-size: 13px;
             cursor: pointer;
-            text-align: center;
             white-space: nowrap;
-            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex; align-items: center; gap: 6px;
         }
-
-        .tab-btn.active {
+        .menu-toggle:hover, .menu-dd.open .menu-toggle { background: rgba(255,255,255,0.28); }
+        .menu-toggle .menu-caret { font-size: 10px; transition: transform .2s; }
+        .menu-dd.open .menu-caret { transform: rotate(180deg); }
+        .menu-list {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 180px;
             background: #fff;
-            color: #667eea;
-            border-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            padding: 6px;
+            z-index: 200;
         }
-
-        body.dark-mode .tab-btn.active {
-            color: #4a5568;
+        .menu-dd.open .menu-list { display: block; }
+        .menu-item {
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: #444;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
         }
+        .menu-item:hover { background: #eef0ff; }
+        .menu-item.active { background: linear-gradient(135deg,#667eea,#764ba2); color: #fff; }
+        body.dark-mode .menu-list { background: #2d2d2d; }
+        body.dark-mode .menu-item { color: #ddd; }
+        body.dark-mode .menu-item:hover { background: #3a3a3a; }
+        body.dark-mode .menu-item.active { background: #4a5568; color: #fff; }
 
-        /* On narrow screens only the active tab shows its label (others show just the icon) so three tabs fit in the header */
         @media (max-width: 560px) {
-            .tab-btn { padding: 6px 8px; }
-            .tab-bar { gap: 4px; }
-            .tab-btn:not(.active) .tab-lbl { display: none; }
+            h1 { font-size: 12.5px; }
+            .header-controls { gap: 4px; }
+            .header-controls button { padding: 6px 7px; }
+            .menu-toggle { padding: 6px 10px; font-size: 12px; }
         }
 
         .angle-input-row {
@@ -177,6 +195,20 @@
         #canvasUraian { width:100%; height:300px; border:2px solid #ddd; border-radius:8px; background:#fafafa; display:block; touch-action:none; margin-bottom:12px; }
         body.dark-mode #canvasUraian { background:#161616; border-color:#444; }
         #vuPrev { flex:0 0 96px; }
+
+        .vec { position:relative; display:inline-block; padding-top:.5em; line-height:1; font-weight:700; margin:0 .08em; }
+        .vec::before { content:''; position:absolute; top:.2em; left:0; right:.05em; height:1.6px; background:currentColor; }
+        .vec::after { content:''; position:absolute; top:.2em; right:-.03em; transform:translateY(-50%); border-left:.3em solid currentColor; border-top:.17em solid transparent; border-bottom:.17em solid transparent; }
+        #canvasMateri { width:100%; height:300px; border:2px solid #ddd; border-radius:8px; background:#fafafa; display:block; touch-action:none; margin-bottom:12px; }
+        body.dark-mode #canvasMateri { background:#161616; border-color:#444; }
+        #mtPrev { flex:0 0 96px; }
+        .qz-pills .qz-pill { flex:1 1 calc(33% - 6px); }
+
+        #canvasSejajar { width:100%; height:300px; border:2px solid #ddd; border-radius:8px; background:#fafafa; display:block; touch-action:none; margin-bottom:12px; }
+        body.dark-mode #canvasSejajar { background:#161616; border-color:#444; }
+        #vsPrev { flex:0 0 96px; }
+        #vsCases .qz-pill { flex:1 1 calc(33% - 6px); font-size:11.5px; }
+        #vsFields { margin-bottom:12px; }
 
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
@@ -773,13 +805,15 @@
             #canvasTerapan { height: 400px; }
             #canvasFormula { height: 400px; }
             #canvasUraian { height: 400px; }
+            #canvasMateri { height: 400px; }
+            #canvasSejajar { height: 400px; }
             #canvasKuis { height: 640px; }
             .qz-pill { flex: 1 1 calc(25% - 6px); }
             header { padding: 12px 22px; }
             h1 { font-size: 16px; }
-            .tab-btn { font-size: 13px; padding: 8px 14px; }
+            .menu-toggle { font-size: 14px; padding: 8px 16px; }
         }
-        @media (min-width: 900px) {
+        @media (min-width: 900px), (min-width: 640px) and (orientation: landscape) {
             .container { grid-template-columns: 1fr; max-width: 1240px; padding: 20px 24px; }
             .va-wrap { max-width: 1240px; padding: 20px 24px; }
             #tabKomponen .section,
@@ -787,7 +821,7 @@
             #tabTerapan .va-section,
             #tabKuis .va-section {
                 display: grid;
-                grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr);
+                grid-template-columns: minmax(300px, 1fr) minmax(0, 1.75fr);
                 column-gap: 24px;
                 align-content: start;
             }
@@ -798,16 +832,16 @@
             #tabKomponen .section > :not(h2):not(.canvas-wrapper),
             #tabJumlah .va-section > :not(h2):not(.va-canvas-wrapper),
             #tabTerapan .va-section > :not(h2):not(canvas),
-            #tabKuis .va-section > :not(h2):not(canvas) { grid-column: 2; }
-            /* left column = the drawing, spanning every row of the right column */
+            #tabKuis .va-section > :not(h2):not(canvas) { grid-column: 1; }
+            /* right column = the drawing, spanning every row of the right column */
             #tabKomponen .section { grid-template-rows: auto repeat(2, auto) 1fr; }
-            #tabKomponen .canvas-wrapper { grid-column: 1; grid-row: 2 / span 3; }
+            #tabKomponen .canvas-wrapper { grid-column: 2; grid-row: 2 / span 3; }
             #tabJumlah .va-section { grid-template-rows: auto repeat(4, auto) 1fr; }
-            #tabJumlah .va-canvas-wrapper { grid-column: 1; grid-row: 2 / span 5; }
+            #tabJumlah .va-canvas-wrapper { grid-column: 2; grid-row: 2 / span 5; }
             #tabTerapan .va-section { grid-template-rows: auto repeat(6, auto) 1fr; }
-            #tabTerapan canvas { grid-column: 1; grid-row: 2 / span 7; }
+            #tabTerapan canvas { grid-column: 2; grid-row: 2 / span 7; }
             #tabKuis .va-section { grid-template-rows: auto repeat(5, auto) 1fr; }
-            #tabKuis canvas { grid-column: 1; grid-row: 2 / span 6; }
+            #tabKuis canvas { grid-column: 2; grid-row: 2 / span 6; }
             /* the drawing always fits the window: header + title + paddings are about 185px */
             #canvas { height: clamp(300px, calc(100vh - 185px), 820px); }
             #canvasAdd { height: clamp(380px, calc(100vh - 185px), 820px); }
@@ -816,29 +850,91 @@
             .qz-pill { flex: 1 1 calc(50% - 6px); }
             #canvasFormula { height: clamp(280px, calc(100vh - 235px), 720px); margin-bottom: 0; }
             #canvasUraian { height: clamp(280px, calc(100vh - 235px), 720px); margin-bottom: 0; }
+            #canvasMateri { height: clamp(280px, calc(100vh - 235px), 720px); margin-bottom: 0; }
+            #canvasSejajar { height: clamp(280px, calc(100vh - 235px), 720px); margin-bottom: 0; }
+            #tabJumlah #vsSection.va-section.vf-section { grid-template-rows: auto repeat(5, auto) 1fr; }
+            #tabJumlah #vsSection.va-section.vf-section > canvas { grid-row: 2 / span 6; }
+            #tabMateri .va-section { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(0, 1.75fr); column-gap: 24px; align-content: start; grid-template-rows: auto repeat(4, auto) 1fr; }
+            #tabMateri .va-section > h2 { grid-column: 1 / -1; }
+            #tabMateri .va-section > :not(h2):not(canvas) { grid-column: 1; }
+            #tabMateri .va-section > canvas { grid-column: 2; grid-row: 2 / span 5; }
             #tabJumlah .va-section.vf-section { grid-template-rows: auto repeat(4, auto) 1fr; }
-            #tabJumlah .va-section.vf-section > canvas { grid-column: 1; grid-row: 2 / span 5; }
+            #tabJumlah .va-section.vf-section > canvas { grid-column: 2; grid-row: 2 / span 5; }
             .jm-switch { max-width: 520px; }
         }
+        /* HP landscape (layar pendek): kanvas mengikuti tinggi layar yang tersisa */
+        @media (orientation: landscape) and (max-height: 520px) {
+            #canvas, #canvasAdd, #canvasTerapan, #canvasKuis, #canvasFormula,
+            #canvasUraian, #canvasMateri, #canvasSejajar { height: max(230px, calc(100vh - 120px)); }
+        }
+        /* ===== Petunjuk putar layar (HP, portrait) ===== */
+        #rotateHint { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 300; display: none; align-items: center; gap: 10px;
+            max-width: min(92vw, 420px); padding: 10px 12px 10px 14px; border-radius: 12px; background: rgba(40,40,60,.94); color: #fff;
+            font-size: 13px; font-weight: 600; line-height: 1.35; box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+        #rotateHint.show { display: flex; }
+        #rotateHint .rh-ico { font-size: 22px; animation: rhTurn 2.4s ease-in-out infinite; }
+        #rotateHint button { background: rgba(255,255,255,.2); color: #fff; border: 0; border-radius: 8px; padding: 6px 10px; font-weight: 700; cursor: pointer; font-family: inherit; }
+        @keyframes rhTurn { 0%,25% { transform: rotate(0); } 60%,100% { transform: rotate(-90deg); } }
         /* ===== Perlindungan ringan & atribusi ===== */
         html, body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
         input, textarea { -webkit-user-select: text; user-select: text; }
         img, canvas { -webkit-user-drag: none; }
         .app-credit { text-align: center; font-size: 12px; opacity: .7; padding: 14px 10px 22px; }
         @media print { body > * { display: none !important; } body::before { content: 'Halaman ini tidak dapat dicetak.'; display: block; padding: 20px; } }
+        /* ===== Apersepsi (layar pembuka) ===== */
+        #aps { position:fixed; inset:0; z-index:5000; display:flex; align-items:center; justify-content:center; text-align:center; padding:24px; color:#fff;
+               background: radial-gradient(circle at 50% 25%, #4caf50 0%, #2e7d32 45%, #1b5e20 100%); overflow:hidden; -webkit-user-select:none; user-select:none; }
+        #aps::before { content:''; position:absolute; inset:0; background: repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 70px, transparent 70px 140px); pointer-events:none; }
+        #aps.hide { display:none; }
+        #aps .aps-intro, #aps .aps-stage { position:relative; display:flex; flex-direction:column; align-items:center; gap:14px; max-width:880px; width:100%; }
+        .aps-icon { font-size:clamp(64px, 18vw, 130px); line-height:1.1; min-height:1.2em; animation: apsPop .5s ease; }
+        .aps-title { font-size:clamp(24px, 6vw, 44px); font-weight:800; text-shadow:0 3px 12px rgba(0,0,0,.4); }
+        .aps-hint { font-size:clamp(14px, 3.6vw, 18px); opacity:.9; }
+        #apsCanvas { width:min(92vw, 520px); height:auto; aspect-ratio:360/220; max-height:42vh; background:rgba(0,40,0,.28) !important; border:3px solid rgba(255,255,255,.4) !important; border-radius:18px; box-shadow:0 8px 24px rgba(0,0,0,.25); }
+        .aps-sub { font-size:clamp(18px, 4.6vw, 34px); font-weight:800; line-height:1.3; min-height:4em; text-align:center; display:flex; align-items:center; justify-content:center; text-shadow:0 3px 14px rgba(0,0,0,.5); padding:0 6px; }
+        .aps-sub span { animation: apsFade .35s ease; }
+        .aps-btn { background:#ffeb3b; color:#1b5e20; border:none; border-radius:30px; padding:14px 30px; font-size:clamp(16px, 4.4vw, 20px); font-weight:800; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,.35); margin-top:10px; }
+        .aps-skip { position:absolute; top:14px; right:14px; background:rgba(0,0,0,.28); color:#fff; border:2px solid rgba(255,255,255,.5); border-radius:20px; padding:7px 14px; font-size:13px; font-weight:700; cursor:pointer; z-index:2; }
+        .aps-bar { position:absolute; left:0; bottom:0; height:6px; width:0; background:#ffeb3b; transition:width .5s linear; }
+        .aps-credit { position:absolute; bottom:14px; left:0; right:0; font-size:12px; opacity:.7; }
+        @keyframes apsPop { from { transform: scale(.5); opacity:0; } to { transform: scale(1); opacity:1; } }
+        @keyframes apsFade { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform:none; } }
+
     </style>
 </head>
 <body>
+    <script>window.__apersepsiActive = true;</script>
+    <div id="aps" role="dialog" aria-label="Apersepsi pembelajaran vektor">
+        <button type="button" class="aps-skip" id="apsSkip">Lewati ›</button>
+        <div class="aps-intro" id="apsIntro">
+            <div class="aps-icon">⚽</div>
+            <h1 class="aps-title">Selamat datang di Pembelajaran Fisika</h1>
+            <p class="aps-hint">Aktifkan suara perangkat, lalu ketuk tombol di bawah untuk memulai.</p>
+            <button type="button" class="aps-btn" id="apsStart">▶ Mulai Apersepsi</button>
+        </div>
+        <div class="aps-stage" id="apsStage" style="display:none">
+            <canvas id="apsCanvas"></canvas>
+            <div class="aps-sub" id="apsSub"></div>
+            <button type="button" class="aps-btn" id="apsDone" style="display:none">Mulai Belajar ▶</button>
+        </div>
+        <div class="aps-bar" id="apsBar"></div>
+        <div class="aps-credit">Mamat Aan S · SMAN 1 Majalengka</div>
+    </div>
+
     <header>
         <div class="header-left">
-            <h1 id="pageTitle">📐 Vektor Komponen</h1>
+            <h1 id="pageTitle">📖 Pengertian Vektor</h1>
         </div>
         <div class="header-center">
-            <div class="tab-bar">
-                <div class="tab-btn active" id="tabBtnKomponen" data-tab="tabKomponen" title="Komponen Vektor"><span class="tab-ico">📐</span><span class="tab-lbl"> Komponen</span></div>
-                <div class="tab-btn" id="tabBtnJumlah" data-tab="tabJumlah" title="Penjumlahan Vektor"><span class="tab-ico">➕</span><span class="tab-lbl"> Jumlah</span></div>
-                <div class="tab-btn" id="tabBtnTerapan" data-tab="tabTerapan" title="Penerapan Komponen Vektor"><span class="tab-ico">🧩</span><span class="tab-lbl"> Penerapan</span></div>
-                <div class="tab-btn" id="tabBtnKuis" data-tab="tabKuis" title="Kuis Gaya pada Benda"><span class="tab-ico">🎯</span><span class="tab-lbl"> Kuis</span></div>
+            <div class="menu-dd" id="menuDd">
+                <button type="button" class="menu-toggle" id="menuToggle" aria-haspopup="true" aria-expanded="false">Materi <span class="menu-caret">▼</span></button>
+                <div class="menu-list" id="menuList">
+                    <div class="menu-item active" id="tabBtnMateri" data-tab="tabMateri"><span class="tab-ico">📖</span> Materi</div>
+                    <div class="menu-item" id="tabBtnJumlah" data-tab="tabJumlah"><span class="tab-ico">➕</span> Jumlah</div>
+                    <div class="menu-item" id="tabBtnKomponen" data-tab="tabKomponen"><span class="tab-ico">📐</span> Komponen</div>
+                    <div class="menu-item" id="tabBtnTerapan" data-tab="tabTerapan"><span class="tab-ico">🧩</span> Penerapan</div>
+                    <div class="menu-item" id="tabBtnKuis" data-tab="tabKuis"><span class="tab-ico">🎯</span> Kuis</div>
+                </div>
             </div>
         </div>
         <div class="header-right">
@@ -857,8 +953,31 @@
         </div>
     </div>
 
+    <!-- ===== TAB 0: MATERI - PENGERTIAN VEKTOR ===== -->
+    <div class="tab-panel active" id="tabMateri">
+    <div class="va-wrap">
+        <div class="va-section">
+            <h2>Materi: Pengertian Vektor</h2>
+            <div class="qz-pills" id="mtPills"></div>
+            <canvas id="canvasMateri"></canvas>
+            <div class="tp-card">
+                <div class="tp-badge" id="mtBadge"></div>
+                <div class="tp-title" id="mtTitle"></div>
+                <div class="tp-body" id="mtBody"></div>
+                <pre class="vf-formula" id="mtRel" style="display:none"></pre>
+            </div>
+            <div class="tp-dots" id="mtDots"></div>
+            <div class="va-actions">
+                <button class="va-btn va-btn-ghost" id="mtPrev">‹ Kembali</button>
+                <button class="va-btn va-btn-primary" id="mtNext">Berikutnya ›</button>
+                <button class="va-btn va-btn-ghost va-btn-voice on" id="mtVoice" title="Suara penjelasan">🔊</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
     <!-- ===== TAB 1: KOMPONEN VEKTOR ===== -->
-    <div class="tab-panel active" id="tabKomponen">
+    <div class="tab-panel" id="tabKomponen">
     <div class="container">
         <!-- Canvas Section -->
         <div class="section">
@@ -889,7 +1008,8 @@
 
         <div class="jm-switch" id="jmSwitch">
             <button type="button" class="jm-pill active" data-view="grafis">📈 Grafis</button>
-            <button type="button" class="jm-pill" data-view="rumus">🧮 Aturan cos &amp; sin</button>
+            <button type="button" class="jm-pill" data-view="sejajar">↔️ Sejajar</button>
+            <button type="button" class="jm-pill" data-view="rumus">🧮 Cos &amp; sin</button>
             <button type="button" class="jm-pill" data-view="uraian">📐 Uraian x–y</button>
         </div>
 
@@ -968,6 +1088,25 @@
                 <button class="va-btn va-btn-ghost" id="vuPrev">‹ Kembali</button>
                 <button class="va-btn va-btn-primary" id="vuNext">Berikutnya ›</button>
                 <button class="va-btn va-btn-ghost va-btn-voice on" id="vuVoice" title="Suara penjelasan">🔊</button>
+            </div>
+        </div>
+
+        <div class="va-section vf-section" id="vsSection" style="display:none">
+            <h2>Menjumlahkan Vektor Sejajar</h2>
+            <div class="qz-pills" id="vsCases"></div>
+            <div class="vf-inputs" id="vsFields"></div>
+            <canvas id="canvasSejajar"></canvas>
+            <div class="tp-card">
+                <div class="tp-badge" id="vsBadge"></div>
+                <div class="tp-title" id="vsTitle"></div>
+                <div class="tp-body" id="vsBody"></div>
+                <pre class="vf-formula" id="vsFormula"></pre>
+            </div>
+            <div class="tp-dots" id="vsDots"></div>
+            <div class="va-actions">
+                <button class="va-btn va-btn-ghost" id="vsPrev">‹ Kembali</button>
+                <button class="va-btn va-btn-primary" id="vsNext">Berikutnya ›</button>
+                <button class="va-btn va-btn-ghost va-btn-voice on" id="vsVoice" title="Suara penjelasan">🔊</button>
             </div>
         </div>
 
@@ -1177,7 +1316,7 @@
             const u = new SpeechSynthesisUtterance(text);
             u.lang = 'id-ID';
             if (kIdVoice) u.voice = kIdVoice;
-            u.rate = 0.95;
+            u.rate = 1.2;
             if (onStart) u.onstart = onStart;
             speechSynthesis.speak(u);
         }
@@ -1187,6 +1326,7 @@
         // again on the first user gesture if the first attempt never started.
         let introAttempts = 0;
         function speakIntro() {
+            if (window.__apersepsiActive) return;
             if (introSpoken || !kVoiceOn || !kTts || !tabKomponenActive() || introAttempts >= 4) return;
             introAttempts++;
             kSpeak(introText, () => { introSpoken = true; });
@@ -1837,7 +1977,7 @@
             const u = new SpeechSynthesisUtterance(text);
             u.lang = 'id-ID';
             if (idVoice) u.voice = idVoice;
-            u.rate = 0.95;
+            u.rate = 1.2;
             speechSynthesis.speak(u);
         }
         function stopSpeech() { speechToken++; speechDone = true; if (ttsSupported) speechSynthesis.cancel(); }
@@ -2216,7 +2356,7 @@
             const u = new SpeechSynthesisUtterance(text);
             u.lang = 'id-ID';
             if (idVoice) u.voice = idVoice;
-            u.rate = 0.95;
+            u.rate = 1.2;
             u.onend = finish;
             u.onerror = finish;
             speechSynthesis.speak(u);
@@ -2399,7 +2539,7 @@
             if (!tts || !voiceOn) return;
             speechSynthesis.cancel();
             const u = new SpeechSynthesisUtterance(t);
-            u.lang = 'id-ID'; if (idVoice) u.voice = idVoice; u.rate = 0.95;
+            u.lang = 'id-ID'; if (idVoice) u.voice = idVoice; u.rate = 1.2;
             speechSynthesis.speak(u);
         }
         if (!tts) voiceBtn.style.display = 'none';
@@ -3075,7 +3215,7 @@
             speakTimer = setTimeout(() => {
                 speechSynthesis.cancel();
                 const u = new SpeechSynthesisUtterance(text);
-                u.lang = 'id-ID'; if (idVoice) u.voice = idVoice; u.rate = 0.95;
+                u.lang = 'id-ID'; if (idVoice) u.voice = idVoice; u.rate = 1.2;
                 speechSynthesis.speak(u);
             }, delay || 0);
         }
@@ -3257,7 +3397,7 @@
         function speak(t) {
             if (!tts || !voiceOn) return;
             speechSynthesis.cancel();
-            const u = new SpeechSynthesisUtterance(t); u.lang = 'id-ID'; if (idVoice) u.voice = idVoice; u.rate = 0.95;
+            const u = new SpeechSynthesisUtterance(t); u.lang = 'id-ID'; if (idVoice) u.voice = idVoice; u.rate = 1.2;
             speechSynthesis.speak(u);
         }
         if (!tts) voiceBtn.style.display = 'none';
@@ -3499,7 +3639,7 @@
         function speak(t) {
             if (!tts || !voiceOn) return;
             speechSynthesis.cancel();
-            const u = new SpeechSynthesisUtterance(t); u.lang = 'id-ID'; if (idVoice) u.voice = idVoice; u.rate = 0.95;
+            const u = new SpeechSynthesisUtterance(t); u.lang = 'id-ID'; if (idVoice) u.voice = idVoice; u.rate = 1.2;
             speechSynthesis.speak(u);
         }
         if (!tts) voiceBtn.style.display = 'none';
@@ -3706,6 +3846,592 @@
     </script>
 
     <script>
+    window.MateriVectorApp = (function() {
+        const canvas = document.getElementById('canvasMateri');
+        const ctx = canvas.getContext('2d');
+        const pillsEl = document.getElementById('mtPills');
+        const badgeEl = document.getElementById('mtBadge'), titleEl = document.getElementById('mtTitle');
+        const bodyEl = document.getElementById('mtBody'), relEl = document.getElementById('mtRel');
+        const dotsEl = document.getElementById('mtDots');
+        const prevBtn = document.getElementById('mtPrev'), nextBtn = document.getElementById('mtNext'), voiceBtn = document.getElementById('mtVoice');
+
+        const PI = Math.PI;
+        const COL = { v: '#2d6cdf', A: '#2d6cdf', B: '#ef6c00', C: '#8e24aa', tail: '#e53935', tip: '#2ea043', ok: '#2e7d32', no: '#c62828' };
+        const SECTIONS = [
+            { name: '1. Gambar', first: 0 },
+            { name: '2. Notasi', first: 3 },
+            { name: '3. Arah vektor', first: 6 }
+        ];
+        const TOTAL = 11;
+        let isDark = false, W = 330, H = 300, SC = 1;
+        let step = 0, animT = 1, animRaf = 0;
+        let T = { x: 80, y: 205 }, Hd = { x: 250, y: 110 };   // tail (pangkal) and head (ujung) of the main vector
+        let drag = null;
+
+        const fmt = n => (Math.round(n * 10) / 10).toString().replace('.', ',');
+        const vec = s => `<span class="vec">${s}</span>`;
+        const fg = () => isDark ? '#e0e0e0' : '#222';
+        const bg = () => isDark ? '#161616' : '#fafafa';
+        const sub = (p, a, b) => Math.max(0, Math.min(1, (p - a) / (b - a)));
+        const sectionOf = i => i >= 6 ? 2 : (i >= 3 ? 1 : 0);
+
+        // ===== Voice =====
+        const tts = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+        let voiceOn = true, idVoice = null;
+        function pickVoice() { if (tts) idVoice = speechSynthesis.getVoices().find(v => /^id([-_]|$)/i.test(v.lang)) || null; }
+        if (tts) { pickVoice(); if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', pickVoice); }
+        function speak(t) {
+            if (!tts || !voiceOn) return;
+            speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(t); u.lang = 'id-ID'; if (idVoice) u.voice = idVoice; u.rate = 1.2;
+            speechSynthesis.speak(u);
+        }
+        if (!tts) voiceBtn.style.display = 'none';
+        voiceBtn.addEventListener('click', () => {
+            voiceOn = !voiceOn; voiceBtn.classList.toggle('on', voiceOn); voiceBtn.textContent = voiceOn ? '🔊' : '🔇';
+            if (voiceOn) speak(content(step).speech); else if (tts) speechSynthesis.cancel();
+        });
+
+        // ===== Content =====
+        function content(i) {
+            return [
+                { title: 'Vektor digambar dengan panah',
+                  body: 'Vektor adalah besaran yang memiliki <b>nilai</b> dan <b>arah</b>. Untuk menggambarnya, kita menggunakan sebuah <b>panah</b>.',
+                  speech: 'Bagian satu, gambar vektor. Vektor adalah besaran yang memiliki nilai dan arah. Untuk menggambarnya, kita menggunakan sebuah panah.' },
+                { title: 'Pangkal vektor',
+                  body: '<b>Pangkal</b> vektor adalah titik awal panah, yaitu titik tempat vektor mulai digambar. Coba geser pangkalnya: vektor berpindah tempat, tetapi nilai dan arahnya tidak berubah.',
+                  speech: 'Pangkal vektor adalah titik awal panah, yaitu titik tempat vektor mulai digambar. Coba geser pangkalnya. Vektor berpindah tempat, tetapi nilai dan arahnya tidak berubah.' },
+                { title: 'Ujung vektor',
+                  body: '<b>Ujung</b> vektor adalah kepala panah. <b>Panjang panah</b> menunjukkan besar (nilai) vektor, dan <b>arah panah</b> menunjukkan arah vektor. Coba geser ujung panahnya!',
+                  speech: 'Ujung vektor adalah kepala panah. Panjang panah menunjukkan besar atau nilai vektor, dan arah panah menunjukkan arah vektor. Coba geser ujung panahnya.' },
+                { title: 'Notasi dengan huruf',
+                  body: `Vektor diberi nama dengan sebuah huruf, misalnya A. Penulisannya memakai <b>tanda panah di atas huruf</b>, ${vec('A')}, atau memakai <b>huruf tebal</b>, <b>A</b>.`,
+                  speech: 'Bagian dua, notasi vektor. Vektor diberi nama dengan sebuah huruf, misalnya A. Penulisannya memakai tanda panah di atas huruf, atau memakai huruf tebal.' },
+                { title: 'Notasi titik pangkal dan ujung',
+                  body: `Vektor juga ditulis dengan dua huruf: huruf titik <b>pangkal</b> lalu huruf titik <b>ujung</b>. Vektor dari titik P ke titik Q ditulis ${vec('PQ')}.`,
+                  speech: 'Vektor juga bisa ditulis dengan dua huruf, yaitu huruf titik pangkal lalu huruf titik ujung. Vektor dari titik P ke titik Q ditulis P Q dengan tanda panah di atasnya.' },
+                { title: 'Besar vektor',
+                  body: `Besar vektor ditulis dengan tanda harga mutlak, ${'|' + vec('A') + '|'}, atau dengan huruf A saja tanpa tanda panah. Besar vektor sama dengan panjang panahnya, dan nilainya selalu positif.`,
+                  speech: 'Besar vektor ditulis dengan tanda harga mutlak, atau dengan huruf A saja tanpa tanda panah. Besar vektor sama dengan panjang panahnya, dan nilainya selalu positif.' },
+                { title: 'Searah dan besar sama',
+                  body: `Dua vektor <b>searah</b> jika panahnya menunjuk ke arah yang sama. Jika panjang panahnya juga sama, keduanya adalah vektor yang sama: ${vec('A')} = ${vec('B')}.`,
+                  rel: 'Searah + besar sama\n→ vektor sama: A = B',
+                  speech: 'Bagian tiga, vektor searah dan berlawanan. Dua vektor searah jika panahnya menunjuk ke arah yang sama. Jika panjang panahnya juga sama, keduanya adalah vektor yang sama. A sama dengan B.' },
+                { title: 'Searah, besar berbeda',
+                  body: `Panah menunjuk ke arah yang sama, tetapi panjangnya berbeda. Besar kedua vektor tidak sama, sehingga ${vec('A')} ≠ ${vec('B')}.`,
+                  rel: 'Searah + besar beda\n→ A ≠ B  (|B| < |A|)',
+                  speech: 'Panah menunjuk ke arah yang sama, tetapi panjangnya berbeda. Besar kedua vektor tidak sama, sehingga A tidak sama dengan B.' },
+                { title: 'Berlawanan arah, besar sama',
+                  body: `Dua vektor <b>berlawanan arah</b> jika panahnya saling berlawanan. Dengan besar yang sama, ${vec('B')} = −${vec('A')}: nilainya sama, tetapi arahnya berlawanan, sehingga ${vec('A')} ≠ ${vec('B')}.`,
+                  rel: 'Berlawanan + besar sama\n→ B = −A  (A ≠ B)',
+                  speech: 'Dua vektor berlawanan arah jika panahnya saling berlawanan. Dengan besar yang sama, B sama dengan minus A. Nilainya sama, tetapi arahnya berlawanan, sehingga A tidak sama dengan B.' },
+                { title: 'Berlawanan arah, besar berbeda',
+                  body: `Arah panah berlawanan dan panjangnya berbeda. Jadi besar dan arah kedua vektor sama-sama berbeda: ${vec('A')} ≠ ${vec('B')}.`,
+                  rel: 'Berlawanan + besar beda\n→ A ≠ B',
+                  speech: 'Arah panah berlawanan dan panjangnya berbeda. Jadi besar dan arah kedua vektor sama-sama berbeda. A tidak sama dengan B.' },
+                { title: 'Vektor sejajar',
+                  body: 'Vektor <b>sejajar</b> jika garis kerjanya sejajar. Vektor yang searah maupun yang berlawanan arah sama-sama sejajar; yang membedakan hanyalah arah panahnya.',
+                  rel: 'Sejajar = searah atau berlawanan\n(garis kerjanya sejajar)',
+                  speech: 'Vektor sejajar jika garis kerjanya sejajar. Vektor yang searah maupun yang berlawanan arah sama-sama sejajar. Yang membedakan hanyalah arah panahnya.' }
+            ][i];
+        }
+
+        // ===== Drawing helpers =====
+        function prog(i) { return i < step ? 1 : (i === step ? animT : 0); }
+        function line(a, b, color, lw, dash, p) {
+            if (p === undefined) p = 1; if (p <= 0.005) return;
+            ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = lw; if (dash) ctx.setLineDash(dash);
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(a.x + (b.x - a.x) * p, a.y + (b.y - a.y) * p); ctx.stroke(); ctx.restore();
+        }
+        function arrow(a, b, color, lw, p) {
+            if (p === undefined) p = 1; if (p <= 0.005) return;
+            const pl = Math.min(1, p / 0.88), t = { x: a.x + (b.x - a.x) * pl, y: a.y + (b.y - a.y) * pl };
+            ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(t.x, t.y); ctx.stroke();
+            if (p < 0.88) { ctx.beginPath(); ctx.arc(t.x, t.y, lw * 0.9 + 1, 0, 2 * PI); ctx.fill(); }
+            const hp = sub(p, 0.88, 1);
+            if (hp > 0 && Math.hypot(b.x - a.x, b.y - a.y) > 6) {
+                const ang = Math.atan2(b.y - a.y, b.x - a.x), hl = (9 + lw) * hp;
+                ctx.beginPath(); ctx.moveTo(b.x, b.y);
+                ctx.lineTo(b.x - hl * Math.cos(ang - 0.4), b.y - hl * Math.sin(ang - 0.4));
+                ctx.lineTo(b.x - hl * Math.cos(ang + 0.4), b.y - hl * Math.sin(ang + 0.4));
+                ctx.closePath(); ctx.fill();
+            }
+            ctx.restore();
+        }
+        function text(str, x, y, color, p, align, size, weight) {
+            const al = p === undefined ? 1 : sub(p, 0.5, 1); if (al <= 0) return 0;
+            ctx.save(); ctx.globalAlpha = al; ctx.font = `${weight || 'bold'} ${size || 14}px Arial`;
+            ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
+            const w = ctx.measureText(str).width;
+            ctx.lineWidth = 4; ctx.strokeStyle = bg(); ctx.strokeText(str, x, y); ctx.fillStyle = color; ctx.fillText(str, x, y); ctx.restore();
+            return w;
+        }
+        // letters with a small arrow drawn above them (vector notation)
+        function vecText(s, x, y, color, size, p, align) {
+            const al = p === undefined ? 1 : sub(p, 0.5, 1); if (al <= 0) return 0;
+            ctx.save(); ctx.globalAlpha = al; ctx.font = `bold ${size}px Arial`; ctx.textBaseline = 'middle';
+            const w = ctx.measureText(s).width, x0 = align === 'left' ? x : x - w / 2;
+            ctx.textAlign = 'left'; ctx.lineWidth = 4; ctx.strokeStyle = bg(); ctx.strokeText(s, x0, y); ctx.fillStyle = color; ctx.fillText(s, x0, y);
+            const ay = y - size * 0.66; ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(x0 - 1, ay); ctx.lineTo(x0 + w + 2, ay); ctx.stroke();
+            ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(x0 + w + 4, ay); ctx.lineTo(x0 + w - 2, ay - 3.5); ctx.lineTo(x0 + w - 2, ay + 3.5); ctx.closePath(); ctx.fill();
+            ctx.restore(); return w;
+        }
+        function rrect(x, y, w, h, r, fill, stroke) {
+            ctx.save(); ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h);
+            ctx.fillStyle = fill; ctx.fill(); if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 2; ctx.stroke(); } ctx.restore();
+        }
+        const len = () => Math.hypot(Hd.x - T.x, Hd.y - T.y);
+        const unit = () => { const L = len() || 1; return { x: (Hd.x - T.x) / L, y: (Hd.y - T.y) / L }; };
+
+        // ===== Scenes =====
+        function drawMain() {
+            const d = unit(), n = { x: d.y, y: -d.x }, L = len();
+            const mid = { x: (T.x + Hd.x) / 2, y: (T.y + Hd.y) / 2 };
+            const p0 = step === 0 ? animT : 1;
+            arrow(T, Hd, COL.v, 5, p0);
+            if (step === 0) { text('panah', mid.x + n.x * 20, mid.y + n.y * 20, COL.v, p0, 'center', 17); }
+            const pulse = 1 + 0.25 * Math.sin(performance.now() / 180);
+            if (step >= 1) {
+                ctx.save(); ctx.fillStyle = COL.tail; ctx.beginPath(); ctx.arc(T.x, T.y, step === 1 ? 8 * pulse : 6, 0, 2 * PI); ctx.fill(); ctx.restore();
+                ctx.save(); ctx.strokeStyle = COL.tip; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(Hd.x, Hd.y, step === 2 ? 11 * pulse : 8, 0, 2 * PI); ctx.stroke(); ctx.restore();
+            }
+            if (step === 1) {
+                text('pangkal', T.x - d.x * 4 - n.x * 0, T.y + 26, COL.tail, animT, 'center', 16);
+                text('(titik awal)', T.x, T.y + 44, COL.tail, animT, 'center', 12, '600');
+                text('↔ geser pangkal', 165, 28, fg(), animT, 'center', 13, '600');
+            }
+            if (step === 2) {
+                text('ujung', Hd.x + d.x * 18 + n.x * 6, Hd.y + d.y * 18 + n.y * 6 - 10, COL.tip, animT, 'center', 16);
+                text('(kepala panah)', Hd.x + d.x * 18 + n.x * 6, Hd.y + d.y * 18 + n.y * 6 + 8, COL.tip, animT, 'center', 12, '600');
+                // length bracket on the opposite side of the label
+                const o = -24, a = { x: T.x - n.x * o, y: T.y - n.y * o }, b = { x: Hd.x - n.x * o, y: Hd.y - n.y * o };
+                line(a, b, '#8e24aa', 2, [5, 4], sub(animT, 0.2, 0.8));
+                [a, b].forEach(q => line({ x: q.x + n.x * 6, y: q.y + n.y * 6 }, { x: q.x - n.x * 6, y: q.y - n.y * 6 }, '#8e24aa', 2, null, sub(animT, 0.2, 0.8)));
+                text('panjang = besar', (a.x + b.x) / 2 - n.x * 18 * (o < 0 ? -1 : 1) * 0 + n.x * 18, (a.y + b.y) / 2 + n.y * 18, '#8e24aa', animT, 'center', 13);
+                // direction arc
+                const th = Math.atan2(-(Hd.y - T.y), Hd.x - T.x);
+                line(T, { x: T.x + 60, y: T.y }, isDark ? '#aaa' : '#777', 1.5, [5, 4], sub(animT, 0.3, 0.8));
+                ctx.save(); ctx.strokeStyle = COL.tail; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(T.x, T.y, 34, 0, -th * sub(animT, 0.4, 1), th > 0); ctx.stroke(); ctx.restore();
+                text('arah', T.x + 44, T.y + 16, COL.tail, animT, 'center', 14);
+                text('↔ geser ujung', 165, 28, fg(), animT, 'center', 13, '600');
+            }
+            if (step === 3) {
+                vecText('A', mid.x + n.x * 28, mid.y + n.y * 28, COL.v, 24, animT);
+                // the two ways of writing it
+                rrect(40, 236, 100, 40, 10, isDark ? '#2a2a2a' : '#fff', COL.v);
+                vecText('A', 90, 262, COL.v, 22, animT);
+                text('atau', 165, 258, fg(), animT, 'center', 13, '600');
+                rrect(190, 236, 100, 40, 10, isDark ? '#2a2a2a' : '#fff', COL.v);
+                text('A', 240, 258, isDark ? '#fff' : '#000', animT, 'center', 26, '900');
+                text('tanda panah', 90, 290, fg(), animT, 'center', 11, '600'); text('huruf tebal', 240, 290, fg(), animT, 'center', 11, '600');
+            }
+            if (step === 4) {
+                ctx.save(); ctx.fillStyle = COL.tail; ctx.beginPath(); ctx.arc(T.x, T.y, 6, 0, 2 * PI); ctx.fill(); ctx.restore();
+                text('P', T.x - 16, T.y + 14, COL.tail, animT, 'center', 20); text('Q', Hd.x + d.x * 16 + 4, Hd.y + d.y * 16 - 6, COL.tip, animT, 'center', 20);
+                vecText('PQ', mid.x + n.x * 30, mid.y + n.y * 30, COL.v, 24, animT);
+                text('P = pangkal   Q = ujung', 165, 262, fg(), animT, 'center', 14);
+                text('dari P menuju Q', 165, 282, fg(), animT, 'center', 12, '600');
+            }
+            if (step === 5) {
+                const cxm = mid.x + n.x * 30, cym = mid.y + n.y * 30;
+                ctx.save(); ctx.font = 'bold 22px Arial'; const wA = ctx.measureText('A').width; ctx.restore();
+                const x0 = cxm - (wA + 22) / 2;
+                text('|', x0, cym, COL.v, animT, 'center', 26); vecText('A', x0 + 11 + wA / 2, cym, COL.v, 22, animT); text('|', x0 + wA + 22, cym, COL.v, animT, 'center', 26);
+                const o = 24, a = { x: T.x - n.x * o, y: T.y - n.y * o }, b = { x: Hd.x - n.x * o, y: Hd.y - n.y * o };
+                line(a, b, '#8e24aa', 2, [5, 4], sub(animT, 0.2, 0.8));
+                text(`|A| = ${fmt(L / 30)} satuan`, 165, 256, '#8e24aa', animT, 'center', 17);
+                text('atau cukup ditulis A (tanpa panah)', 165, 280, fg(), animT, 'center', 12, '600');
+            }
+            if (step === 1 || step === 2) text(`Besar = ${fmt(L / 30)} satuan`, 8, 290, fg(), 1, 'left', 12, '600');
+        }
+
+        // Two (or three) arrows compared: same / different direction, same / different size
+        function drawCompare() {
+            const al = 24 * PI / 180, u = { x: Math.cos(al), y: -Math.sin(al) }, n = { x: -u.y * -1, y: u.x * -1 };   // n points "up-left" of u
+            const nn = { x: u.y, y: -u.x };          // perpendicular (up-left)
+            const A0 = { x: 52, y: 150 }, B0 = { x: 52, y: 205 }, LA = 190;
+            const p = animT;
+            const cfg = {
+                6: { LB: 190, opp: false, rel: ['Searah', 'Besar sama'], res: 'eq', ok: true },
+                7: { LB: 105, opp: false, rel: ['Searah', 'Besar beda'], res: 'ne', ok: false },
+                8: { LB: 190, opp: true, rel: ['Berlawanan', 'Besar sama'], res: 'neg', ok: false },
+                9: { LB: 105, opp: true, rel: ['Berlawanan', 'Besar beda'], res: 'ne', ok: false },
+                10: null
+            }[step];
+            const guide = (s, color) => { const q = { x: s.x - u.x * 30, y: s.y - u.y * 30 }; line(q, { x: q.x + u.x * 290, y: q.y + u.y * 290 }, color, 1.5, [4, 5], 1); };
+            if (step === 10) {
+                [[{ x: 40, y: 120 }, 170, false, COL.A, 'A'], [{ x: 40, y: 175 }, 110, false, COL.B, 'B'], [{ x: 40, y: 230 }, 150, true, COL.C, 'C']].forEach((q, k) => {
+                    const s = q[0], L = q[1], op = q[2], pk = sub(p, k * 0.25, k * 0.25 + 0.5);
+                    guide(s, 'rgba(120,120,120,.55)');
+                    const a = op ? { x: s.x + u.x * L, y: s.y + u.y * L } : s, b = op ? s : { x: s.x + u.x * L, y: s.y + u.y * L };
+                    arrow(a, b, q[3], 5, pk);
+                    vecText(q[4], (a.x + b.x) / 2 + nn.x * 22, (a.y + b.y) / 2 + nn.y * 22, q[3], 20, pk);
+                });
+                text('semua garis kerjanya sejajar', 195, 282, fg(), p, 'center', 14);
+                return;
+            }
+            guide(A0, 'rgba(120,120,120,.45)'); guide(B0, 'rgba(120,120,120,.45)');
+            arrow(A0, { x: A0.x + u.x * LA, y: A0.y + u.y * LA }, COL.A, 5, sub(p, 0, 0.5));
+            vecText('A', A0.x + u.x * LA / 2 + nn.x * 22, A0.y + u.y * LA / 2 + nn.y * 22, COL.A, 20, sub(p, 0, 0.5));
+            const tb = cfg.opp ? { x: B0.x + u.x * cfg.LB, y: B0.y + u.y * cfg.LB } : B0, hb = cfg.opp ? B0 : { x: B0.x + u.x * cfg.LB, y: B0.y + u.y * cfg.LB };
+            arrow(tb, hb, COL.B, 5, sub(p, 0.4, 0.9));
+            vecText('B', (tb.x + hb.x) / 2 + nn.x * 22, (tb.y + hb.y) / 2 + nn.y * 22, COL.B, 20, sub(p, 0.4, 0.9));
+            // length marks: both ends of A's length projected down to B's line
+            if (cfg.LB === 190) { line({ x: A0.x + u.x * LA, y: A0.y + u.y * LA }, { x: B0.x + u.x * LA, y: B0.y + u.y * LA }, 'rgba(120,120,120,.6)', 1.5, [3, 4], sub(p, 0.6, 1)); }
+            // chips
+            const c1 = cfg.rel[0], c2 = cfg.rel[1];
+            const okDir = c1 === 'Searah', okSize = c2 === 'Besar sama';
+            rrect(30, 226, 130, 30, 15, okDir ? '#e8f5e9' : '#ffebee', okDir ? COL.ok : COL.no); text(c1, 95, 241, okDir ? COL.ok : COL.no, sub(p, 0.6, 1), 'center', 14);
+            rrect(170, 226, 130, 30, 15, okSize ? '#e8f5e9' : '#ffebee', okSize ? COL.ok : COL.no); text(c2, 235, 241, okSize ? COL.ok : COL.no, sub(p, 0.7, 1), 'center', 14);
+            // result
+            const pr = sub(p, 0.8, 1), col = cfg.res === 'eq' ? COL.ok : COL.no;
+            ctx.save(); ctx.globalAlpha = pr; ctx.font = 'bold 22px Arial'; ctx.restore();
+            let x = 125; const y = 284;
+            if (cfg.res === 'eq') { vecText('A', x, y, col, 20, pr); text('=', x + 24, y, col, pr, 'center', 22); vecText('B', x + 48, y, col, 20, pr); }
+            else if (cfg.res === 'ne') { vecText('A', x, y, col, 20, pr); text('≠', x + 24, y, col, pr, 'center', 22); vecText('B', x + 48, y, col, 20, pr); }
+            else { vecText('B', x - 20, y, col, 20, pr); text('= −', x + 6, y, col, pr, 'center', 22); vecText('A', x + 34, y, col, 20, pr); text('(A ≠ B)', x + 90, y, col, pr, 'center', 14); }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, W, H); ctx.fillStyle = bg(); ctx.fillRect(0, 0, W, H);
+            ctx.strokeStyle = isDark ? '#242424' : '#eee'; ctx.lineWidth = 1;
+            for (let x = 0; x < W; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+            for (let y = 0; y < H; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+            if (step <= 5) drawMain(); else drawCompare();
+        }
+
+        // ===== Panel / navigation =====
+        function updatePanel() {
+            const c = content(step), sec = sectionOf(step);
+            badgeEl.textContent = `Bagian ${sec + 1} dari 3 · Langkah ${step + 1} dari ${TOTAL}`;
+            titleEl.textContent = c.title; bodyEl.innerHTML = c.body;
+            relEl.textContent = c.rel || ''; relEl.style.display = c.rel ? '' : 'none';
+            dotsEl.innerHTML = '';
+            for (let i = 0; i < TOTAL; i++) { const d = document.createElement('span'); d.className = 'tp-dot' + (i < step ? ' done' : '') + (i === step ? ' cur' : ''); dotsEl.appendChild(d); }
+            prevBtn.disabled = step === 0; nextBtn.disabled = step === TOTAL - 1;
+            pillsEl.querySelectorAll('.qz-pill').forEach((b, i) => b.classList.toggle('active', i === sec));
+        }
+        function animateStep() {
+            cancelAnimationFrame(animRaf); animT = 0;
+            const t0 = performance.now(), DUR = step >= 6 ? 2400 : 1800;
+            (function tick(now) {
+                animT = Math.min(1, (now - t0) / DUR); draw();
+                // keep pulsing highlights alive on the interactive steps
+                if (animT < 1 || (step >= 1 && step <= 2)) animRaf = requestAnimationFrame(tick);
+            })(t0);
+        }
+        function goStep(i, speakIt) {
+            step = Math.max(0, Math.min(TOTAL - 1, i)); updatePanel(); animateStep();
+            if (speakIt) speak(content(step).speech);
+        }
+        SECTIONS.forEach((s, i) => {
+            const b = document.createElement('button'); b.type = 'button'; b.className = 'qz-pill'; b.textContent = s.name;
+            b.addEventListener('click', () => goStep(s.first, true)); pillsEl.appendChild(b);
+        });
+        prevBtn.addEventListener('click', () => goStep(step - 1, true));
+        nextBtn.addEventListener('click', () => goStep(step + 1, true));
+
+        // ===== Dragging pangkal / ujung (sections 1 and 2) =====
+        const pos = e => { const r = canvas.getBoundingClientRect(); return { x: (e.clientX - r.left) / SC, y: (e.clientY - r.top) / SC }; };
+        canvas.addEventListener('pointerdown', e => {
+            if (step > 5) return;
+            const p = pos(e);
+            if (Math.hypot(p.x - Hd.x, p.y - Hd.y) < 22) drag = { kind: 'tip' };
+            else if (Math.hypot(p.x - T.x, p.y - T.y) < 22) drag = { kind: 'tail', dx: Hd.x - T.x, dy: Hd.y - T.y };
+            if (drag) { try { canvas.setPointerCapture(e.pointerId); } catch (_) {} e.preventDefault(); }
+        });
+        canvas.addEventListener('pointermove', e => {
+            if (!drag) return; const p = pos(e);
+            const cl = (v, a, b) => Math.max(a, Math.min(b, v));
+            if (drag.kind === 'tip') {
+                let nx = cl(p.x, 14, W - 14), ny = cl(p.y, 14, H - 14);
+                if (Math.hypot(nx - T.x, ny - T.y) < 36) { const d = unit(); nx = T.x + d.x * 36; ny = T.y + d.y * 36; }
+                Hd = { x: nx, y: ny };
+            } else {
+                const tx = cl(p.x, 14 - Math.min(0, drag.dx), W - 14 - Math.max(0, drag.dx)), ty = cl(p.y, 14 - Math.min(0, drag.dy), H - 14 - Math.max(0, drag.dy));
+                T = { x: tx, y: ty }; Hd = { x: tx + drag.dx, y: ty + drag.dy };
+            }
+            animT = 1; draw();
+        });
+        ['pointerup', 'pointercancel'].forEach(ev => canvas.addEventListener(ev, () => { drag = null; }));
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+            const rw = rect.width || 300, rh = rect.height || 300;
+            SC = Math.max(0.5, Math.min(2.2, Math.min(rw / 330, rh / 300)));
+            W = rw / SC; H = rh / SC;
+            canvas.width = rw * dpr; canvas.height = rh * dpr;
+            ctx.setTransform(dpr * SC, 0, 0, dpr * SC, 0, 0);
+        }
+        const isActive = () => document.getElementById('tabMateri').classList.contains('active');
+        window.addEventListener('resize', () => { if (isActive()) { resizeCanvas(); draw(); } });
+        updatePanel();
+
+        return {
+            onDarkModeToggle: function(d) { isDark = d; if (isActive()) draw(); },
+            onShow: function() { if (!isActive()) return; resizeCanvas(); animT = 1; draw(); },
+            start: function() { if (!isActive()) return; resizeCanvas(); goStep(0, true); }
+        };
+    })();
+    </script>
+
+    <script>
+    window.SejajarVectorApp = (function() {
+        const canvas = document.getElementById('canvasSejajar');
+        const ctx = canvas.getContext('2d');
+        const casesEl = document.getElementById('vsCases');
+        const fieldsEl = document.getElementById('vsFields');
+        const badgeEl = document.getElementById('vsBadge'), titleEl = document.getElementById('vsTitle');
+        const bodyEl = document.getElementById('vsBody'), formulaEl = document.getElementById('vsFormula');
+        const dotsEl = document.getElementById('vsDots');
+        const prevBtn = document.getElementById('vsPrev'), nextBtn = document.getElementById('vsNext'), voiceBtn = document.getElementById('vsVoice');
+
+        const PI = Math.PI, TOTAL = 3;
+        const PAL = ['#2d6cdf', '#ef6c00', '#8e24aa'], COLR = '#e53935', OKC = '#2e7d32';
+        const SUB = ['₁', '₂', '₃'];
+        // sign: +1 = to the right (positive), -1 = to the left (negative)
+        const CASES = [
+            { name: '1. Searah', signs: [1, 1, 1], mags: [3, 4, 5] },
+            { name: '2. Ada yang berlawanan', signs: [1, -1, 1], mags: [6, 4, 3] },
+            { name: '3. Resultan nol', signs: [1, -1], mags: [5, 5] }
+        ];
+        let ci = 0, step = 0, animT = 1, animRaf = 0, isDark = false, W = 330, H = 300;
+        const state = CASES.map(c => c.mags.slice());
+
+        const fmt = n => (Math.round(n * 100) / 100).toString().replace('.', ',');
+        const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+        const sub = (p, a, b) => Math.max(0, Math.min(1, (p - a) / (b - a)));
+        const ease = x => 1 - Math.pow(1 - Math.max(0, Math.min(1, x)), 3);
+        const fg = () => isDark ? '#e0e0e0' : '#222';
+        const bg = () => isDark ? '#161616' : '#fafafa';
+        const nm = k => 'F' + SUB[k];
+
+        function calc() {
+            const c = CASES[ci], mags = state[ci].map(m => clamp(isNaN(m) ? 0.1 : m, 0.1, 99));
+            const vals = mags.map((m, k) => m * c.signs[k]);
+            const pos = [0]; vals.forEach(v => pos.push(pos[pos.length - 1] + v));
+            const R = pos[pos.length - 1];
+            return { c, mags, vals, pos, R, n: vals.length, zero: Math.abs(R) < 1e-9 };
+        }
+        const dirWord = s => s > 0 ? 'kanan' : 'kiri';
+
+        // ===== Voice =====
+        const tts = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+        let voiceOn = true, idVoice = null;
+        function pickVoice() { if (tts) idVoice = speechSynthesis.getVoices().find(v => /^id([-_]|$)/i.test(v.lang)) || null; }
+        if (tts) { pickVoice(); if (speechSynthesis.addEventListener) speechSynthesis.addEventListener('voiceschanged', pickVoice); }
+        function speak(t) {
+            if (!tts || !voiceOn) return;
+            speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(t); u.lang = 'id-ID'; if (idVoice) u.voice = idVoice; u.rate = 1.2;
+            speechSynthesis.speak(u);
+        }
+        if (!tts) voiceBtn.style.display = 'none';
+        voiceBtn.addEventListener('click', () => {
+            voiceOn = !voiceOn; voiceBtn.classList.toggle('on', voiceOn); voiceBtn.textContent = voiceOn ? '🔊' : '🔇';
+            if (voiceOn) speak(content(step).speech); else if (tts) speechSynthesis.cancel();
+        });
+
+        // ===== Texts =====
+        function content(i) {
+            const d = calc(), { n, mags, vals, R } = d;
+            const list = mags.map((m, k) => `${nm(k)} = ${fmt(m)} N`).join(', ');
+            const eqLine = d.c.signs.map((s, k) => (k === 0 ? (s < 0 ? '−' : '') : (s < 0 ? ' − ' : ' + ')) + nm(k)).join('');
+            const numLine = d.c.signs.map((s, k) => (k === 0 ? (s < 0 ? '−' : '') : (s < 0 ? ' − ' : ' + ')) + fmt(mags[k])).join('');
+            const resTxt = d.zero ? 'R = 0' : `R = ${fmt(Math.abs(R))} N ke ${dirWord(R)}`;
+            if (ci === 0) return [
+                { title: 'Tiga vektor sejajar dan searah',
+                  body: `Ketiga vektor berada pada garis kerja yang sejajar dan menunjuk ke arah yang sama, yaitu ke kanan. Besarnya: ${list}.`,
+                  formula: '',
+                  speech: `Contoh satu. Tiga vektor sejajar dan searah. Ketiganya menunjuk ke kanan. Besarnya ${mags.map((m, k) => `F ${k + 1} sama dengan ${fmt(m)} newton`).join(', ')}.` },
+                { title: 'Susun ujung ke pangkal',
+                  body: 'Letakkan pangkal F₂ di ujung F₁, lalu pangkal F₃ di ujung F₂. Karena searah, panah-panah itu menyambung ke arah yang sama.',
+                  formula: '',
+                  speech: 'Letakkan pangkal F dua di ujung F satu, lalu pangkal F tiga di ujung F dua. Karena searah, panah-panah itu menyambung ke arah yang sama.' },
+                { title: 'Resultan = jumlah besar vektor',
+                  body: 'Resultan R digambar dari pangkal F₁ ke ujung F₃. Vektor sejajar yang searah cukup dijumlahkan besarnya.',
+                  formula: `R = ${eqLine}\nR = ${numLine} = ${fmt(Math.abs(R))} N\nArah R sama dengan arah ketiga vektor (ke ${dirWord(R)})`,
+                  speech: `Resultan digambar dari pangkal F satu ke ujung F tiga. Karena sejajar dan searah, besarnya dijumlahkan. R sama dengan ${numLine.replace(/ \+ /g, ' ditambah ')} sama dengan ${fmt(Math.abs(R))} newton, ke arah yang sama dengan ketiga vektor.` }
+            ][i];
+            if (ci === 1) return [
+                { title: 'Tiga vektor sejajar, satu berlawanan arah',
+                  body: `F₁ dan F₃ menunjuk ke kanan, sedangkan F₂ menunjuk ke kiri. Tetapkan arah kanan sebagai positif (+) dan arah kiri sebagai negatif (−). Besarnya: ${list}.`,
+                  formula: '',
+                  speech: `Contoh dua. Tiga vektor sejajar, tetapi F dua berlawanan arah. Tetapkan arah kanan sebagai positif dan arah kiri sebagai negatif. Besarnya ${mags.map((m, k) => `F ${k + 1} sama dengan ${fmt(m)} newton`).join(', ')}.` },
+                { title: 'Susun ujung ke pangkal',
+                  body: 'Letakkan pangkal tiap vektor di ujung vektor sebelumnya. F₂ yang berlawanan arah menarik panah kembali ke kiri, sedangkan F₃ maju lagi ke kanan.',
+                  formula: '',
+                  speech: 'Letakkan pangkal tiap vektor di ujung vektor sebelumnya. F dua yang berlawanan arah menarik panah kembali ke kiri, sedangkan F tiga maju lagi ke kanan.' },
+                { title: 'Resultan = jumlah dengan tanda',
+                  body: 'Vektor searah dijumlahkan, vektor yang berlawanan arah dikurangkan. Tanda hasil akhir menunjukkan arah resultan.',
+                  formula: `R = ${eqLine}\nR = ${numLine} = ${fmt(R)} N\n${d.zero ? 'R = 0: resultan nol' : (R > 0 ? 'R positif → arah ke kanan' : 'R negatif → arah ke kiri')}`,
+                  speech: `Vektor searah dijumlahkan, vektor yang berlawanan dikurangkan. R sama dengan ${numLine.replace(/ \+ /g, ' ditambah ').replace(/ − /g, ' dikurangi ')} sama dengan ${fmt(R)} newton. ${d.zero ? 'Resultannya nol.' : 'Resultan menunjuk ke ' + dirWord(R) + '.'}` }
+            ][i];
+            const equal = Math.abs(mags[0] - mags[1]) < 1e-9;
+            return [
+                { title: 'Dua vektor sejajar, berlawanan arah',
+                  body: `F₁ menunjuk ke kanan dan F₂ menunjuk ke kiri. Besarnya: ${list}.${equal ? ' Besar keduanya sama.' : ' Coba samakan besar keduanya!'}`,
+                  formula: '',
+                  speech: `Contoh tiga. Dua vektor sejajar dan berlawanan arah. F satu ke kanan dan F dua ke kiri. Besarnya ${mags.map((m, k) => `F ${k + 1} sama dengan ${fmt(m)} newton`).join(', ')}.` },
+                { title: 'Susun ujung ke pangkal',
+                  body: equal ? 'Letakkan pangkal F₂ di ujung F₁. Karena besarnya sama dan arahnya berlawanan, ujung F₂ kembali tepat ke pangkal F₁.' : 'Letakkan pangkal F₂ di ujung F₁. Karena arahnya berlawanan, F₂ menarik panah kembali ke kiri.',
+                  formula: '',
+                  speech: equal ? 'Letakkan pangkal F dua di ujung F satu. Karena besarnya sama dan arahnya berlawanan, ujung F dua kembali tepat ke pangkal F satu.' : 'Letakkan pangkal F dua di ujung F satu. Karena arahnya berlawanan, F dua menarik panah kembali ke kiri.' },
+                { title: d.zero ? 'Resultan sama dengan nol' : 'Resultan = selisih besar vektor',
+                  body: d.zero ? 'Kedua vektor saling meniadakan, sehingga resultannya nol. Pada gaya, keadaan ini disebut seimbang: benda tidak mengalami perubahan gerak.' : `Karena besar kedua vektor tidak sama, resultan tidak nol. Resultan berarah sama dengan vektor yang lebih besar, yaitu ke ${dirWord(R)}.`,
+                  formula: `R = ${eqLine}\nR = ${numLine} = ${fmt(R)} N\n${d.zero ? 'R = 0 (kedua vektor saling meniadakan)' : resTxt}`,
+                  speech: d.zero ? `R sama dengan F satu dikurangi F dua, yaitu ${fmt(mags[0])} dikurangi ${fmt(mags[1])} sama dengan nol. Kedua vektor saling meniadakan, sehingga resultannya nol dan benda berada dalam keadaan seimbang.` : `R sama dengan ${fmt(mags[0])} dikurangi ${fmt(mags[1])} sama dengan ${fmt(R)} newton. Resultan tidak nol, dan menunjuk ke ${dirWord(R)}.` }
+            ][i];
+        }
+
+        // ===== Drawing =====
+        function prog(i) { return i < step ? 1 : (i === step ? animT : 0); }
+        function line(a, b, color, lw, dash, p) {
+            if (p === undefined) p = 1; if (p <= 0.005) return;
+            ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = lw; if (dash) ctx.setLineDash(dash);
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(a.x + (b.x - a.x) * p, a.y + (b.y - a.y) * p); ctx.stroke(); ctx.restore();
+        }
+        function arrow(a, b, color, lw, p) {
+            if (p === undefined) p = 1; if (p <= 0.005) return;
+            const pl = Math.min(1, p / 0.88), t = { x: a.x + (b.x - a.x) * pl, y: a.y + (b.y - a.y) * pl };
+            ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = lw; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(t.x, t.y); ctx.stroke();
+            if (p < 0.88) { ctx.beginPath(); ctx.arc(t.x, t.y, lw * 0.9 + 1, 0, 2 * PI); ctx.fill(); }
+            const hp = sub(p, 0.88, 1);
+            if (hp > 0 && Math.hypot(b.x - a.x, b.y - a.y) > 6) {
+                const ang = Math.atan2(b.y - a.y, b.x - a.x), hl = (9 + lw) * hp;
+                ctx.beginPath(); ctx.moveTo(b.x, b.y);
+                ctx.lineTo(b.x - hl * Math.cos(ang - 0.4), b.y - hl * Math.sin(ang - 0.4));
+                ctx.lineTo(b.x - hl * Math.cos(ang + 0.4), b.y - hl * Math.sin(ang + 0.4));
+                ctx.closePath(); ctx.fill();
+            }
+            ctx.restore();
+        }
+        function text(str, x, y, color, p, align, size, weight) {
+            const al = p === undefined ? 1 : sub(p, 0.6, 1); if (al <= 0) return;
+            ctx.save(); ctx.globalAlpha = al; ctx.font = `${weight || 'bold'} ${size || 14}px Arial`;
+            ctx.textAlign = align || 'center'; ctx.textBaseline = 'middle';
+            ctx.lineWidth = 4; ctx.strokeStyle = bg(); ctx.strokeText(str, x, y); ctx.fillStyle = color; ctx.fillText(str, x, y); ctx.restore();
+        }
+
+        function draw() {
+            const d = calc(), { n, vals, pos, R } = d;
+            ctx.clearRect(0, 0, W, H); ctx.fillStyle = bg(); ctx.fillRect(0, 0, W, H);
+            ctx.strokeStyle = isDark ? '#242424' : '#eee'; ctx.lineWidth = 1;
+            for (let x = 0; x < W; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+            for (let y = 0; y < H; y += 30) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+            const all = [0, ...pos, ...vals];
+            const minX = Math.min(...all), maxX = Math.max(...all), span = Math.max(maxX - minX, 1e-6);
+            const u = Math.min((W - 76) / span, 42);
+            const X = p => (W - span * u) / 2 + (p - minX) * u;
+            const rowY = k => 52 + 40 * k, ladY = k => 52 + 34 * k, yR = 52 + 34 * n + 22;
+
+            // direction legend
+            arrow({ x: 12, y: H - 14 }, { x: 52, y: H - 14 }, isDark ? '#aaa' : '#777', 2, 1); text('+ kanan', 58, H - 14, isDark ? '#bbb' : '#666', 1, 'left', 12, '600');
+            arrow({ x: W - 12, y: H - 14 }, { x: W - 52, y: H - 14 }, isDark ? '#aaa' : '#777', 2, 1); text('− kiri', W - 58, H - 14, isDark ? '#bbb' : '#666', 1, 'right', 12, '600');
+
+            if (step === 0) {
+                vals.forEach((v, k) => {
+                    const pk = sub(animT, k * 0.25, k * 0.25 + 0.5), a = { x: X(0), y: rowY(k) }, b = { x: X(v), y: rowY(k) };
+                    line({ x: 8, y: a.y }, { x: W - 8, y: a.y }, 'rgba(120,120,120,.35)', 1.2, [4, 5], pk);
+                    arrow(a, b, PAL[k], 5, pk);
+                    text(`${nm(k)} = ${fmt(d.mags[k])} N`, (a.x + b.x) / 2, a.y - 14, PAL[k], pk, 'center', 13);
+                });
+                ctx.save(); ctx.strokeStyle = isDark ? '#888' : '#999'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 4]); ctx.beginPath(); ctx.moveTo(X(0), 30); ctx.lineTo(X(0), rowY(n - 1) + 22); ctx.stroke(); ctx.restore();
+                text('sejajar', W / 2, 24, fg(), animT, 'center', 13, '600');
+                return;
+            }
+            // chain (steps 1 and 2)
+            vals.forEach((v, k) => {
+                const tk = step === 1 ? ease(sub(animT, k * 0.28, k * 0.28 + 0.5)) : 1;
+                const sx = X(0) + (X(pos[k]) - X(0)) * tk, sy = rowY(k) + (ladY(k) - rowY(k)) * tk;
+                const a = { x: sx, y: sy }, b = { x: sx + (X(v) - X(0)), y: sy };
+                if (k > 0 && tk > 0.9) line({ x: X(pos[k]), y: ladY(k - 1) }, { x: X(pos[k]), y: ladY(k) }, 'rgba(120,120,120,.7)', 1.5, [3, 4], 1);
+                arrow(a, b, PAL[k], 5, 1);
+                text(nm(k), (a.x + b.x) / 2, a.y - 13, PAL[k], tk > 0.95 ? 1 : 0, 'center', 13);
+            });
+            if (step === 2) {
+                const p = animT;
+                vals.forEach((v, k) => line({ x: X(pos[k + 1]), y: ladY(k) }, { x: X(pos[k + 1]), y: yR }, 'rgba(120,120,120,.6)', 1.3, [3, 4], sub(p, 0, 0.4)));
+                line({ x: X(0), y: ladY(0) }, { x: X(0), y: yR }, 'rgba(120,120,120,.6)', 1.3, [3, 4], sub(p, 0, 0.4));
+                if (d.zero) {
+                    const pulse = 1 + 0.2 * Math.sin(performance.now() / 160);
+                    ctx.save(); ctx.globalAlpha = sub(p, 0.4, 1); ctx.fillStyle = OKC; ctx.beginPath(); ctx.arc(X(0), yR, 9 * pulse, 0, 2 * PI); ctx.fill(); ctx.restore();
+                    text('R = 0', X(0) + 18, yR + 2, OKC, p, 'left', 20);
+                    text('ujung kembali ke pangkal', W / 2, yR + 34, OKC, p, 'center', 13, '600');
+                } else {
+                    arrow({ x: X(0), y: yR }, { x: X(R), y: yR }, COLR, 6, sub(p, 0.4, 1));
+                    text(`R = ${fmt(Math.abs(R))} N`, (X(0) + X(R)) / 2, yR + 18, COLR, p, 'center', 15);
+                    text(R > 0 ? 'ke kanan' : 'ke kiri', (X(0) + X(R)) / 2, yR + 36, COLR, p, 'center', 12, '600');
+                }
+            }
+        }
+
+        // ===== Panel / inputs =====
+        function buildFields() {
+            const c = CASES[ci];
+            fieldsEl.innerHTML = '';
+            c.signs.forEach((s, k) => {
+                const lab = document.createElement('label'); lab.className = 'vf-field';
+                lab.innerHTML = `<span style="color:${PAL[k]}">${nm(k)} ${s > 0 ? '→' : '←'} (N)</span><input type="number" min="0.1" max="99" step="0.5" inputmode="decimal" value="${state[ci][k]}">`;
+                lab.querySelector('input').addEventListener('input', e => { state[ci][k] = parseFloat(String(e.target.value).replace(',', '.')); refresh(); });
+                fieldsEl.appendChild(lab);
+            });
+            fieldsEl.style.gridTemplateColumns = `repeat(${c.signs.length}, 1fr)`;
+        }
+        function updatePanel() {
+            const c = content(step);
+            badgeEl.textContent = `Contoh ${ci + 1} · Langkah ${step + 1} dari ${TOTAL}`;
+            titleEl.textContent = c.title; bodyEl.textContent = c.body;
+            formulaEl.textContent = c.formula; formulaEl.style.display = c.formula ? '' : 'none';
+            dotsEl.innerHTML = '';
+            for (let i = 0; i < TOTAL; i++) { const e = document.createElement('span'); e.className = 'tp-dot' + (i < step ? ' done' : '') + (i === step ? ' cur' : ''); dotsEl.appendChild(e); }
+            prevBtn.disabled = step === 0; nextBtn.disabled = step === TOTAL - 1;
+            casesEl.querySelectorAll('.qz-pill').forEach((b, i) => b.classList.toggle('active', i === ci));
+        }
+        function animateStep() {
+            cancelAnimationFrame(animRaf); animT = 0;
+            const t0 = performance.now(), DUR = step === 1 ? 2600 : 2000;
+            (function tick(now) {
+                animT = Math.min(1, (now - t0) / DUR); draw();
+                if (animT < 1 || (step === 2 && calc().zero)) animRaf = requestAnimationFrame(tick);
+            })(t0);
+        }
+        function goStep(i, speakIt) { step = clamp(i, 0, TOTAL - 1); updatePanel(); animateStep(); if (speakIt) speak(content(step).speech); }
+        function refresh() { cancelAnimationFrame(animRaf); animT = 1; updatePanel(); draw(); if (step === 2 && calc().zero) animateStepKeep(); }
+        function animateStepKeep() { cancelAnimationFrame(animRaf); (function tick() { draw(); if (step === 2 && calc().zero) animRaf = requestAnimationFrame(tick); })(); }
+        function setCase(i, speakIt) { ci = i; buildFields(); goStep(0, speakIt); }
+
+        CASES.forEach((c, i) => {
+            const b = document.createElement('button'); b.type = 'button'; b.className = 'qz-pill'; b.textContent = c.name;
+            b.addEventListener('click', () => setCase(i, true)); casesEl.appendChild(b);
+        });
+        prevBtn.addEventListener('click', () => goStep(step - 1, true));
+        nextBtn.addEventListener('click', () => goStep(step + 1, true));
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+            const rw = rect.width || 300, rh = rect.height || 300;
+            const sc = Math.max(0.5, Math.min(2.2, Math.min(rw / 330, rh / 300)));
+            W = rw / sc; H = rh / sc;
+            canvas.width = rw * dpr; canvas.height = rh * dpr;
+            ctx.setTransform(dpr * sc, 0, 0, dpr * sc, 0, 0);
+        }
+        const isVisible = () => document.getElementById('tabJumlah').classList.contains('active') && document.getElementById('vsSection').style.display !== 'none';
+        window.addEventListener('resize', () => { if (isVisible()) { resizeCanvas(); draw(); } });
+        buildFields(); updatePanel();
+
+        return {
+            onDarkModeToggle: function(d) { isDark = d; if (isVisible()) draw(); },
+            onShow: function() { if (!isVisible()) return; resizeCanvas(); animT = 1; draw(); }
+        };
+    })();
+    </script>
+
+    <script>
         // ===== Shared: tab switching + dark mode =====
         const sharedDarkModeBtn = document.getElementById('darkModeBtn');
         let sharedIsDarkMode = false;
@@ -3720,12 +4446,25 @@
             window.QuizVectorApp.onDarkModeToggle(sharedIsDarkMode);
             window.FormulaVectorApp.onDarkModeToggle(sharedIsDarkMode);
             window.UraianVectorApp.onDarkModeToggle(sharedIsDarkMode);
+            window.MateriVectorApp.onDarkModeToggle(sharedIsDarkMode);
+            window.SejajarVectorApp.onDarkModeToggle(sharedIsDarkMode);
         });
 
-        const tabButtons = document.querySelectorAll('.tab-btn');
+        const menuDd = document.getElementById('menuDd');
+        document.getElementById('menuToggle').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const open = menuDd.classList.toggle('open');
+            e.currentTarget.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        document.addEventListener('click', (e) => { if (!menuDd.contains(e.target)) menuDd.classList.remove('open'); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') menuDd.classList.remove('open'); });
+
+        const tabButtons = document.querySelectorAll('.menu-item');
         tabButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const targetId = btn.getAttribute('data-tab');
+                document.getElementById('menuDd').classList.remove('open');
+                document.getElementById('menuToggle').setAttribute('aria-expanded','false');
                 tabButtons.forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
                 btn.classList.add('active');
@@ -3733,7 +4472,10 @@
 
                 if ('speechSynthesis' in window) speechSynthesis.cancel();
                 const title = document.getElementById('pageTitle');
-                if (targetId === 'tabKomponen') {
+                if (targetId === 'tabMateri') {
+                    title.textContent = '📖 Pengertian Vektor';
+                    window.MateriVectorApp.onShow();
+                } else if (targetId === 'tabKomponen') {
                     title.textContent = '📐 Vektor Komponen';
                     window.ComponentVectorApp.onShow();
                 } else if (targetId === 'tabJumlah') {
@@ -3741,6 +4483,7 @@
                     window.AdditionVectorApp.onShow();
                     window.FormulaVectorApp.onShow();
                     window.UraianVectorApp.onShow();
+                    window.SejajarVectorApp.onShow();
                 } else if (targetId === 'tabTerapan') {
                     title.textContent = '🧩 Penerapan Vektor';
                     window.ApplicationVectorApp.onShow();
@@ -3790,6 +4533,22 @@
             if (document.fullscreenElement) applyFullscreenCanvasSizing();
         });
 
+        // ===== Petunjuk putar layar: HP + portrait, hanya di Jumlah / Komponen / Kuis =====
+        let rotateHintDismissed = false;
+        function updateRotateHint() {
+            const el = document.getElementById('rotateHint');
+            const panel = document.querySelector('.tab-panel.active');
+            const wantsLandscape = panel && ['tabJumlah', 'tabKomponen', 'tabKuis'].includes(panel.id);
+            const portraitPhone = window.matchMedia('(orientation: portrait)').matches && Math.min(window.innerWidth, window.innerHeight) < 600;
+            const apsOpen = document.getElementById('aps') && !document.getElementById('aps').classList.contains('hide');
+            el.classList.toggle('show', !!(wantsLandscape && portraitPhone && !rotateHintDismissed && !apsOpen));
+        }
+        document.getElementById('rotateHintClose').addEventListener('click', () => { rotateHintDismissed = true; updateRotateHint(); });
+        window.addEventListener('resize', updateRotateHint);
+        window.addEventListener('orientationchange', updateRotateHint);
+        document.querySelectorAll('.menu-item').forEach(b => b.addEventListener('click', () => setTimeout(updateRotateHint, 0)));
+        setInterval(updateRotateHint, 1500); // juga menangkap penutupan apersepsi
+
         // ===== Sub-tabs inside "Jumlah": Grafis / Aturan cos & sin / Uraian x-y =====
         document.querySelectorAll('#jmSwitch .jm-pill').forEach(pill => {
             pill.addEventListener('click', () => {
@@ -3799,11 +4558,301 @@
                 document.getElementById('vaGrafis').style.display = view === 'grafis' ? '' : 'none';
                 document.getElementById('vfSection').style.display = view === 'rumus' ? '' : 'none';
                 document.getElementById('vuSection').style.display = view === 'uraian' ? '' : 'none';
+                document.getElementById('vsSection').style.display = view === 'sejajar' ? '' : 'none';
                 if (view === 'grafis') window.AdditionVectorApp.onShow();
                 else if (view === 'rumus') window.FormulaVectorApp.onShow();
-                else window.UraianVectorApp.onShow();
+                else if (view === 'uraian') window.UraianVectorApp.onShow();
+                else window.SejajarVectorApp.onShow();
             });
         });
+    </script>
+
+    <script>
+    // ===== Apersepsi: teks muncul seperti subtitle (3-5 kata) dengan audio yang sinkron =====
+    (function() {
+        const SCENES = [
+            { icon: '👋', chunks: ['Selamat datang di Pembelajaran Fisika.', 'Kali ini kita akan belajar sesuatu yang bisa jadi belum kita pikirkan sebelumnya.', 'Padahal ini penting lho!'] },
+            { icon: '⚽', chunks: ['Pernahkah kalian melihat pemain sepak bola menendang bola ke arah gawang?'] },
+            { icon: '🤔', chunks: ['Jika bola ditendang dengan kecepatan yang sama,', 'apakah hasilnya akan sama ketika bola ditendang lurus ke depan dan ketika ditendang menyudut?'] },
+            { icon: '🎯', chunks: ['Bola tidak hanya memiliki nilai kecepatan, tetapi juga arah gerak.', ['Begitu pula ketika kita mendorong meja, menarik benda, atau mengamati gerak pesawat.', '📦✈️']] },
+            { icon: '🧭', chunks: ['Dalam Fisika, besaran yang memiliki nilai dan arah disebut besaran vektor.', ['Contohnya adalah perpindahan, kecepatan, percepatan, dan gaya.', '🏃💨💪']] }
+        ];
+        const flat = [];
+        SCENES.forEach(sc => sc.chunks.forEach(c => flat.push({ t: typeof c === 'string' ? c : c[0], icon: typeof c === 'string' ? sc.icon : c[1] })));
+
+        // satu scene animasi per baris narasi
+        const SCENE_IDS = [
+            'welcome', 'welcome', 'welcome',
+            'kick',
+            'cmp-ready', 'cmp-q',
+            'speed', 'pushpull',
+            'def-both', 'ex-multi'
+        ];
+        const root = document.getElementById('aps'), intro = document.getElementById('apsIntro'), stage = document.getElementById('apsStage');
+        const cv = document.getElementById('apsCanvas'), cx = cv.getContext('2d');
+        const subEl = document.getElementById('apsSub'), barEl = document.getElementById('apsBar');
+        const startBtn = document.getElementById('apsStart'), skipBtn = document.getElementById('apsSkip'), doneBtn = document.getElementById('apsDone');
+        const tts = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+        let token = 0, closed = false, timer = 0;
+        document.body.style.overflow = 'hidden';
+
+
+        // ===== Animasi otomatis (menyesuaikan potongan narasi yang sedang dibacakan) =====
+        const DW = 360, DH = 220, TAU = Math.PI * 2;
+        let scene = 'welcome', sceneT0 = 0, rafId = 0;
+        function fitCanvas() {
+            const r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+            if (!r.width) return;
+            cv.width = r.width * dpr; cv.height = r.height * dpr;
+            const k = r.width / DW; cx.setTransform(dpr * k, 0, 0, dpr * k, 0, 0);
+        }
+        const ease = x => 1 - Math.pow(1 - Math.max(0, Math.min(1, x)), 3);
+        const clamp01 = x => Math.max(0, Math.min(1, x));
+        function txt(str, x, y, color, size, align) {
+            cx.save(); cx.font = `800 ${size || 15}px Arial`; cx.textAlign = align || 'center'; cx.textBaseline = 'middle';
+            cx.lineWidth = 4; cx.strokeStyle = 'rgba(0,0,0,.55)'; cx.lineJoin = 'round'; cx.strokeText(str, x, y);
+            cx.fillStyle = color || '#fff'; cx.fillText(str, x, y); cx.restore();
+        }
+        function arrow(ax, ay, bx, by, color, lw, p) {
+            if (p === undefined) p = 1; if (p <= 0.01) return;
+            const tx = ax + (bx - ax) * p, ty = ay + (by - ay) * p;
+            cx.save(); cx.strokeStyle = color; cx.fillStyle = color; cx.lineWidth = lw || 4; cx.lineCap = 'round';
+            cx.beginPath(); cx.moveTo(ax, ay); cx.lineTo(tx, ty); cx.stroke();
+            const ang = Math.atan2(ty - ay, tx - ax), hl = 8 + (lw || 4);
+            if (Math.hypot(tx - ax, ty - ay) > 8) {
+                cx.beginPath(); cx.moveTo(tx, ty);
+                cx.lineTo(tx - hl * Math.cos(ang - 0.45), ty - hl * Math.sin(ang - 0.45));
+                cx.lineTo(tx - hl * Math.cos(ang + 0.45), ty - hl * Math.sin(ang + 0.45));
+                cx.closePath(); cx.fill();
+            }
+            cx.restore();
+        }
+        function ball(x, y, rot, r) {
+            r = r || 10;
+            cx.save(); cx.translate(x, y); cx.rotate(rot || 0);
+            cx.fillStyle = '#fff'; cx.strokeStyle = '#263238'; cx.lineWidth = 1.5;
+            cx.beginPath(); cx.arc(0, 0, r, 0, TAU); cx.fill(); cx.stroke();
+            cx.fillStyle = '#263238';
+            cx.beginPath(); for (let i = 0; i < 5; i++) { const a = i * TAU / 5 - Math.PI / 2; cx.lineTo(Math.cos(a) * r * 0.42, Math.sin(a) * r * 0.42); } cx.closePath(); cx.fill();
+            for (let i = 0; i < 5; i++) { const a = i * TAU / 5 - Math.PI / 2; cx.beginPath(); cx.arc(Math.cos(a) * r * 0.82, Math.sin(a) * r * 0.82, r * 0.16, 0, TAU); cx.fill(); }
+            cx.restore();
+        }
+        function pitch(goal) {
+            cx.fillStyle = 'rgba(0,60,0,.35)'; cx.fillRect(0, 152, DW, DH - 152);
+            cx.strokeStyle = 'rgba(255,255,255,.85)'; cx.lineWidth = 2.5;
+            cx.beginPath(); cx.moveTo(0, 152); cx.lineTo(DW, 152); cx.stroke();
+            if (goal) {
+                cx.strokeStyle = '#fff'; cx.lineWidth = 3; cx.strokeRect(308, 98, 42, 54);
+                cx.lineWidth = 1; cx.strokeStyle = 'rgba(255,255,255,.55)';
+                for (let i = 1; i < 5; i++) { cx.beginPath(); cx.moveTo(308 + i * 8.4, 98); cx.lineTo(308 + i * 8.4, 152); cx.stroke(); }
+                for (let j = 1; j < 4; j++) { cx.beginPath(); cx.moveTo(308, 98 + j * 13.5); cx.lineTo(350, 98 + j * 13.5); cx.stroke(); }
+            }
+        }
+        function player(x, y, swing) {
+            cx.save(); cx.strokeStyle = '#fff'; cx.fillStyle = '#ffcc80'; cx.lineWidth = 4; cx.lineCap = 'round';
+            cx.beginPath(); cx.arc(x, y - 62, 8, 0, TAU); cx.fill();
+            cx.beginPath(); cx.moveTo(x, y - 54); cx.lineTo(x, y - 24); cx.stroke();          // body
+            cx.beginPath(); cx.moveTo(x, y - 48); cx.lineTo(x - 14, y - 34); cx.moveTo(x, y - 48); cx.lineTo(x + 12, y - 36); cx.stroke(); // arms
+            cx.beginPath(); cx.moveTo(x, y - 24); cx.lineTo(x - 6, y); cx.stroke();            // standing leg
+            const a = swing, lx = x + Math.sin(a) * 26, ly = y - 24 + Math.cos(a) * 24;        // kicking leg
+            cx.beginPath(); cx.moveTo(x, y - 24); cx.lineTo(lx, ly); cx.stroke(); cx.restore();
+            return { x: lx, y: ly };
+        }
+        function rrect(x, y, w, h, r, fill) {
+            cx.save(); cx.fillStyle = fill; cx.beginPath();
+            if (cx.roundRect) cx.roundRect(x, y, w, h, r); else cx.rect(x, y, w, h);
+            cx.fill(); cx.restore();
+        }
+
+        const SCENES_FN = {
+            'welcome'(t) {
+                const by = 120 - Math.abs(Math.sin(t * 3)) * 42;
+                cx.fillStyle = 'rgba(0,0,0,.25)'; cx.beginPath(); cx.ellipse(180, 160, 22 - (120 - by) * 0.12, 5, 0, 0, TAU); cx.fill();
+                ['#ffeb3b', '#80d8ff', '#ff8a80'].forEach((col, k) => {
+                    const a = t * 0.9 + k * TAU / 3, len = 62 + 10 * Math.sin(t * 2 + k);
+                    arrow(180 + Math.cos(a) * 20, by + Math.sin(a) * 20, 180 + Math.cos(a) * len, by + Math.sin(a) * len, col, 4);
+                });
+                ball(180, by, t * 4, 14);
+            },
+            'kick'(t) {
+                pitch(true);
+                const u = t % 3.6;
+                const swing = u < 0.5 ? -0.6 + (u / 0.5) * 0.4 : (u < 0.8 ? -0.2 + ((u - 0.5) / 0.3) * 1.5 : Math.max(0.3, 1.3 - (u - 0.8) * 1.2));
+                const foot = player(90, 152, swing);
+                let bx = 120, by = 142, rot = 0;
+                if (u >= 0.8 && u < 2.4) { const p = (u - 0.8) / 1.6; bx = 120 + (318 - 120) * p; by = 142 - 76 * 4 * p * (1 - p) - 4 * p; rot = p * 14; }
+                else if (u >= 2.4) { bx = 318; by = 138 + (u - 2.4) * 6; rot = 14; }
+                if (u >= 2.4 && u < 3.0) { cx.save(); cx.translate(Math.sin((u - 2.4) * 40) * 2, 0); cx.restore(); }
+                ball(bx, by, rot, 9);
+                if (u >= 2.4) txt('GOL!', 300, 80, '#ffeb3b', 20 + 3 * Math.sin((u - 2.4) * 12));
+            },
+            'speed'(t) {
+                pitch(false);
+                const len = 70 + 45 * Math.sin(t * 2.2);
+                const bx = 60 + ((t * len * 0.35) % 150);
+                ball(bx, 134, bx * 0.15, 11);
+                arrow(bx + 14, 134, bx + 14 + len, 134, '#ffeb3b', 5);
+                txt('kecepatan', bx + 14 + len / 2, 104, '#ffeb3b', 15);
+                cx.save(); cx.strokeStyle = '#ffeb3b'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(bx + 14, 168); cx.lineTo(bx + 14 + len, 168); cx.moveTo(bx + 14, 162); cx.lineTo(bx + 14, 174); cx.moveTo(bx + 14 + len, 162); cx.lineTo(bx + 14 + len, 174); cx.stroke(); cx.restore();
+                txt('nilai (besar)', bx + 14 + len / 2, 188, '#ffeb3b', 13);
+            },
+            'dir'(t) {
+                pitch(false);
+                const th = 48 * Math.sin(t * 1.4) * Math.PI / 180, cxp = 110, cyp = 134, L = 105;
+                cx.save(); cx.setLineDash([6, 5]); cx.strokeStyle = 'rgba(255,255,255,.7)'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(cxp, cyp); cx.lineTo(cxp + 170, cyp); cx.stroke(); cx.restore();
+                ball(cxp, cyp, t * 3, 11);
+                arrow(cxp + 12 * Math.cos(th), cyp - 12 * Math.sin(th), cxp + L * Math.cos(th), cyp - L * Math.sin(th), '#80d8ff', 5);
+                cx.save(); cx.strokeStyle = '#80d8ff'; cx.lineWidth = 2.5; cx.beginPath(); cx.arc(cxp, cyp, 44, 0, -th, th > 0); cx.stroke(); cx.restore();
+                txt('arah', cxp + 175 * 0.62, cyp - 56 * Math.sign(th || 1) * 0 - 62, '#80d8ff', 16);
+                txt('θ = ' + Math.round(Math.abs(th * 180 / Math.PI)) + '°', cxp + 66, cyp + (th > 0 ? -12 : 20), '#fff', 13);
+            },
+            'pushpull'(t) {
+                pitch(false);
+                const u = t % 6, push = u < 3, p = push ? u / 3 : (u - 3) / 3;
+                const bx = push ? 130 + 80 * ease(p) : 210 - 80 * ease(p);
+                rrect(bx - 30, 106, 60, 46, 6, '#d7a86e'); rrect(bx - 30, 106, 60, 8, 4, '#a1783f');
+                if (push) {
+                    const hx = bx - 44 - 4 * Math.sin(t * 8);
+                    cx.fillStyle = '#ffcc80'; cx.beginPath(); cx.arc(hx, 130, 11, 0, TAU); cx.fill();
+                    arrow(bx + 34, 128, bx + 94, 128, '#ff5252', 5); txt('F', bx + 100, 112, '#ff5252', 18); txt('mendorong', 180, 36, '#fff', 20);
+                } else {
+                    const hx = bx - 100 + 4 * Math.sin(t * 8);
+                    cx.strokeStyle = '#8d6e63'; cx.lineWidth = 3; cx.beginPath(); cx.moveTo(bx - 30, 130); cx.lineTo(hx + 11, 130); cx.stroke();
+                    cx.fillStyle = '#ffcc80'; cx.beginPath(); cx.arc(hx, 130, 11, 0, TAU); cx.fill();
+                    arrow(bx - 34, 118, bx - 94, 118, '#ff5252', 5); txt('F', bx - 100, 102, '#ff5252', 18); txt('menarik', 180, 36, '#fff', 20);
+                }
+            },
+            'plane'(t) {
+                const u = (t % 4.5) / 4.5, x = -30 + (DW + 40) * u, y = 110 - 20 * Math.sin(u * Math.PI);
+                cx.fillStyle = 'rgba(255,255,255,.25)'; for (let i = 0; i < 3; i++) { cx.beginPath(); cx.ellipse(70 + i * 110 - ((t * 20) % 110), 50 + (i % 2) * 40, 26, 9, 0, 0, TAU); cx.fill(); }
+                cx.save(); cx.font = '54px Arial'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.translate(x, y); cx.rotate(-0.1); cx.fillText('✈️', 0, 0); cx.restore();
+                arrow(x + 34, y - 4, x + 94, y - 14, '#ffeb3b', 5); txt('v', x + 104, y - 22, '#ffeb3b', 18);
+                txt('gerak pesawat', 180, 196, '#fff', 15);
+            },
+            'cmp-ready'(t, mode) { cmpScene(t, 'ready'); },
+            'cmp-q'(t) { cmpScene(t, 'q'); },
+            'cmp-straight'(t) { cmpScene(t, 'straight'); },
+            'cmp-angle'(t) { cmpScene(t, 'angle'); },
+            'def-intro'(t) {
+                const a = ease(t / 0.6), b = ease((t - 0.8) / 0.6);
+                cx.save(); cx.globalAlpha = a; rrect(36, 82, 120, 56, 14, '#ffeb3b'); txt('NILAI', 96, 110, '#1b5e20', 24); cx.restore();
+                cx.save(); cx.globalAlpha = Math.min(a, b); txt('+', 180, 110, '#fff', 34); cx.restore();
+                cx.save(); cx.globalAlpha = b; rrect(204, 82, 120, 56, 14, '#80d8ff'); txt('ARAH', 264, 110, '#0d47a1', 24); cx.restore();
+            },
+            'def-both'(t) {
+                const p = ease((t % 4) / 1.5);
+                arrow(70, 160, 280, 70, '#ffeb3b', 7, p);
+                if (p > 0.9) { txt('nilai = panjang panah', 150, 150, '#ffeb3b', 15); txt('arah = ke mana panah menunjuk', 222, 48, '#80d8ff', 14); }
+            },
+            'def-vector'(t) {
+                arrow(70, 160, 280, 70, '#ffeb3b', 7, 1);
+                const s = 1 + 0.08 * Math.sin(t * 5);
+                cx.save(); cx.translate(180, 188); cx.scale(s, s); txt('BESARAN VEKTOR', 0, 0, '#fff', 24); cx.restore();
+            },
+            'ex-disp'(t) {
+                const u = t % 5.5;
+                cx.save(); cx.setLineDash([7, 6]); cx.strokeStyle = 'rgba(255,255,255,.75)'; cx.lineWidth = 3; cx.beginPath(); cx.moveTo(50, 170);
+                cx.bezierCurveTo(100, 60, 160, 200, 200, 110); cx.bezierCurveTo(230, 60, 270, 110, 300, 60); cx.stroke(); cx.restore();
+                cx.fillStyle = '#fff'; [[50, 170, 'A'], [300, 60, 'B']].forEach(q => { cx.beginPath(); cx.arc(q[0], q[1], 7, 0, TAU); cx.fill(); txt(q[2], q[0] + (q[2] === 'A' ? -14 : 14), q[1] + (q[2] === 'A' ? 4 : -6), '#fff', 16); });
+                arrow(50, 170, 300, 60, '#ff5252', 6, ease((u - 1) / 1.5));
+                if (u > 2.5) txt('perpindahan', 150, 100, '#ff5252', 18);
+            },
+            'ex-multi'(t) {
+                const u = t % 8.5, c = { x: 180, y: 120 };
+                const items = [['v', 'kecepatan', '#69f0ae', 150, -20], ['a', 'percepatan', '#80d8ff', 0, -85], ['F', 'gaya', '#ff5252', -140, 30]];
+                cx.fillStyle = '#fff'; cx.beginPath(); cx.arc(c.x, c.y, 8, 0, TAU); cx.fill();
+                items.forEach((it, k) => {
+                    const p = ease((u - k * 1.7) / 1.0);
+                    arrow(c.x, c.y, c.x + it[3] * 0.78, c.y + it[4] * 1.2, it[2], 6, p);
+                    if (p > 0.9) txt(it[0] + ' (' + it[1] + ')', c.x + it[3] * 0.78 + (it[3] === 0 ? 0 : (it[3] > 0 ? -4 : 4)), c.y + it[4] * 1.2 + (it[4] < -60 ? -16 : 20), it[2], 15);
+                });
+            }
+        };
+        function cmpScene(t, mode) {
+            pitch(true);
+            const sx = 70, sy = 142, L = 56, ang = 42 * Math.PI / 180;
+            const pulse = 1 + 0.04 * Math.sin(t * 6);
+            if (mode === 'ready' || mode === 'q') {
+                ball(sx, sy, 0, 10);
+                arrow(sx + 12, sy, sx + 12 + L * pulse, sy, '#69f0ae', 5); txt('v', sx + 18 + L, sy + 14, '#69f0ae', 15);
+                ball(sx, sy - 44, 0, 10);
+                arrow(sx + 12 * Math.cos(ang), sy - 44 - 12 * Math.sin(ang), sx + 12 * Math.cos(ang) + L * pulse * Math.cos(ang), sy - 44 - 12 * Math.sin(ang) - L * pulse * Math.sin(ang), '#ffab40', 5);
+                txt('v', sx + 12 + L * Math.cos(ang) + 14, sy - 44 - L * Math.sin(ang) - 14, '#ffab40', 15);
+                txt('besar v sama', 200, 40, '#fff', 17);
+                if (mode === 'q') txt('?', 240, 110, '#ffeb3b', 70 + 8 * Math.sin(t * 5));
+            } else if (mode === 'straight') {
+                const p = clamp01((t % 3) / 1.8), x = sx + (318 - sx) * p;
+                cx.save(); cx.setLineDash([5, 5]); cx.strokeStyle = 'rgba(105,240,174,.9)'; cx.lineWidth = 2.5; cx.beginPath(); cx.moveTo(sx, sy); cx.lineTo(x, sy); cx.stroke(); cx.restore();
+                arrow(sx + 12, sy, sx + 12 + L, sy, '#69f0ae', 5);
+                ball(x, sy, p * 18, 10); txt('lurus ke depan', 180, 40, '#69f0ae', 18);
+            } else {
+                const p = clamp01((t % 3) / 2.0), x = sx + (250 - sx) * p, y = sy - 4 * 82 * p * (1 - p);
+                cx.save(); cx.setLineDash([5, 5]); cx.strokeStyle = 'rgba(255,171,64,.9)'; cx.lineWidth = 2.5; cx.beginPath();
+                for (let i = 0; i <= 40; i++) { const q = i / 40 * p, qx = sx + (250 - sx) * q, qy = sy - 4 * 82 * q * (1 - q); i ? cx.lineTo(qx, qy) : cx.moveTo(qx, qy); } cx.stroke(); cx.restore();
+                arrow(sx + 12 * Math.cos(ang), sy - 12 * Math.sin(ang), sx + 12 * Math.cos(ang) + L * Math.cos(ang), sy - 12 * Math.sin(ang) - L * Math.sin(ang), '#ffab40', 5);
+                ball(x, y, p * 18, 10); txt('menyudut', 180, 40, '#ffab40', 18);
+            }
+        }
+        function animLoop(now) {
+            if (closed) return;
+            cx.clearRect(0, 0, DW, DH);
+            const fn = SCENES_FN[scene];
+            if (fn) { try { fn((now - sceneT0) / 1000); } catch (_) {} }
+            rafId = requestAnimationFrame(animLoop);
+        }
+        function setScene(id) { if (id !== scene) { scene = id; sceneT0 = performance.now(); } }
+        window.addEventListener('resize', fitCanvas);
+
+        function show(i) {
+            const c = flat[i];
+            subEl.innerHTML = ''; const sp = document.createElement('span'); sp.textContent = c.t; subEl.appendChild(sp);
+            setScene(SCENE_IDS[i] || 'welcome');
+            barEl.style.width = ((i + 1) / flat.length * 100) + '%';
+        }
+        function stopSpeech() { if (tts) speechSynthesis.cancel(); }
+        function finish() {
+            if (closed) return;
+            skipBtn.style.display = 'none'; doneBtn.style.display = '';
+            barEl.style.width = '100%';
+        }
+        function close() {
+            if (closed) return; closed = true; token++; clearTimeout(timer); stopSpeech(); cancelAnimationFrame(rafId);
+            root.classList.add('hide'); document.body.style.overflow = '';
+            window.__apersepsiActive = false;
+            // continue straight to the first menu: Materi (Pengertian Vektor)
+            setTimeout(() => { if (window.MateriVectorApp) window.MateriVectorApp.start(); }, 150);
+        }
+        // silent fallback: no usable speech engine -> subtitles advance on a timer
+        function timerMode(i, tk) {
+            if (tk !== token || closed) return;
+            if (i >= flat.length) { finish(); return; }
+            show(i);
+            const words = flat[i].t.split(/\s+/).length;
+            timer = setTimeout(() => timerMode(i + 1, tk), words * 300 + 500);
+        }
+        function begin() {
+            intro.style.display = 'none'; stage.style.display = '';
+            fitCanvas(); sceneT0 = performance.now(); cancelAnimationFrame(rafId); rafId = requestAnimationFrame(animLoop);
+            const tk = ++token;
+            if (!tts) { timerMode(0, tk); return; }
+            let started = false;
+            speechSynthesis.cancel();
+            const voice = speechSynthesis.getVoices().find(v => /^id([-_]|$)/i.test(v.lang)) || null;
+            flat.forEach((c, i) => {
+                const u = new SpeechSynthesisUtterance(c.t);
+                u.lang = 'id-ID'; if (voice) u.voice = voice; u.rate = 1.2;
+                u.onstart = () => { if (tk !== token || closed) return; started = true; show(i); };
+                if (i === flat.length - 1) { u.onend = () => { if (tk === token && !closed) finish(); }; }
+                speechSynthesis.speak(u);
+            });
+            // if the browser never starts speaking, show the subtitles silently
+            timer = setTimeout(() => { if (!started && tk === token && !closed) { speechSynthesis.cancel(); timerMode(0, tk); } }, 3500);
+        }
+        startBtn.addEventListener('click', begin);
+        skipBtn.addEventListener('click', close);
+        doneBtn.addEventListener('click', close);
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && !closed) close(); });
+    })();
     </script>
 
     <script>
@@ -3825,5 +4874,10 @@
         try { console.log('%c© Mamat Aan S · SMAN 1 Majalengka', 'font-weight:bold;color:#667eea'); } catch (_) {}
     })();
     </script>
+    <div id="rotateHint" role="status">
+        <span class="rh-ico">📱</span>
+        <span>Putar layar ke mendatar agar kanvas dan pengaturan tampil berdampingan.</span>
+        <button type="button" id="rotateHintClose">Tutup</button>
+    </div>
 </body>
 </html>
