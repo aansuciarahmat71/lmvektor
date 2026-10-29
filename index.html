@@ -204,11 +204,24 @@
         #mtPrev { flex:0 0 96px; }
         .qz-pills .qz-pill { flex:1 1 calc(33% - 6px); }
 
-        #canvasSejajar { width:100%; height:300px; border:2px solid #ddd; border-radius:8px; background:#fafafa; display:block; touch-action:none; margin-bottom:12px; }
+        #canvasSejajar { width:100%; height:240px; border:2px solid #ddd; border-radius:8px; background:#fafafa; display:block; touch-action:none; margin-bottom:12px; }
         body.dark-mode #canvasSejajar { background:#161616; border-color:#444; }
         #vsPrev { flex:0 0 96px; }
-        #vsCases .qz-pill { flex:1 1 calc(33% - 6px); font-size:11.5px; }
+        #vsCases { flex-wrap:nowrap; gap:5px; }
+        #vsCases .qz-pill { flex:1 1 0; min-width:0; padding:7px 2px; font-size:10.5px; letter-spacing:.2px; white-space:nowrap; }
+        @media (max-width: 380px) { #vsCases .qz-pill { font-size:9.5px; letter-spacing:0; padding:7px 1px; } }
+        @media (max-width: 340px) { #vsCases .qz-pill { font-size:8.5px; } }
         #vsFields { margin-bottom:12px; }
+
+        /* ===== Menu Jumlah > Grafis: kotak pilihan vektor & metode diperkecil (sekitar setengah) ===== */
+        #vaGrafis .va-chip-row { gap: 6px; margin-bottom: 8px; }
+        #vaGrafis .va-chip { flex: 0 0 auto; min-width: 52px; padding: 2px 8px; border-radius: 7px; line-height: 1.05; }
+        #vaGrafis .va-chip .va-name { font-size: 13px; }
+        #vaGrafis .va-chip .va-comp { font-size: 8.5px; margin-top: 0; }
+        #vaGrafis .va-chip-badge { width: 15px; height: 15px; font-size: 9px; top: -6px; left: -6px; }
+        #vaGrafis .va-method-row { gap: 6px; margin-bottom: 10px; }
+        #vaGrafis .va-method-btn { flex: 0 0 auto; padding: 3px 12px; border-radius: 7px; font-size: 11px; line-height: 1.1; }
+        #vaGrafis .va-method-btn .va-sub { font-size: 8px; margin-top: 1px; }
 
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
@@ -806,7 +819,7 @@
             #canvasFormula { height: 400px; }
             #canvasUraian { height: 400px; }
             #canvasMateri { height: 400px; }
-            #canvasSejajar { height: 400px; }
+            #canvasSejajar { height: 320px; }
             #canvasKuis { height: 640px; }
             .qz-pill { flex: 1 1 calc(25% - 6px); }
             header { padding: 12px 22px; }
@@ -851,7 +864,7 @@
             #canvasFormula { height: clamp(280px, calc(100vh - 235px), 720px); margin-bottom: 0; }
             #canvasUraian { height: clamp(280px, calc(100vh - 235px), 720px); margin-bottom: 0; }
             #canvasMateri { height: clamp(280px, calc(100vh - 235px), 720px); margin-bottom: 0; }
-            #canvasSejajar { height: clamp(280px, calc(100vh - 235px), 720px); margin-bottom: 0; }
+            #canvasSejajar { height: clamp(224px, calc((100vh - 235px) * 0.8), 576px); margin-bottom: 0; }
             #tabJumlah #vsSection.va-section.vf-section { grid-template-rows: auto repeat(5, auto) 1fr; }
             #tabJumlah #vsSection.va-section.vf-section > canvas { grid-row: 2 / span 6; }
             #tabMateri .va-section { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(0, 1.75fr); column-gap: 24px; align-content: start; grid-template-rows: auto repeat(4, auto) 1fr; }
@@ -865,16 +878,9 @@
         /* HP landscape (layar pendek): kanvas mengikuti tinggi layar yang tersisa */
         @media (orientation: landscape) and (max-height: 520px) {
             #canvas, #canvasAdd, #canvasTerapan, #canvasKuis, #canvasFormula,
-            #canvasUraian, #canvasMateri, #canvasSejajar { height: max(230px, calc(100vh - 120px)); }
+            #canvasUraian, #canvasMateri { height: max(230px, calc(100vh - 120px)); }
+            #canvasSejajar { height: max(184px, calc((100vh - 120px) * 0.8)); }
         }
-        /* ===== Petunjuk putar layar (HP, portrait) ===== */
-        #rotateHint { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 300; display: none; align-items: center; gap: 10px;
-            max-width: min(92vw, 420px); padding: 10px 12px 10px 14px; border-radius: 12px; background: rgba(40,40,60,.94); color: #fff;
-            font-size: 13px; font-weight: 600; line-height: 1.35; box-shadow: 0 6px 20px rgba(0,0,0,.35); }
-        #rotateHint.show { display: flex; }
-        #rotateHint .rh-ico { font-size: 22px; animation: rhTurn 2.4s ease-in-out infinite; }
-        #rotateHint button { background: rgba(255,255,255,.2); color: #fff; border: 0; border-radius: 8px; padding: 6px 10px; font-weight: 700; cursor: pointer; font-family: inherit; }
-        @keyframes rhTurn { 0%,25% { transform: rotate(0); } 60%,100% { transform: rotate(-90deg); } }
         /* ===== Perlindungan ringan & atribusi ===== */
         html, body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
         input, textarea { -webkit-user-select: text; user-select: text; }
@@ -899,7 +905,106 @@
         .aps-credit { position:absolute; bottom:14px; left:0; right:0; font-size:12px; opacity:.7; }
         @keyframes apsPop { from { transform: scale(.5); opacity:0; } to { transform: scale(1); opacity:1; } }
         @keyframes apsFade { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform:none; } }
+        /* ===== Mode kompak (HP/portrait): tiap menu & submenu muat 1 layar ===== */
+        @media (orientation: portrait), (max-width: 639px) {
+            header { padding: 8px 10px; }
+            .app-credit { padding: 3px 6px 5px; font-size: 10px; }
+            .tab-panel.active { display: flex; flex-direction: column; overflow-y: auto;
+                height: calc(100vh - var(--hh,62px) - 24px); height: calc(100dvh - var(--hh,62px) - 24px); }
+            .tab-panel.active > .va-wrap, .tab-panel.active > .container {
+                flex: 1 1 auto; min-height: 0; display: flex !important; flex-direction: column;
+                max-width: none; margin: 0; padding: 6px 8px; gap: 6px; }
+            #tabMateri .va-section, #tabKomponen .section, #tabTerapan .va-section,
+            #tabKuis .va-section, #tabJumlah .va-section, #tabUmpan .va-section {
+                display: flex !important; flex-direction: column; flex: 1 1 auto; min-height: 0;
+                padding: 8px 10px !important; margin: 0 !important; border-radius: 12px !important; }
+            #tabJumlah .va-section[style*="display: none"], #tabJumlah .va-section[style*="display:none"] { display: none !important; }
+            .va-section > *, .section > * { flex: none; }
+            .va-section h2, .section h2 { font-size: 13px; margin: 0 0 6px; padding-bottom: 5px; }
+            .va-hint { font-size: 11px; margin-bottom: 4px; }
+            #tabTerapan .va-hint { display: none; }
+            .instruction { margin: 0 0 6px; padding: 6px 8px; font-size: 11px; line-height: 1.35; }
+            .angle-input-row { margin-bottom: 6px; padding: 4px 8px; font-size: 12px; }
+            .angle-input-row input[type="number"] { padding: 3px 6px; font-size: 13px; }
+            .voice-toggle { padding: 3px 8px; font-size: 13px; }
+            .jm-switch { margin-bottom: 6px; gap: 5px; }
+            .jm-pill { padding: 6px 2px; font-size: 11px; }
+            .vf-inputs { padding: 6px; gap: 6px; margin-bottom: 6px; }
+            .vf-field { font-size: 11px; gap: 2px; }
+            .vf-field input { padding: 4px 6px; font-size: 14px; }
+            .vu-box { padding: 5px; margin-bottom: 6px; }
+            #vuList { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 8px; }
+            .vu-row { margin-bottom: 0; gap: 4px; }
+            .vu-name { flex: 0 0 18px; font-size: 12px; }
+            .vu-row label { font-size: 9px; }
+            .vu-row input { padding: 3px 4px; font-size: 12px; }
+            .vu-btn { padding: 4px; font-size: 11px; }
+            .va-chip-row { margin-bottom: 4px; }
+            .va-order-row { margin-bottom: 4px; min-height: 22px; }
+            .va-method-row { margin-bottom: 6px; }
+            .va-method-btn { padding: 5px 4px; font-size: 12px; }
+            .va-method-btn .va-sub { font-size: 9px; margin-top: 0; }
+            .qz-pills { flex-wrap: nowrap; gap: 4px; margin-bottom: 6px; }
+            .qz-pills .qz-pill { flex: 1 1 0 !important; min-width: 0; padding: 6px 2px; font-size: 10.5px;
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            #vsCases { margin-bottom: 6px; }
+            .qz-desc { font-size: 11.5px; padding: 6px 8px; margin-bottom: 6px; min-height: 76px; }
+            .qz-feedback { height: 80px; overflow-y: auto; padding: 6px 8px; font-size: 12px; margin: 6px 0 4px; gap: 8px; }
+            .qz-ico { font-size: 18px; }
+            .qz-score { margin-bottom: 4px; }
+            .tp-card { height: clamp(120px, 24dvh, 220px); overflow-y: auto; padding: 7px 9px; margin: 6px 0 2px; }
+            .tp-badge { font-size: 10px; }
+            .tp-title { font-size: 14px; margin: 1px 0 3px; }
+            .tp-body { font-size: 12.5px; line-height: 1.45; }
+            .vf-formula { font-size: 11.5px; line-height: 1.4; padding: 5px 7px; margin-top: 5px; }
+            .tp-dots { margin: 5px 0; }
+            .va-btn { padding: 8px; }
+            .va-btn-voice { padding: 8px 0; }
+            #tpPrev, #vfPrev, #vuPrev, #vsPrev, #mtPrev { flex: 0 0 84px; }
+            /* kanvas mengisi sisa tinggi layar */
+            #canvas, #canvasAdd, #canvasTerapan, #canvasKuis, #canvasFormula, #canvasUraian, #canvasMateri, #canvasSejajar {
+                height: auto !important; flex: 1 1 0 !important; min-height: 120px !important; margin-bottom: 0 !important; }
+            .canvas-wrapper, .va-canvas-wrapper { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+            .va-overlay-controls { position: static !important; margin-top: 6px; padding: 0 !important;
+                background: none !important; box-shadow: none !important; }
+            .va-step-note { margin-bottom: 4px; }
+            #datetime { font-size: 10px; padding: 3px 6px; }
+        }
 
+
+        /* ===== Polling umpan balik ===== */
+        .poll-view { display: flex; flex-direction: column; gap: 6px; }
+        .poll-view[hidden] { display: none !important; }
+        #tabUmpan .poll-view { flex: 1 1 auto; min-height: 0; }
+        .poll-rows { display: flex; flex-direction: column; gap: 6px; overflow-y: auto; min-height: 0; flex: 1 1 auto; }
+        .poll-row { display: flex; align-items: center; gap: 6px; }
+        .poll-name { flex: 1 1 auto; min-width: 0; font-size: 13px; font-weight: 700; }
+        .poll-opt { flex: 0 0 auto; background: #fff; color: #555; border: 2px solid #ddd; border-radius: 9px; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .poll-opt:hover { transform: none; background: #f3f3f3; border-color: #ccc; }
+        .poll-opt.yes.sel, .poll-opt.yes.sel:hover { background: #2e7d32; border-color: #2e7d32; color: #fff; }
+        .poll-opt.no.sel, .poll-opt.no.sel:hover { background: #ef6c00; border-color: #ef6c00; color: #fff; }
+        body.dark-mode .poll-opt { background: #2d2d2d; border-color: #444; color: #ddd; }
+        body.dark-mode .poll-opt.yes.sel { background: #2e7d32; border-color: #2e7d32; color: #fff; }
+        body.dark-mode .poll-opt.no.sel { background: #ef6c00; border-color: #ef6c00; color: #fff; }
+        #pollSaran { width: 100%; height: 68px; flex: none; resize: none; border: 2px solid #ddd; border-radius: 8px; padding: 7px 9px; font-family: inherit; font-size: 13px; line-height: 1.4; background: #fff; color: #333; }
+        #pollSaran:focus { outline: none; border-color: #667eea; }
+        body.dark-mode #pollSaran { background: #1a1a1a; border-color: #444; color: #e0e0e0; }
+        .poll-status { font-size: 12px; min-height: 16px; text-align: center; font-weight: 600; color: #667eea; flex: none; }
+        .poll-status.err { color: #c62828; }
+        body.dark-mode .poll-status { color: #a0aec0; }
+        .poll-n { font-size: 12px; opacity: .8; flex: none; }
+        .poll-bar { display: grid; grid-template-columns: 112px 1fr 78px; gap: 6px; align-items: center; margin-bottom: 7px; }
+        .poll-bar-name { font-size: 12px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .poll-track { height: 14px; border-radius: 7px; background: #e8eaf6; overflow: hidden; }
+        body.dark-mode .poll-track { background: #3a3a3a; }
+        .poll-fill { height: 100%; border-radius: 7px; transition: width .6s ease; }
+        .poll-pct { font-size: 12px; font-weight: 800; text-align: right; }
+        .poll-saran-title { font-size: 13px; font-weight: 800; color: #667eea; margin-top: 4px; flex: none; }
+        body.dark-mode .poll-saran-title { color: #a0aec0; }
+        #pollSaranList { flex: 1 1 auto; min-height: 60px; overflow-y: auto; }
+        .poll-saran { font-size: 12px; line-height: 1.4; background: #f4f6ff; border-left: 3px solid #667eea; border-radius: 0 6px 6px 0; padding: 5px 8px; margin-bottom: 4px; word-break: break-word; }
+        body.dark-mode .poll-saran { background: #232323; }
+        .poll-empty { font-size: 12px; opacity: .65; }
     </style>
 </head>
 <body>
@@ -927,13 +1032,14 @@
         </div>
         <div class="header-center">
             <div class="menu-dd" id="menuDd">
-                <button type="button" class="menu-toggle" id="menuToggle" aria-haspopup="true" aria-expanded="false">Materi <span class="menu-caret">▼</span></button>
+                <button type="button" class="menu-toggle" id="menuToggle" aria-haspopup="true" aria-expanded="false">Pengertian Vektor <span class="menu-caret">▼</span></button>
                 <div class="menu-list" id="menuList">
-                    <div class="menu-item active" id="tabBtnMateri" data-tab="tabMateri"><span class="tab-ico">📖</span> Materi</div>
+                    <div class="menu-item active" id="tabBtnMateri" data-tab="tabMateri"><span class="tab-ico">📖</span> Pengertian Vektor</div>
                     <div class="menu-item" id="tabBtnJumlah" data-tab="tabJumlah"><span class="tab-ico">➕</span> Jumlah</div>
                     <div class="menu-item" id="tabBtnKomponen" data-tab="tabKomponen"><span class="tab-ico">📐</span> Komponen</div>
                     <div class="menu-item" id="tabBtnTerapan" data-tab="tabTerapan"><span class="tab-ico">🧩</span> Penerapan</div>
                     <div class="menu-item" id="tabBtnKuis" data-tab="tabKuis"><span class="tab-ico">🎯</span> Kuis</div>
+                    <div class="menu-item" id="tabBtnUmpan" data-tab="tabUmpan"><span class="tab-ico">💬</span> Umpan Balik</div>
                 </div>
             </div>
         </div>
@@ -944,12 +1050,6 @@
             </div>
         </div>
     </header>
-    <div id="rotateHint" role="status">
-        <span class="rh-ico">📱</span>
-        <span>Putar layar ke mendatar agar kanvas dan pengaturan tampil berdampingan.</span>
-        <button type="button" id="rotateHintClose">Tutup</button>
-    </div>
-
     <div class="angle-modal-backdrop" id="angleModal">
         <div class="angle-modal" role="dialog" aria-modal="true">
             <h3 id="angleModalTitle"></h3>
@@ -962,7 +1062,7 @@
     <div class="tab-panel active" id="tabMateri">
     <div class="va-wrap">
         <div class="va-section">
-            <h2>Materi: Pengertian Vektor</h2>
+            <h2>Pengertian Vektor</h2>
             <div class="qz-pills" id="mtPills"></div>
             <canvas id="canvasMateri"></canvas>
             <div class="tp-card">
@@ -1165,6 +1265,35 @@
                 <button class="va-btn va-btn-ghost" id="qzReset" title="Ulangi soal ini">↺ Ulangi</button>
                 <button class="va-btn va-btn-primary" id="qzNext" disabled>Soal berikutnya ›</button>
                 <button class="va-btn va-btn-ghost va-btn-voice on" id="qzSound" title="Suara benar/salah">🔊</button>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- ===== TAB 5: UMPAN BALIK (POLLING) ===== -->
+    <div class="tab-panel" id="tabUmpan">
+    <div class="va-wrap">
+        <div class="va-section">
+            <h2>Umpan Balik: Apakah Materinya Bisa Dipahami?</h2>
+            <div class="poll-view" id="pollForm">
+                <div class="va-hint">Pilih satu jawaban untuk tiap menu yang sudah kamu coba, lalu tulis saran (boleh dikosongkan).</div>
+                <div class="poll-rows" id="pollRows"></div>
+                <textarea id="pollSaran" maxlength="500" placeholder="Saran untuk simulasi atau cara belajarnya (opsional)"></textarea>
+                <div class="poll-status" id="pollStatus"></div>
+                <div class="va-actions">
+                    <button type="button" class="va-btn va-btn-ghost" id="pollLihat" style="flex:0 0 112px">📊 Lihat hasil</button>
+                    <button type="button" class="va-btn va-btn-primary" id="pollKirim">Kirim jawaban</button>
+                </div>
+            </div>
+            <div class="poll-view" id="pollResult" hidden>
+                <div class="poll-n" id="pollN"></div>
+                <div id="pollBars"></div>
+                <div class="poll-saran-title">💡 Saran pengguna</div>
+                <div id="pollSaranList"></div>
+                <div class="va-actions">
+                    <button type="button" class="va-btn va-btn-ghost" id="pollKembali" style="flex:1">‹ Isi / ubah jawaban</button>
+                    <button type="button" class="va-btn va-btn-ghost" id="pollRefresh" style="flex:0 0 100px">↻ Muat ulang</button>
+                </div>
             </div>
         </div>
     </div>
@@ -2030,7 +2159,9 @@
         }
 
         function fitScale(w, h) {
-            const reserveBottom = PANEL_H + PANEL_MARGIN * 2 + PANEL_GAP + OVERLAY_RESERVE;
+            const ovEl = document.querySelector('.va-overlay-controls');
+            const overlayReserve = (ovEl && getComputedStyle(ovEl).position === 'absolute') ? OVERLAY_RESERVE : 0;
+            const reserveBottom = PANEL_H + PANEL_MARGIN * 2 + PANEL_GAP + overlayReserve;
             const drawableTop = TOP_LABEL_GAP;
             const drawableH = Math.max(80, h - reserveBottom - drawableTop);
             const pts = [{x:0,y:0}];
@@ -4199,9 +4330,9 @@
         const SUB = ['₁', '₂', '₃'];
         // sign: +1 = to the right (positive), -1 = to the left (negative)
         const CASES = [
-            { name: '1. Searah', signs: [1, 1, 1], mags: [3, 4, 5] },
-            { name: '2. Ada yang berlawanan', signs: [1, -1, 1], mags: [6, 4, 3] },
-            { name: '3. Resultan nol', signs: [1, -1], mags: [5, 5] }
+            { name: '1. SEARAH', signs: [1, 1, 1], mags: [3, 4, 5] },
+            { name: '2. BERLAWANAN', signs: [1, -1, 1], mags: [6, 4, 3] },
+            { name: '3. RESULTAN NOL', signs: [1, -1], mags: [5, 5] }
         ];
         let ci = 0, step = 0, animT = 1, animRaf = 0, isDark = false, W = 330, H = 300;
         const state = CASES.map(c => c.mags.slice());
@@ -4438,6 +4569,162 @@
     </script>
 
     <script>
+    window.PollApp = (function() {
+        // Isi dengan URL Web App Google Apps Script (lihat poll_umpan_balik.gs) agar hasil
+        // semua siswa terkumpul. Kosong = mode lokal (hasil hanya dari perangkat ini).
+        const ENDPOINT = '';
+        const MATERI = [
+            ['pengertian', 'Pengertian Vektor'], ['grafis', 'Jumlah · Grafis'], ['sejajar', 'Jumlah · Sejajar'],
+            ['rumus', 'Jumlah · Cos & sin'], ['uraian', 'Jumlah · Uraian x–y'], ['komponen', 'Komponen'],
+            ['terapan', 'Penerapan'], ['kuis', 'Kuis']
+        ];
+        const $ = id => document.getElementById(id);
+        const ls = {
+            get(k) { try { return localStorage.getItem(k); } catch (_) { return null; } },
+            set(k, v) { try { localStorage.setItem(k, v); } catch (_) {} }
+        };
+        function uid() {
+            let id = ls.get('vk_poll_id');
+            if (!id) {
+                id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
+                ls.set('vk_poll_id', id);
+            }
+            return id;
+        }
+        let votes = {};
+        try {
+            const me = JSON.parse(ls.get('vk_poll_me') || 'null');
+            if (me) { votes = me.votes || {}; $('pollSaran').value = me.saran || ''; }
+        } catch (_) {}
+
+        function status(msg, err) { const el = $('pollStatus'); el.textContent = msg || ''; el.classList.toggle('err', !!err); }
+
+        function renderRows() {
+            const box = $('pollRows'); box.innerHTML = '';
+            MATERI.forEach(([k, name]) => {
+                const row = document.createElement('div'); row.className = 'poll-row';
+                const nm = document.createElement('div'); nm.className = 'poll-name'; nm.textContent = name; row.appendChild(nm);
+                [[1, '👍 Paham', 'yes'], [0, '🤔 Belum', 'no']].forEach(([v, label, cls]) => {
+                    const b = document.createElement('button'); b.type = 'button';
+                    b.className = 'poll-opt ' + cls + (votes[k] === v ? ' sel' : ''); b.textContent = label;
+                    b.setAttribute('aria-pressed', votes[k] === v);
+                    b.addEventListener('click', () => { if (votes[k] === v) delete votes[k]; else votes[k] = v; renderRows(); });
+                    row.appendChild(b);
+                });
+                box.appendChild(row);
+            });
+        }
+
+        // ----- penyimpanan lokal (satu entri per perangkat) -----
+        function saveLocal(resp) {
+            let all = {}; try { all = JSON.parse(ls.get('vk_poll_local') || '{}') || {}; } catch (_) {}
+            all[resp.id] = resp; ls.set('vk_poll_local', JSON.stringify(all));
+        }
+        function localAgg() {
+            let all = {}; try { all = JSON.parse(ls.get('vk_poll_local') || '{}') || {}; } catch (_) {}
+            const list = Object.values(all), per = {}, saran = [];
+            MATERI.forEach(([k]) => per[k] = { yes: 0, total: 0 });
+            list.forEach(r => {
+                MATERI.forEach(([k]) => { const v = r.votes && r.votes[k]; if (v === 1 || v === 0) { per[k].total++; if (v === 1) per[k].yes++; } });
+                if (r.saran) saran.push({ t: r.t, text: r.saran });
+            });
+            saran.sort((a, b) => b.t - a.t);
+            return { ok: true, n: list.length, per, saran: saran.slice(0, 30), local: true };
+        }
+
+        // ----- server (Google Apps Script) -----
+        async function post(resp) {
+            const opt = { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(resp) };
+            try { const r = await fetch(ENDPOINT, opt); const d = await r.json(); return d && d.ok ? 'ok' : 'fail'; } catch (_) {}
+            try { await fetch(ENDPOINT, Object.assign({ mode: 'no-cors' }, opt)); return 'opaque'; } catch (_) {}
+            return 'fail';
+        }
+        async function loadResults() {
+            if (ENDPOINT) {
+                try {
+                    const r = await fetch(ENDPOINT + (ENDPOINT.indexOf('?') > -1 ? '&' : '?') + 't=' + Date.now());
+                    const d = await r.json();
+                    if (d && d.ok) return d;
+                } catch (_) {}
+            }
+            const d = localAgg(); d.fallback = !!ENDPOINT; return d;
+        }
+
+        function renderResult(d) {
+            const note = !ENDPOINT ? ' (mode lokal: hanya dari perangkat ini)' : (d.fallback ? ' (server tidak terjangkau, menampilkan data perangkat ini)' : '');
+            $('pollN').textContent = 'Jumlah responden: ' + (d.n || 0) + note;
+            const bars = $('pollBars'); bars.innerHTML = '';
+            MATERI.forEach(([k, name]) => {
+                const c = (d.per && d.per[k]) || { yes: 0, total: 0 };
+                const pct = c.total ? Math.round(c.yes / c.total * 100) : 0;
+                const color = !c.total ? '#bdbdbd' : (pct >= 75 ? '#2e7d32' : (pct >= 50 ? '#f9a825' : '#e53935'));
+                const row = document.createElement('div'); row.className = 'poll-bar';
+                const nm = document.createElement('div'); nm.className = 'poll-bar-name'; nm.textContent = name; nm.title = name;
+                const tr = document.createElement('div'); tr.className = 'poll-track';
+                const fl = document.createElement('div'); fl.className = 'poll-fill'; fl.style.background = color; fl.style.width = '0%';
+                tr.appendChild(fl);
+                const pc = document.createElement('div'); pc.className = 'poll-pct';
+                pc.textContent = c.total ? (pct + '% · ' + c.yes + '/' + c.total) : '–';
+                row.appendChild(nm); row.appendChild(tr); row.appendChild(pc); bars.appendChild(row);
+                requestAnimationFrame(() => requestAnimationFrame(() => { fl.style.width = pct + '%'; }));
+            });
+            const list = $('pollSaranList'); list.innerHTML = '';
+            const items = (d.saran || []).filter(x => x && x.text);
+            if (!items.length) { const e = document.createElement('div'); e.className = 'poll-empty'; e.textContent = 'Belum ada saran.'; list.appendChild(e); }
+            items.forEach(x => { const el = document.createElement('div'); el.className = 'poll-saran'; el.textContent = x.text; list.appendChild(el); });
+        }
+        async function showResult() {
+            $('pollForm').hidden = true; $('pollResult').hidden = false;
+            $('pollN').textContent = 'Memuat hasil…';
+            renderResult(await loadResults());
+        }
+        function showForm() { $('pollResult').hidden = true; $('pollForm').hidden = false; }
+
+        async function kirim() {
+            if (!Object.keys(votes).length) { status('Pilih Paham / Belum untuk minimal satu menu dulu.', true); return; }
+            const resp = { id: uid(), t: Date.now(), votes: Object.assign({}, votes), saran: $('pollSaran').value.trim().slice(0, 500) };
+            ls.set('vk_poll_me', JSON.stringify(resp)); saveLocal(resp);
+            const btn = $('pollKirim'); btn.disabled = true; status('Mengirim…');
+            let res = 'local';
+            if (ENDPOINT) res = await post(resp);
+            btn.disabled = false;
+            status(res === 'fail' ? 'Tidak bisa terhubung ke server. Jawaban disimpan di perangkat ini.' : 'Terima kasih, jawabanmu sudah tercatat ✓', res === 'fail');
+            showResult();
+        }
+
+        $('pollKirim').addEventListener('click', kirim);
+        $('pollLihat').addEventListener('click', showResult);
+        $('pollKembali').addEventListener('click', () => { status(''); showForm(); });
+        $('pollRefresh').addEventListener('click', showResult);
+        renderRows();
+
+        return { onShow: function() {} };
+    })();
+    </script>
+
+    <script>
+        // ===== Tinggi header -> variabel CSS, dan sinkronkan kanvas saat ukurannya berubah =====
+        (function() {
+            const hdr = document.querySelector('header');
+            const setHH = () => document.documentElement.style.setProperty('--hh', hdr.offsetHeight + 'px');
+            setHH(); window.addEventListener('resize', setHH); window.addEventListener('load', setHH);
+            if (!('ResizeObserver' in window)) return;
+            const map = { canvas: 'ComponentVectorApp', canvasAdd: 'AdditionVectorApp', canvasTerapan: 'ApplicationVectorApp',
+                canvasKuis: 'QuizVectorApp', canvasFormula: 'FormulaVectorApp', canvasUraian: 'UraianVectorApp',
+                canvasMateri: 'MateriVectorApp', canvasSejajar: 'SejajarVectorApp' };
+            const last = {};
+            const ro = new ResizeObserver(entries => {
+                entries.forEach(en => {
+                    const id = en.target.id, r = en.contentRect, prev = last[id];
+                    last[id] = { w: r.width, h: r.height };
+                    if (r.width < 1 || r.height < 1) return;
+                    if (prev && Math.abs(prev.w - r.width) < 1 && Math.abs(prev.h - r.height) < 1) return;
+                    requestAnimationFrame(() => { const app = window[map[id]]; if (app && app.onShow) app.onShow(); });
+                });
+            });
+            Object.keys(map).forEach(id => { const el = document.getElementById(id); if (el) ro.observe(el); });
+        })();
+
         // ===== Shared: tab switching + dark mode =====
         const sharedDarkModeBtn = document.getElementById('darkModeBtn');
         let sharedIsDarkMode = false;
@@ -4493,6 +4780,9 @@
                 } else if (targetId === 'tabTerapan') {
                     title.textContent = '🧩 Penerapan Vektor';
                     window.ApplicationVectorApp.onShow();
+                } else if (targetId === 'tabUmpan') {
+                    title.textContent = '💬 Umpan Balik';
+                    window.PollApp.onShow();
                 } else {
                     title.textContent = '🎯 Kuis Gaya';
                     window.QuizVectorApp.onShow();
@@ -4538,22 +4828,6 @@
         window.addEventListener('resize', () => {
             if (document.fullscreenElement) applyFullscreenCanvasSizing();
         });
-
-        // ===== Petunjuk putar layar: HP + portrait, hanya di Jumlah / Komponen / Kuis =====
-        let rotateHintDismissed = false;
-        function updateRotateHint() {
-            const el = document.getElementById('rotateHint');
-            const panel = document.querySelector('.tab-panel.active');
-            const wantsLandscape = panel && ['tabJumlah', 'tabKomponen', 'tabKuis'].includes(panel.id);
-            const portraitPhone = window.matchMedia('(orientation: portrait)').matches && Math.min(window.innerWidth, window.innerHeight) < 600;
-            const apsOpen = document.getElementById('aps') && !document.getElementById('aps').classList.contains('hide');
-            el.classList.toggle('show', !!(wantsLandscape && portraitPhone && !rotateHintDismissed && !apsOpen));
-        }
-        document.getElementById('rotateHintClose').addEventListener('click', () => { rotateHintDismissed = true; updateRotateHint(); });
-        window.addEventListener('resize', updateRotateHint);
-        window.addEventListener('orientationchange', updateRotateHint);
-        document.querySelectorAll('.menu-item').forEach(b => b.addEventListener('click', () => setTimeout(updateRotateHint, 0)));
-        setInterval(updateRotateHint, 1500); // juga menangkap penutupan apersepsi
 
         // ===== Sub-tabs inside "Jumlah": Grafis / Aturan cos & sin / Uraian x-y =====
         document.querySelectorAll('#jmSwitch .jm-pill').forEach(pill => {
