@@ -62,6 +62,26 @@
             .menu-toggle { padding: 6px 10px; font-size: 12px; }
         }
 
+
+        /* ===== Tabel sudut istimewa ===== */
+        .sp-table-wrap { margin-top: 12px; overflow-x: auto; align-self: start; }
+        .sp-title { font-size: 14px; font-weight: 800; color: #667eea; margin: 0 0 6px; }
+        table.sp-table { width: 100%; border-collapse: collapse; font-size: 14px; background: #fff; border: 2px solid #667eea; border-radius: 8px; overflow: hidden; }
+        .sp-table th { background: #667eea; color: #fff; padding: 7px 8px; text-align: center; font-weight: 800; }
+        .sp-table td { padding: 6px 8px; text-align: center; border-top: 1px solid #e2e6f5; color: #333; white-space: nowrap; }
+        .sp-table td:first-child { font-weight: 800; color: #4a3f9a; }
+        .sp-table tr.sp-active td { background: #fff3c4; color: #b23c00; font-weight: 800; }
+        .sp-table .fr { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.1; font-size: .85em; margin: 0 2px; }
+        .sp-table .fr > span:first-child { border-bottom: 1.5px solid currentColor; padding: 0 2px 1px; }
+        .sp-table .fr > span:last-child { padding: 1px 2px 0; }
+        .sp-table .alt { font-size: .85em; opacity: .85; }
+        body.dark-mode .sp-title { color: #a0aec0; }
+        body.dark-mode table.sp-table { background: #232323; border-color: #a0aec0; }
+        body.dark-mode .sp-table th { background: #4a5568; }
+        body.dark-mode .sp-table td { color: #ddd; border-top-color: #3a3a3a; }
+        body.dark-mode .sp-table td:first-child { color: #cbd5e0; }
+        body.dark-mode .sp-table tr.sp-active td { background: #4a3a10; color: #ffcc66; }
+
         .angle-input-row {
             display: flex;
             align-items: center;
@@ -1102,6 +1122,21 @@
                 <canvas id="canvas"></canvas>
                 <div id="datetime"></div>
             </div>
+            <div class="sp-table-wrap">
+                <div class="sp-title">📋 Tabel Sudut Istimewa</div>
+                <table class="sp-table" id="spTable">
+                    <thead><tr><th>Sudut (θ)</th><th>sin θ</th><th>cos θ</th><th>tan θ</th></tr></thead>
+                    <tbody>
+                        <tr data-deg="0"><td>0°</td><td>0</td><td>1</td><td>0</td></tr>
+                        <tr data-deg="30"><td>30°</td><td><span class="fr"><span>1</span><span>2</span></span></td><td><span class="fr"><span>1</span><span>2</span></span>√3</td><td><span class="fr"><span>1</span><span>3</span></span>√3</td></tr>
+                        <tr data-deg="37"><td>37°</td><td>0,6 <span class="alt">(<span class="fr"><span>3</span><span>5</span></span>)</span></td><td>0,8 <span class="alt">(<span class="fr"><span>4</span><span>5</span></span>)</span></td><td>0,75 <span class="alt">(<span class="fr"><span>3</span><span>4</span></span>)</span></td></tr>
+                        <tr data-deg="45"><td>45°</td><td><span class="fr"><span>1</span><span>2</span></span>√2</td><td><span class="fr"><span>1</span><span>2</span></span>√2</td><td>1</td></tr>
+                        <tr data-deg="53"><td>53°</td><td>0,8 <span class="alt">(<span class="fr"><span>4</span><span>5</span></span>)</span></td><td>0,6 <span class="alt">(<span class="fr"><span>3</span><span>5</span></span>)</span></td><td>1,33 <span class="alt">(<span class="fr"><span>4</span><span>3</span></span>)</span></td></tr>
+                        <tr data-deg="60"><td>60°</td><td><span class="fr"><span>1</span><span>2</span></span>√3</td><td><span class="fr"><span>1</span><span>2</span></span></td><td>√3</td></tr>
+                        <tr data-deg="90"><td>90°</td><td>1</td><td>0</td><td>∞ <span class="alt">(Tak terdefinisi)</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
 
@@ -1417,7 +1452,13 @@
         const angleInput = document.getElementById('angleInput');
 
         // Keep the angle input in sync when the vector is dragged
+        function updateAngleTable() {
+            document.querySelectorAll('#spTable tbody tr').forEach(tr => {
+                tr.classList.toggle('sp-active', Math.abs(angle - parseFloat(tr.dataset.deg)) < 0.05);
+            });
+        }
         function updateDisplay() {
+            updateAngleTable();
             if (angleInput && document.activeElement !== angleInput) {
                 angleInput.value = (Math.round(angle * 10) / 10).toString();
             }
@@ -1501,12 +1542,14 @@
             clearTimeout(angleModalTimer);
             if (isNaN(v)) return;
             angle = ((v % 360) + 360) % 360;
+            updateAngleTable();
             draw();
             // debounce so typing "0,5" or "9" -> "90" doesn't trigger prematurely
             angleModalTimer = setTimeout(maybeShowAnglePopup, 700);
         });
         angleInput.addEventListener('change', maybeShowAnglePopup);
         angleInput.addEventListener('blur', updateDisplay);
+        updateAngleTable();
 
         // Draw function
         function draw() {
